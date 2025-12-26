@@ -46,18 +46,7 @@
     "Updated": "Updated",
     "Close": "Close",
     "Remove": "Remove",
-    "GotIt": "Got it",
-    "Send": "Send",
-    "Reset": "Reset",
-    "ViewJSON": "View JSON Details",
-    "RefreshCredentials": "Refresh Credentials",
-    "AppName": "Aries Bifold"
-  },
-  "Toast": {
-    "OpenIDCredRefreshing": {
-      "Title": "Refreshing credentials",
-      "Message": "Your OpenID credentials are being refreshed in the background."
-    }
+    "ConnectToDigiCred": "Connect to DigiCred"
   },
   "Date": {
     "ShortFormat": "MMM D",
@@ -98,12 +87,10 @@
     "code_en": "English",
     "code_fr": "French",
     "code_pt-BR": "Portuguese",
-    "Checked": "checked",
-    "NotChecked": "not checked"
+    "code_sp": "Spanish"
   },
   "Error": {
     "ReportThisProblem": "Report this problem",
-    "Reported": "Reported",
     "Unknown": "Unknown Error",
     "Problem": "A problem has occurred",
     "ErrorCode": "Error code",
@@ -117,7 +104,7 @@
     "Message1027": "There was a problem while accepting the proof request.",
     "Title1028": "Unable to reject proof request",
     "Message1028": "There was a problem while rejecting the proof request",
-    "Title1029": "Details unable to update retrieved credentials.",
+    "Title1029": "Details Unable to update retrieved credentials.",
     "Message1029": "There was a problem while updating retrieved credentials.",
     "Title1030": "Unable to accept connection.",
     "Message1030": "There was a problem while accepting the connection redirection.",
@@ -152,17 +139,7 @@
     "Title1045": "Unable to initialize agent.",
     "Message1045": "There was a problem while initializing agent.",
     "Title1046": "Unable to fetch contacts.",
-    "Message1046": "There was a problem while fetching contacts.",
-    "Title1047": "Unable to display card.",
-    "Message1047": "There was a problem parsing credential card.",
-    "Title1048": "Proof request problems.",
-    "Message1048": "There was a problem with the proof request.",
-    "Title1049": "Unable to change PIN.",
-    "Message1049": "There was a problem while attempting to change your PIN.",
-    "GenericError": {
-      "Title": "Something went wrong",
-      "Message": "There was an unexpected error, please try again later."
-    }
+    "Message1046": "There was a problem while fetching contacts."
   },
   "SelectionAxs": {
     "RadioChecked": "checked",
@@ -183,8 +160,8 @@
     "Attestation": "I have read, understand and accept the terms and conditions."
   },
   "Tour": {
-    "GuideTitle": "Welcome to Aries Bifold",
-    "WouldYouLike": "Would you like some guidance on how to use Aries Bifold?",
+    "GuideTitle": "Welcome to the DigiCred Wallet",
+    "WouldYouLike": "Would you like some guidance on how to use the DigiCred Wallet?",
     "UseAppGuides": "Use app guides",
     "DoNotUseAppGuides": "Don't use app guides",
     "AddAndShare": "Add and share credentials",
@@ -202,127 +179,80 @@
     "Skip": "Skip",
     "Next": "Next",
     "Back": "Back",
-    "Done": "Done",
-    "AccessibilitySteps": "Step {{ stepOn }} of {{ stepsOutOf }} - {{ title }}"
+    "Done": "Done"
   },
   "CameraDisclosure": {
     "AllowCameraUse": "Allow camera use",
     "CameraDisclosure": "The camera is used to scan QR codes that initiate a credential offer or credential request. No information about the images is stored, used for analytics, or shared.",
-    "ToContinueUsing": "To continue using the Aries Bifold scan feature, please allow camera permissions.",
+    "ToContinueUsing": "To continue using the DigiCred Wallet scan feature, please allow camera permissions.",
+    "SettingsApp": "You can change this option later in the Settings app.",
     "OpenSettings": "Open settings"
   },
   "PINCreate": {
-    "Header": "Aries Bifold",
-    "Subheader": "Secure your Aries wallet",
-    "Explainer": {
-      "PrimaryHeading": "Secure your Wallet",
-      "PINReminder": "On the following screen you will be asked to set up a strong <b>personal identification number</b> (PIN).",
-      "WhyNeedPin": {
-        "Header": "Why you need a PIN",
-        "Paragraph": "Your PIN is an important security feature:",
-        "ParagraphList1": "You can use your PIN instead of biometrics to open your wallet",
-        "ParagraphList2": "Or use your biometrics to open your wallet, and if your biometrics change change on your device you will need to use the PIN to authenticate your wallet"
-      }
-    },
-    "InfoBox": {
-      "title": "Remember your PIN",
-      "message": "Make sure you remember your PIN\nIf you forget it you will need to setup the wallet again and re-add your cards."
-    },
     "Message": {
       "CrossPatternValidation": "A pattern of cross was detected in your PIN. Please try again.",
       "OddOrEvenSequenceValidation": "An odd or even sequence was detected in your PIN. Please try again.",
       "NoRepetitionOfTheSameNumbersValidation": "The PIN can't have a repetition of the same digit. Please try again.",
-      "MaxAdjacentNumberRepetitionValidation": "Adjacent numbers repeating times are more than allowed. Please try again.",
       "NoRepetitionOfTheTwoSameNumbersValidation": "A repeated two-digit sequence was detected in your PIN. Please try again.",
       "NoSeriesOfNumbersValidation": "A series was detected in your PIN. Please try again.",
       "PINOnlyContainDigitsValidation": "Your PIN needs to only contain digits. Please try again.",
       "PINTooShortValidation": "Your PIN is too short. Please try again.",
       "PINTooLongValidation": "Your PIN is too long. Please try again.",
-      "PINExpectedLengthValidation": "Your PIN must be {{num}} digits. Please try again.",
-      "OldPINIncorrect": "Your old pin is incorrect. Please try again.",
-      "PINCommonlyUsed": "Your PIN uses a commonly used pattern. Please try again."
+      "OldPINIncorrect": "Your old pin is incorrect. Please try again."
     },
     "Helper": {
       "CrossPatternValidation": "Does not contain a pattern of cross.",
       "OddOrEvenSequenceValidation": "Does not contain an odd or even sequence.",
       "NoRepetitionOfTheSameNumbersValidation": "Does not contain the same repeating number.",
-      "MaxAdjacentNumberRepetitionValidation": "Adjacent numbers repeating times are limited.",
       "NoRepetitionOfTheTwoSameNumbersValidation": "Does not contain repeating two-digit sequence.",
       "NoSeriesOfNumbersValidation": "Does not contain a series of numbers (123).",
       "PINOnlyContainDigitsValidation": "Must contain only digits.",
-      "PINTooShortValidation": "Your PIN must be more than {{num}} digits.",
-      "PINTooLongValidation": "Your PIN must be less than {{num}} digits.",
-      "PINExpectedLengthValidation": "Your PIN must be {{num}} digits.",
-      "PINCommonlyUsed": "Your PIN uses a commonly used pattern. Please try again.",
-      "CheckIcon": "Criteria met",
-      "ClearIcon": "Criteria not met"
+      "PINTooShortValidation": "The PIN should contain 6 digits.",
+      "PINTooLongValidation": "The PIN should contain 6 digits."
     },
+    "UserAuthenticationPIN": "User authentication PIN",
     "PINTooShort": "PIN is too short",
     "InvalidPIN": "Invalid PIN",
     "PINsDoNotMatch": "PINs do not match",
-    "EnterPINTitle": "Enter a 6 digit PIN",
-    "EnterPIN": "Enter PIN",
-    "ReenterPIN": "Re-enter PIN",
-    "CreatePIN": "Create PIN",
-    "RememberPIN": "Create a PIN to secure your wallet.",
-    "PINDisclaimer": "If you forget it, you may need to set up your wallet again and re-add your cards.",
-    "Show": "Show PIN",
-    "Hide": "Hide PIN",
-    "Masked": "PIN Masked for privacy"
-  },
-  "PINCreateConfirm": {
-    "PINInputLabel": "Re-enter your PIN to confirm it"
-  },
-  "PINChange": {
+    "PleaseUseOnlyNumbersInYourPIN": "Please use only numbers in your PIN",
+    "YourPINMustBe6DigitsInLength": "Your PIN needs to be 6 digits long.",
+    "EnteredPINsDoNotMatch": "The entered PINs do not match. Please try again.",
+    "YouNeedToCreateA6DigitPIN": "You need to create a 6 digit PIN",
+    "PleaseReenterYourPIN": "Please re-enter your PIN",
     "PinChangeSuccessTitle": "Successfully changed your PIN",
     "PinChangeSuccessMessage": "Your PIN was successsfully changed. You can now log in with your new PIN.",
     "EnterOldPINTitle": "Enter your old PIN",
-    "EnterOldPIN": "Enter your old PIN",
-    "EnterPINTitle": "Enter a new 6 digit PIN",
-    "ReenterPIN": "Re-enter new PIN",
+    "NewPIN": "new",
+    "EnterPINTitle": "Enter a {{ new }}6 digit PIN",
+    "EnterPIN": "Enter PIN",
+    "ReenterPIN": "Re-enter {{ new }}PIN",
+    "ReenterPINTitle": "Re-Enter PIN",
+    "CreatePIN": "Create PIN",
+    "RememberPIN": "Create a PIN to secure your wallet.",
     "RememberChangePIN": "Change your PIN to secure your wallet.",
-    "ChangePIN": "Change PIN"
-  },
-  "PINChangeSuccess": {
-    "InfoBox": {
-      "Title": "Your PIN has been changed",
-      "Description": "You can now log-in with your new PIN"
-    },
-    "PrimaryButton": "Go back to settings"
+    "PINDisclaimer": "If you forget it, you may need to set up your wallet again and re-add your cards.",
+    "Show": "Show PIN",
+    "Hide": "Hide PIN",
+    "ChangePIN": "Change PIN",
+    "Continue": "Continue",
+    "EnterYourCurrentPIN": "Enter your current PIN"
   },
   "PINEnter": {
-    "AppTitle": "Aries Bifold",
-    "Title": "Welcome back",
-    "SubText": "Sign-in to access your wallet.",
-    "EnterPIN": "Enter your wallet PIN to sign-in",
+    "EnterPIN": "Enter your wallet PIN",
     "Unlock": "Unlock",
     "Or": "Or",
     "BiometricsUnlock": "Unlock with biometrics",
     "IncorrectPIN": "Incorrect PIN",
     "RepeatPIN": "Please try your PIN again.",
-    "IncorrectPINTries": "Incorrect PIN: {{tries}} tries before your app is temporarily locked",
-    "LastTryBeforeTimeout": "Incorrect PIN: Last try before timeout",
     "EnableBiometrics": "You have to enable biometrics to be able to load the wallet.",
     "BiometricsNotProvided": "Biometrics not provided, you may use PIN to load the wallet.",
     "BiometricsError": "Biometrics were not successful.",
     "BiometricsErrorEnterPIN": "Please enter your wallet PIN.",
-    "LockedOut": "You were locked out after {{ time }} minute(s) of inactivity.",
+    "LockedOut": "You locked out after 5 minutes of inactivity.",
     "ReEnterPIN": "Re-enter your wallet PIN",
     "BiometricsChanged": "Biometrics unlock has been disabled because your device biometrics changed.",
     "BiometricsChangedEnterPIN": "Please enter your wallet PIN.",
-    "AttemptLockoutWarning": "Note: for your security, entering another incorrect PIN will temporarily lock the wallet.",
-    "AppSettingChanged": "The application setting has changed.",
-    "AppSettingChangedEnterPIN": "Please confirm your change by entering your wallet PIN.",
-    "AppSettingSave": "Save",
-    "AppSettingCancel": "Cancel",
-    "ChangeBiometricsHeader": "Change in biometrics",
-    "ChangeBiometricsSubtext": "Please enter your PIN to confirm a change in biometrics",
-    "ChangeBiometricsInputLabel": "Enter your wallet PIN",
-    "ChangeBiometricsInputLabelParenthesis": "(Required)",
-    "ForgotPINLink": "Forgot your PIN?",
-    "ForgotPINModalTitle": "Forgot your PIN?",
-    "ForgotPINModalDescription": "Forgot your PIN? You'll need to reinstall and setup your wallet again.",
-    "Loading": "Logging in"
+    "AttemptLockoutWarning": "Note: for your security, entering another incorrect PIN will temporarily lock the wallet."
   },
   "AttemptLockout": {
     "Title": "Your wallet is temporarily locked",
@@ -330,27 +260,18 @@
     "TryAgain": "You can try again in:",
     "Hours": "hours",
     "Minutes": "minutes",
-    "Seconds": "seconds",
-    "ForgotPIN": "Forgot your PIN?",
-    "ForgotPINDescription": "For security purposes, you're unable to recover or reset your PIN. You will need to reinstall your wallet and add your credentials again."
+    "Seconds": "seconds"
   },
   "Biometry": {
     "Toggle": "Toggle Biometrics",
-    "On": "Biomtrics On",
-    "Off": "Biometrics Off",
-    "EnabledText1": "Unlock the wallet with your phone's biometrics instead of your wallet PIN.",
+    "EnabledText1": "The DigiCred wallet defaults to using your biometrics (face recognition or fingerprint) to unlock the application. We use a PIN as a backup if your biometrics are not working. You can use this control to turn off biometric unlock.",
     "EnabledText2": "Using biometrics means that all fingerprints or face ID added on this phone will have access to your wallet.",
     "NotEnabledText1": "Biometrics is not currently setup on this device and therefore cannot be enabled.",
     "NotEnabledText2": "If you wish to enable this feature turn biometrics on in the device settings and then return to this screen.",
     "Warning": "Ensure only you have access to your wallet.",
-    "UseToUnlock": "Use biometrics to unlock wallet?",
+    "UseToUnlock": "Enable Biometrics",
     "UnlockPromptTitle": "Wallet Unlock",
-    "UnlockPromptDescription": "Use biometrics to unlock your wallet",
-    "AllowBiometricsTitle": "Enable biometrics",
-    "AllowBiometricsDesc": "To unlock BC Wallet with your biometrics, please allow biometrics use within your device's settings.",
-    "SetupBiometricsTitle": "Biometrics is not enabled",
-    "SetupBiometricsDesc": "To unlock BC Wallet with your biometrics, please set up your biometrics in your device's settings.",
-    "OpenSettings": "Open settings"
+    "UnlockPromptDescription": "Use biometrics to unlock your wallet"
   },
   "ActivityHistory": {
     "Header": "Activity history",
@@ -456,31 +377,25 @@
       "CardAccepted": "Card accepted:",
       "CardDeclined": "Card declined:",
       "CardExpired": "Card expired",
-      "CardRemoved": "Card removed",
       "CardRevoked": "Card revoked",
-      "CardUpdates": "Card updates",
-      "WalletPinUpdated": "Wallet PIN updated",
       "InformationSent": "Information sent to:",
-      "InformationNotSent": "Information not sent to:",
-      "Connection": "Connection",
-      "ConnectionRemoved": "Connection removed",
-      "ActivateBiometry": "Biometrics activated",
-      "DeactivateBiometry": "Biometrics deactivated"
+      "WalletPinUpdated": "Wallet PIN updated"
     },
     "CardDescription": {
       "CardExpired": "{{cardName}} expired",
       "CardRevoked": "{{cardName}} revoked",
       "WalletPinUpdated": "New PIN set"
     },
-    "Today": "Today"
+    "Today": "Today",
+    "UseHistoryCapability": "Enable history",
+    "UseHistoryCapabilityToggle": "Toggle Enable history"
   },
   "Contacts": {
     "EmptyList": "Your Contacts is empty!",
     "TypeHere": "Message this contact...",
     "PeopleAndOrganizations": "People and organizations you've interacted with are listed here.",
     "WhatAreContacts": "What are Contacts?",
-    "AddContact": "Add Contact",
-    "UnknownContact": "Unknown Contact"
+    "AddContact": "Add Contact"
   },
   "ContactDetails": {
     "Created": "Created",
@@ -494,17 +409,12 @@
     "GoToCredentials": "Go to Credentials",
     "RemoveContact": "Remove Contact",
     "ContactRemoved": "Contact removed",
-    "RemoveContactMessageWarning": "Removing this Contact will delete all existing messages and notifications from them.",
-    "RemoveContactMessageTop": "Without this contact, you'll no longer be able to:",
-    "RemoveContactMessageBottom": "They won't be notified that you removed them from your contacts.",
-    "RemoveContactsBulletPoint1": "Send or receive messages",
-    "RemoveContactsBulletPoint2": "Be notified of updates to your credentials",
-    "RemoveContactsBulletPoint3": "Get offered new credentials",
-    "RemoveContactsBulletPoint4": "Request proof of information",
-    "GoToCredentialDetail": "Go to credential details",
-    "CredentialName": "Credential name",
-    "Credentials": "My credentials from this contact",
-    "NoCredentials": "You don't have any credentials from this contact."
+    "RemoveContactMessageTop": "By removing this Contact you'll no longer be able to:",
+    "RemoveContactMessageBottom": "This Contact will not be notified that you removed them from your Contacts",
+    "RemoveContactsBulletPoint1": "Direct message this Contact",
+    "RemoveContactsBulletPoint2": "Get offered new credentials from this Contact",
+    "RemoveContactsBulletPoint3": "Get notified of updates to your credentials issued by this Contact",
+    "RemoveContactsBulletPoint4": "Request for information from this Contact or they request information from you"
   },
   "WhatAreContacts": {
     "Title": "What are Contacts?",
@@ -521,11 +431,10 @@
     "CredentialDetails": "Credential Details",
     "EmptyList": "Your wallet is empty. Your accepted credentials will be added here.",
     "IssuedBy": "Issued by",
-    "Issued": "Issued",
     "Credential": "credential"
   },
   "PushNotifications": {
-    "EnableNotifications": "Enable Notifications to get instant alerts",
+    "EnableNotifiactions": "Enable Notifications to get instant alerts",
     "BeNotified": "Be notified when you receive:",
     "ReceiveNotifications": "Receive notifications",
     "BulletFour": "new messages",
@@ -545,7 +454,6 @@
     "CreatedAt": "Created At:",
     "Version": "Version",
     "Issued": "Issued",
-    "IssuedOn": "Issued on",
     "PrivacyPolicy": "Privacy policy",
     "TermsAndConditions": "Terms and conditions",
     "RemoveFromWallet": "Remove from wallet",
@@ -563,14 +471,14 @@
     "HowToGetThisCredentialBackListItem1": "You will have to go to the organization that issued you this credential and request it again.",
     "CredentialRemoved": "Credential removed",
     "IssuedBy": "Issued by:",
-    "RemoveCredential": "Remove Credential",
-    "NavigateToIssuerDetailsHint": "Tap to navigate to issuer details"
+    "RemoveCredential": "Remove Credential"
   },
   "Home": {
+    "Welcome": "Welcome",
     "Notification": "Notification",
-    "Notifications": "Notifications",
+    "Notifications": "Home",
     "NoNewUpdates": "You have no new notifications.",
-    "NoCredentials": "Your wallet is empty",
+    "NoCredentials": "You have no credentials in your wallet.",
     "SeeAll": "See all",
     "YouHave": "You have",
     "Credential": "credential",
@@ -579,8 +487,7 @@
     "NewMessage": "New message",
     "SentMessage": "sent a message",
     "ReceivedMessage": "You received a new message",
-    "ViewMessage": "View message",
-    "ScanOfferAddCard": "Scan an offer to add a card to your wallet"
+    "ViewMessage": "View message"
   },
   "Scan": {
     "SuccessfullyAcceptedConnection": "Successfully Accepted Connection",
@@ -595,8 +502,6 @@
     "UnableToHandleRedirection": "Unable to handle redirection",
     "Close": "Close",
     "Torch": "Flash",
-    "TorchOn": "Flash On",
-    "TorchOff": "Flash Off",
     "ScanHelp": "Scan Help",
     "ScanNow": "Scan Now",
     "WhatToScan": "What QR Codes can be scanned?",
@@ -632,15 +537,6 @@
     "Toggle": "Toggle Connection Inviter Capability",
     "UseConnectionInviterCapability": "Use connection inviter capability?",
     "OpenContact": "Open Contact"
-  },
-  "LoadingPlaceholder": {
-    "Connecting": "Connecting...",
-    "SlowLoadingTitle": "This is slower than usual",
-    "SlowLoadingBody": "Check your internet connection and try again.",
-    "CredentialOffer": "Loading credential offer...",
-    "YourOffer": "You're being offered a credential",
-    "ProofRequest": "Loading proof request...",
-    "YourRequest": "You'll be requested to share the following information."
   },
   "ConnectionAlert": {
     "AddedContacts": "Added to Contacts",
@@ -679,7 +575,6 @@
     "DeclineTitle": "Decline credential offer?",
     "Declined": "Declined",
     "DeclineParagraph1": "In order to receive the credential offer again, you will need to restart the issuing process again with the issuing service.",
-    "DeclineParagraph1WithIssuerName": "If you change your mind you will need to request the card from {{ issuer }} again.",
     "DeclineParagraph2": "Are you sure you want to decline this credential offer?",
     "CustomOfferTitle": "Delete this offer?",
     "CustomOfferParagraph1": "Deleting this offer will remove the notification from your list.",
@@ -690,7 +585,6 @@
   },
   "ProofRequest": {
     "RequestForProof": "Request for proof",
-    "ReceiveProofTitle": "Received an information request from",
     "JustAMoment": "Just a moment while we prepare things for you...",
     "FromYourWallet": "From your wallet",
     "MissingCredentials": "Missing credentials",
@@ -708,7 +602,6 @@
     "RejectThisProof?": "Reject this Proof Request?",
     "DeclineThisProof?": "Decline this Proof Request?",
     "MultipleCredentials": "You have multiple credentials to choose from:",
-    "AvailableCards": "Available cards",
     "AcceptingProof": "Accepting Proof",
     "SuccessfullyAcceptedProof": "Successfully Accepted Proof",
     "SensitiveInformation": "This request is asking for sensitive information.",
@@ -721,7 +614,6 @@
     "CredentialMetadataNotFound": "Could not find credential metadata",
     "NewProofRequest": "New Proof Request",
     "NotAvailableInYourWallet": "Not in your wallet",
-    "MissingAttribute": "{{ name }} is missing",
     "PredicateNotSatisfied": "Requirement not met",
     "IsRequesting": "is requesting",
     "IsRequestingSomethingYouDontHaveAvailable": "is requesting something you don't have available",
@@ -752,29 +644,12 @@
     "DeclineBulletPoint3": "Are you sure you want to decline this proof request?",
     "NoInfoShared": "No information was shared",
     "YourInfo": "Your information was not shared",
-    "YouCantRespond": "You can't respond to this proof request.",
-    "YouCantRespondReasons": "You can't respond due to: ",
-    "CredentialNotInWallet": "This credential is not present in your wallet.",
-    "CredentialIsMissing": "missing credentials",
-    "ProofRequestPredicateError": "requirements aren't met",
-    "CredentialForProofIsRevoked": "revoked credential",
-    "ProofRequestStateError": "The proof request received is in: {{state}}, decline this proof and try again.",
-    "ProofRequestErrorMessage": "Something went wrong with the proof request.",
-    "PleaseAddress": " Please address them before continuing."
-  },
-  "UnsatisfiedProofRequest": {
-    "Title": "Information Request",
-    "InfoBox": {
-      "Title": "You do not have a card for this request",
-      "Subtitle": "Check with {{verifierName}} for accepted cards."
-    },
-    "VerifierDetail": "Received an information request from: ",
-    "RequestPurpose": " • {{requestPurpose}}"
+    "YouCantRespond": "You can't respond due to the following reasons. Please address them before continuing."
   },
   "Settings": {
     "Version": "Version",
     "VersionString": "0.0.0-0",
-    "AppSettings": "App Settings",
+    "AppSettings": "Settings",
     "AboutApp": "About App",
     "ChangePin": "Change PIN",
     "Language": "Language",
@@ -788,24 +663,15 @@
     "Help": "Help",
     "MoreInformation": "More information",
     "Developer": "Developer options",
-    "Notifications": "Notifications",
-    "AutoLockTime": "Auto lock time",
-    "Logout": "Log out",
-    "ConfigureMediator": "Configure Mediator",
-    "ChangeMediator": "Change Mediator",
-    "ChangeMediatorDescription": "Changing the mediator will restart the app. Do you want to continue?",
-    "GenericErrorMessages": "Generic error messages"
-  },
-  "AutoLockTimes": {
-    "FiveMinutes": "Five Minutes",
-    "ThreeMinutes": "Three Minutes",
-    "OneMinute": "One Minute",
-    "Never": "Never"
+    "Notifications": "Notifications"
   },
   "TabStack": {
-    "Home": "Notifications",
+    "Home": "Home",
     "Scan": "Scan",
-    "Credentials": "Credentials"
+    "Credentials": "Credentials",
+    "Conversation": "Conversation",
+    "Settings": "Settings",
+    "Contacts": "Contacts"
   },
   "RootStack": {
     "Contacts": "Contacts",
@@ -819,12 +685,6 @@
   "QRRender": {
     "GenerationError": "Unable to generate QR code"
   },
-  "JSONDetails": {
-    "Share": "Share JSON",
-    "Copy": "Copy contents",
-    "CopiedSuccess": "Copied to clipboard",
-    "CopiedError": "Unable to copy to clipboard"
-  },
   "Record": {
     "Hide": "Hide",
     "Show": "Show",
@@ -837,22 +697,18 @@
   "Screens": {
     "Splash": "Splash",
     "Onboarding": "Onboarding",
-    "Preface": "Aries Bifold",
+    "Preface": "DigiCred Wallet",
     "Terms": "Terms & Conditions",
     "CreatePIN": "Create a PIN",
-    "ConfirmPIN": "Confirm PIN",
     "EnterPIN": "Enter PIN",
-    "Home": "Notifications",
+    "Home": "Home",
     "Scan": "Scan",
-    "ScanHelp": "Scan Help",
     "Credentials": "Credentials",
     "CredentialDetails": "Credential Details",
-    "Notifications": "Notifications",
+    "Notifications": "Home",
     "CredentialOffer": "Credential Offer",
     "ProofChangeCredential": "Choose a credential",
     "ProofRequest": "Proof Request",
-    "UnsatisfiedProofRequest": "Unsatisfied Proof Request",
-    "ChangeCard": "Change Card",
     "ProofRequestDetails": "Proof Request Details",
     "ProofRequestAttributeDetails": "Proof Request Attribute Details",
     "ProofDetails": "Proof Details",
@@ -876,16 +732,19 @@
     "OnTheWay": "On The Way",
     "Declined": "Declined",
     "UseBiometry": "Use Biometry",
-    "PushNotifications": "Push notifications",
+    "UsePushNotifications": "Use Push Notifications",
     "CustomNotification": "Custom Notification",
     "ProofRequesting": "Proof Requesting",
     "NameWallet": "Name your wallet",
     "RenameContact": "Edit Contact Name",
-    "HistorySettings": "History Settings",
+    "FindAndConnectOpportunities": "Find And Connect Opportunities",
+    "EducationList": "Education",
+    "InstitutionDetail": "Institution Detail",
+    "MilitaryList": "Military",
+    "EmployersList": "Employers",
+    "StateGovernmentList": "State Government",
     "History": "History",
-    "HistoryDetails": "History Details",
-    "UpdateAvailable": "Update Available",
-    "JSONDetails": "JSON details"
+    "HistorySettings": "History Settings"
   },
   "Loading": {
     "TakingTooLong": "This is taking longer than usual. You can return to home or continue waiting.",
@@ -912,14 +771,16 @@
   },
   "NetInfo": {
     "NoInternetConnectionTitle": "No internet connection",
-    "NoInternetConnectionMessage": "You're unable to access services using Bifold or receive credentials until you're back online.\n\nPlease check your internet connection."
+    "NoInternetConnectionMessage": "You're unable to access services using Bifold or receive credentials until you're back online.\n\nPlease check your internet connection.",
+    "LedgerConnectivityIssueTitle": "Wallet Services",
+    "LedgerConnectivityIssueMessage": "A firewall may be preventing you from connecting to wallet related services."
   },
   "Onboarding": {
-    "SkipA11y": "Skip introduction to Aries Bifold"
+    "SkipA11y": "Skip introduction to the DigiCred Wallet"
   },
   "Preface": {
     "PrimaryHeading": "Is this app for you?",
-    "Paragraph1": "Most people will not have a need for Aries Bifold because very few digital credentials are currently available.",
+    "Paragraph1": "Please confirm.",
     "Confirmed": "I have confirmed that this app is for me."
   },
   "Chat": {
@@ -936,12 +797,10 @@
     "CredentialReceived": "received a credential",
     "ProofRequestSent": "sent a proof request",
     "ProofPresentationReceived": "has sent you information",
-    "ProofRequestReceived": "has sent you a proof request",
+    "ProofRequestReceived": "received a proof request",
     "ProofRequestRejected": "rejected a proof request",
     "ProofRequestRejectReceived": "rejected a proof request",
-    "ProofRequestSatisfied": "shared information",
-    "Actions": "More",
-    "Details": "Details"
+    "ProofRequestSatisfied": "shared information"
   },
   "Verifier": {
     "UseVerifierCapability": "Use Verifier capability?",
@@ -981,18 +840,5 @@
     "InvalidPredicateValueDetails": "Must be a number",
     "ConnectionLessLabel": "Anonymous",
     "WaitingForResponse": "Waiting for response..."
-  },
-  "AppUpdate": {
-    "Heading": "Update Bifold to the latest version",
-    "Body": "Bifold was updated with new improvements. Update your app now to enjoy the latest features and enhancements.",
-    "LearnMore": "Learn what's New",
-    "UpdateNow": "Update the app",
-    "UpdateLater": "Do this later"
-  },
-  "Banner": {
-    "AlertsLength": "You have {{ alerts }} alerts"
-  },
-  "FullScreenErrorModal": {
-    "PrimaryCTA": "Go back to home"
   }
 }

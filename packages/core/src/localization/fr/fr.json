@@ -2,7 +2,7 @@
   "Global": {
     "Enter": "Entrer",
     "Submit": "Soumettre",
-    "NoneYet!": "Votre portefeuille est vide. Vos attestations acceptées seront ajoutées ici.",
+    "NoneYet!": "Votre portefeuille est vide. Vos attestations acceptés seront ajoutés ici.",
     "Save": "Enregistrer",
     "Cancel": "Annuler",
     "Confirm": "Confirmer",
@@ -33,31 +33,19 @@
     "Biometrics": "Biométrie",
     "On": "Activé",
     "Off": "Désactivé",
-    "History": "Historique",
-    "SaveSettings": "Enregistrer les paramètres",
-    "organization": "Organisation",
-    "Issuer": "Émetteur",
-    "RevokedByIssuer": "Révoqué par cet émetteur",
-    "Verifier": "Vérificateur",
-    "Expired": "Expiré",
-    "Revoked": "Révoqué",
-    "Issued": "Émis",
-    "Requested": "Demandé",
-    "Updated": "Mis à jour",
+    "History": "History(fr)",
+    "SaveSettings": "Save Settings(fr)",
+    "organization": "Organization(fr)",
+    "Issuer": "Issuer(fr)",
+    "RevokedByIssuer": "Revoked by this issuer(fr)",
+    "Verifier": "Verifier(fr)",
+    "Expired": "Expired(fr)",
+    "Revoked": "Revoked(fr)",
+    "Issued": "Issued(fr)",
+    "Requested": "Requested(fr)",
+    "Updated": "Updated(fr)",
     "Remove": "Supprimer",
-    "Close": "Fermer",
-    "GotIt": "Got it (FR)",
-    "Send": "Envoyer",
-    "Reset": "Reset (FR)",
-    "ViewJSON": "View JSON Details (FR)",
-    "RefreshCredentials": "Refresh Credentials (FR)",
-    "AppName": "Aries Bifold (FR)"
-  },
-  "Toast": {
-    "OpenIDCredRefreshing": {
-      "Title": "Refreshing credentials (FR)",
-      "Message": "Your OpenID credentials are being refreshed in the background. (FR)"
-    }
+    "Close": "Fermer"
   },
   "Date": {
     "ShortFormat": "D MMM",
@@ -98,12 +86,10 @@
     "code_en": "Anglais",
     "code_fr": "Français",
     "code_pt-BR": "Portugais",
-    "Checked": "coché",
-    "NotChecked": "non coché"
+    "code_sp": "Espagnol"
   },
   "Error": {
     "ReportThisProblem": "Signaler ce problème",
-    "Reported": "Reported (FR)",
     "Unknown": "Erreur inconnue",
     "Problem": "Un problème est survenu",
     "ErrorCode": "Code d'erreur",
@@ -152,17 +138,7 @@
     "Title1045": "Impossible d'initialiser l'agent.",
     "Message1045": "Il y a eu un problème lors de l'initialisation de l'agent.",
     "Title1046": "Impossible de récupérer les contacts.",
-    "Message1046": "Il y a eu un problème lors de la récupération des contacts.",
-    "Title1047": "Unable to display card. (FR)",
-    "Message1047": "There was a problem parsing credential card. (FR)",
-    "Title1048": "Proof request problems. (FR)",
-    "Message1048": "There was a problem with the proof request. (FR)",
-    "Title1049": "Unable to change PIN. (FR)",
-    "Message1049": "There was a problem while attempting to change your PIN. (FR)",
-    "GenericError": {
-      "Title": "Something went wrong (FR)",
-      "Message": "There was an unexpected error, please try again later. (FR)"
-    }
+    "Message1046": "Il y a eu un problème lors de la récupération des contacts."
   },
   "SelectionAxs": {
     "RadioChecked": "checked(fr)",
@@ -202,8 +178,7 @@
     "Skip": "Passer",
     "Next": "Suivant",
     "Back": "Précédent",
-    "Done": "Terminer",
-    "AccessibilitySteps": "Étape {{ stepOn }} de {{ stepsOutOf }} - {{ title }}"
+    "Done": "Terminer"
   },
   "CameraDisclosure": {
     "AllowCameraUse": "Autoriser l'utilisation de la caméra",
@@ -212,47 +187,25 @@
     "OpenSettings": "Ouvrir les paramètres"
   },
   "PINCreate": {
-    "Header": "Aries Bifold (FR)",
-    "Subheader": "Secure your Aries wallet (FR)",
-    "Explainer": {
-      "PrimaryHeading": "Secure your Wallet (FR)",
-      "PINReminder": "On the following screen you will be asked to set up a strong <b>personal identification number</b> (PIN). (FR)",
-      "WhyNeedPin": {
-        "Header": "Why you need a PIN (FR)",
-        "Paragraph": "Your PIN is an important security feature: (FR)",
-        "ParagraphList1": "You can use your PIN instead of biometrics to open your wallet (FR)",
-        "ParagraphList2": "Or use your biometrics to open your wallet, and if your biometrics change change on your device you will need to use the PIN to authenticate your wallet (FR)"
-      }
-    },
-    "InfoBox": {
-      "title": "Remember your PIN (FR)",
-      "message": "Make sure you remember your PIN\n- If you forget it you will need to setup the wallet again and re-add your cards (FR)"
-    },
     "Message": {
       "CrossPatternValidation": "Un patron de croix a été détecté dans votre NIP. Veuillez saisir un NIP différent.",
       "OddOrEvenSequenceValidation": "Une séquence impaire ou paire a été détectée dans votre NIP. Veuillez saisir un NIP différent.",
-      "MaxAdjacentNumberRepetitionValidation": "Adjacent numbers repeating times are more than allowed. Please try again. (FR)",
       "NoRepetitionOfTheTwoSameNumbersValidation": "Une séquence de deux chiffres répétée a été détectée dans votre NIP. Veuillez saisir un NIP différent.",
       "NoRepetitionOfTheSameNumbersValidation": "Votre NIP contient une répétition. Choisissez un NIP différent.",
       "NoSeriesOfNumbersValidation": "Une suite a été détectée dans votre NIP. Veuillez saisir un NIP différent.",
       "PINOnlyContainDigitsValidation": "Votre NIP doit contenir que des chiffres. Veuillez saisir un NIP différent.",
       "PINTooShortValidation": "Votre NIP est trop court. Veuillez saisir un NIP différent.",
-      "PINTooLongValidation": "Votre NIP est trop long. Veuillez saisir un NIP différent.",
-      "PINCommonlyUsed": "Your PIN uses a commonly used pattern. Please try again. (FR)"
+      "PINTooLongValidation": "Votre NIP est trop long. Veuillez saisir un NIP différent."
     },
     "Helper": {
       "CrossPatternValidation": "Ne doit pas contenir un patron de croix.",
       "OddOrEvenSequenceValidation": "Ne doit pas contenir une suite paire ou impaire.",
-      "MaxAdjacentNumberRepetitionValidation": "Adjacent numbers repeating times are limited. (FR)",
       "NoRepetitionOfTheTwoSameNumbersValidation": "Ne doit pas contenir deux chiffres qui se répètent.",
       "NoRepetitionOfTheSameNumbersValidation": "Ne doit pas contenir de répétition.",
       "NoSeriesOfNumbersValidation": "Ne doit pas contenir de suite (123).",
       "PINOnlyContainDigitsValidation": "Doit contenir que des chiffres.",
-      "PINTooShortValidation": "Your PIN must be more than {{num}} digits. (FR)",
-      "PINTooLongValidation": "Your PIN must be less than {{num}} digits. (FR)",
-      "PINExpectedLengthValidation": "Your PIN must be {{num}} digits. (FR)",
-      "CheckIcon": "Critère respecté",
-      "ClearIcon": "Critère non-respecté"
+      "PINTooShortValidation": "Le NIP est trop court. Veuillez saisir le NIP à nouveau.",
+      "PINTooLongValidation": "Le NIP est trop long. Veuillez saisir le NIP à nouveau."
     },
     "UserAuthenticationPIN": "NIP d'authentification de l'utilisateur",
     "PINTooShort": "NIP trop court",
@@ -266,7 +219,6 @@
     "PinChangeSuccessTitle": "Votre NIP a été modifié avec succès",
     "PinChangeSuccessMessage": "Votre NIP a été modifié avec succès. Vous pouvez maintenant vous connecter avec votre nouveau NIP.",
     "EnterOldPINTitle": "Veuillez entrer votre ancien NIP",
-    "EnterOldPIN": "Saisir ancien NIP",
     "NewPIN": "nouveau",
     "EnterPINTitle": "Entrer un {{ new }}NIP à 6 chiffres",
     "EnterPIN": "Saisir un NIP",
@@ -278,61 +230,26 @@
     "PINDisclaimer": "Si vous l'oubliez, vous devrez configurer à nouveau votre portefeuille et vos cartes.",
     "Show": "Afficher NIP",
     "Hide": "Masquer NIP",
-    "Masked": "PIN Masked for privacy (FR)",
     "ChangePIN": "Changer votre NIP",
     "Continue": "Continuer",
     "EnterYourCurrentPIN": "Entrez votre NIP actuel"
   },
-  "PINChange": {
-    "PinChangeSuccessTitle": "Successfully changed your PIN (FR)",
-    "PinChangeSuccessMessage": "Your PIN was successsfully changed. You can now log in with your new PIN. (FR)",
-    "EnterOldPINTitle": "Enter your old PIN (FR)",
-    "EnterOldPIN": "Enter your old PIN (FR)",
-    "EnterPINTitle": "Enter a new 6 digit PIN (FR)",
-    "ReenterPIN": "Re-enter new PIN (FR)",
-    "RememberChangePIN": "Change your PIN to secure your wallet. (FR)",
-    "ChangePIN": "Change PIN (FR)"
-  },
-  "PINChangeSuccess": {
-    "InfoBox": {
-      "Title": "Your PIN has been changed (FR)",
-      "Description": "You can now log-in with your new PIN (FR)"
-    },
-    "PrimaryButton": "Go back to settings (FR)"
-  },
   "PINEnter": {
-    "AppTitle": "Aries Bifold",
-    "Title": "Content de te revoir",
-    "SubText": "Connectez-vous pour accéder à votre portefeuille.",
     "EnterPIN": "Veuillez saisir votre NIP",
     "Unlock": "Déverrouiller",
     "Or": "Ou",
     "BiometricsUnlock": "Déverrouiller avec la biométrie",
     "IncorrectPIN": "NIP erroné",
     "RepeatPIN": "Essayez votre NIP à nouveau",
-    "IncorrectPINTries": "Incorrect PIN: {{tries}} tries before your app is temporarily locked (FR)",
-    "LastTryBeforeTimeout": "PIN incorrect : dernier essai avant expiration du délai",
     "EnableBiometrics": "Vous devez activer la biométrie pour pouvoir charger le portefeuille.",
     "BiometricsNotProvided": "Biométrie non fournie, vous pouvez utiliser le NIP pour vous connecter au portefeuille.",
     "BiometricsError": "La biométrie n'a pas réussi.",
     "BiometricsErrorEnterPIN": "Veuillez saisir le code NIP de votre portefeuille.",
-    "LockedOut": "You were locked out after {{ time }} minute(s) of inactivity. (FR)",
+    "LockedOut": "You locked out after 5 minutes of inactivity. (FR)",
     "ReEnterPIN": "Re-enter your wallet PIN (FR)",
     "BiometricsChanged": "Le déverrouillage avec la biométrie a été désactivé, car les données biométriques de votre appareil ont changé.",
     "BiometricsChangedEnterPIN": "Veuillez saisir le code NIP de votre portefeuille.",
-    "AttemptLockoutWarning": "Note: pour votre sécurité, la saisie d'un autre NIP incorrect verrouillera temporairement le portefeuille.",
-    "AppSettingChanged": "Le paramètre de l'application a changé.",
-    "AppSettingChangedEnterPIN": "Veuillez confirmer la modification en saisissant votre NIP.",
-    "AppSettingSave": "Enregistrer",
-    "AppSettingCancel": "Annuler",
-    "ChangeBiometricsHeader": "Change in biometrics (FR)",
-    "ChangeBiometricsSubtext": "Please enter your PIN to confirm a change in biometrics (FR)",
-    "ChangeBiometricsInputLabel": "Enter your wallet PIN (FR)",
-    "ChangeBiometricsInputLabelParenthesis": "(Required) (FR)",
-    "ForgotPINLink": "Forgot your PIN? (FR)",
-    "ForgotPINModalTitle": "Forgot your PIN? (FR)",
-    "ForgotPINModalDescription": "For security purposes, you're unable to recover or reset your PIN. You will need to reinstall your wallet and add your credentials again. (FR)",
-    "Loading": "Logging in (FR)"
+    "AttemptLockoutWarning": "Note: pour votre sécurité, la saisie d'un autre NIP incorrect verrouillera temporairement le portefeuille."
   },
   "AttemptLockout": {
     "Title": "Votre portefeuille est temporairement verrouillé",
@@ -340,14 +257,10 @@
     "TryAgain": "Vous pouvez réessayer dans: ",
     "Hours": "heures",
     "Minutes": "minutes",
-    "Seconds": "secondes",
-    "ForgotPIN": "Forgot your PIN? (FR)",
-    "ForgotPINDescription": "For security purposes, you're unable to recover or reset your PIN. You will need to reinstall your wallet and add your credentials again. (FR)"
+    "Seconds": "secondes"
   },
   "Biometry": {
     "Toggle": "Basculer la biométrie",
-    "On": "Biométrie Activée",
-    "Off": "Biométrie Desactivée",
     "EnabledText1": "Déverrouiller votre portefeuille avec la biométrie de votre appareil au lieu d’utiliser le NIP du portefeuille.",
     "EnabledText2": "Toute personne qui a des données biométriques enregistrées sur cet appareil pourra déverrouiller votre portefeuille et avoir accès à vos attestations.",
     "NotEnabledText1": "La biométrie n'est pas actuellement configurée sur cet appareil et ne peut donc pas être activée.",
@@ -355,12 +268,7 @@
     "Warning": "\n\nAssurez-vous que vous seul avez accès à votre portefeuille.",
     "UseToUnlock": "Utiliser la biométrie pour déverrouiller le portefeuille ?",
     "UnlockPromptTitle": "Déverrouillage du portefeuille",
-    "UnlockPromptDescription": "Utilisez la biométrie pour déverrouiller votre portefeuille",
-    "AllowBiometricsTitle": "Activer la biométrie",
-    "AllowBiometricsDesc": "Pour déverrouiller BC Wallet avec votre biométrie, permettrez la biométrie dans les paramètres de votre appareil.",
-    "SetupBiometricsTitle": "La biométrie n'est pas activée",
-    "SetupBiometricsDesc": "Pour déverrouiller BC Wallet avec votre biométrie, configurez votre biométrie dans les paramètres de votre appareil.",
-    "OpenSettings": "Ouvrir les paramètres"
+    "UnlockPromptDescription": "Utilisez la biométrie pour déverrouiller votre portefeuille"
   },
   "ActivityHistory": {
     "Header": "Activity history(fr)",
@@ -463,58 +371,47 @@
     "Button": "Sort/Filter(fr)",
     "NoHistory": "You haven't used any cards yet.\n\nEach time you add or use a card, that activity will be saved here.(fr)",
     "CardTitle": {
-      "CardAccepted": "Carte Acceptée:",
-      "CardDeclined": "Carte refusée:",
-      "CardExpired": "Card expirée",
-      "CardRemoved": "Carte retirée",
-      "CardRevoked": "Carte révoquée",
-      "CardUpdates": "Mises à jour de la carte",
-      "WalletPinUpdated": "NIP du portefeuille mis à jour",
-      "InformationSent": "Information envoyée à:",
-      "InformationNotSent": "Information non envoyée à:",
-      "Connection": "Connexion",
-      "ConnectionRemoved": "Connexion retirée",
-      "ActivateBiometry": "Biométrie activée",
-      "DeactivateBiometry": "Biométrie désactivée"
+      "CardAccepted": "Card accepted:(fr)",
+      "CardDeclined": "Card declined:(fr)",
+      "CardExpired": "Card expired(fr)",
+      "CardRevoked": "Card revoked(fr)",
+      "InformationSent": "Information sent to:(fr)",
+      "WalletPinUpdated": "Wallet PIN updated(fr)"
     },
     "CardDescription": {
       "CardExpired": "{{cardName}} expired(fr)",
       "CardRevoked": "{{cardName}} revoked(fr)",
       "WalletPinUpdated": "New PIN set(fr)"
     },
-    "Today": "Today(fr)"
+    "Today": "Today(fr)",
+    "UseHistoryCapability": "Enable history(fr)",
+    "UseHistoryCapabilityToggle": "Toggle Enable history(fr)"
   },
   "Contacts": {
     "EmptyList": "Vos Contacts sont vides!",
     "TypeHere": "Envoyer un message à ce contact...",
     "PeopleAndOrganizations": "Les personnes et les organisations avec lesquelles vous avez interagi sont répertoriées ici.",
     "WhatAreContacts": "Qu'est-ce que les Contacts?",
-    "AddContact": "Ajouter un Contact",
-    "UnknownContact": "Contact Inconnu"
+    "AddContact": "Ajouter un Contact"
   },
   "ContactDetails": {
     "Created": "Créé",
     "ConnectionState": "État de la connexion",
     "AContact": "Un Contact",
     "RemoveContact": "Supprimer Contact",
-    "RemoveContactMessageWarning": "Removing this Contact will delete all existing messages and notifications from them. (FR)",
-    "RemoveContactMessageTop": "Without this contact, you'll no longer be able to: (FR)",
-    "RemoveContactMessageBottom": "They won't be notified that you removed them from your contacts. (FR)",
-    "RemoveContactsBulletPoint1": "Send or receive messages (FR)",
-    "RemoveContactsBulletPoint2": "Be notified of updates to your credentials (FR)",
-    "RemoveContactsBulletPoint3": "Get offered new credentials (FR)",
-    "RemoveContactsBulletPoint4": "Request proof of information (FR)",
+    "RemoveContactMessageTop": "En supprimant ce Contact, vous ne pourrez plus : ",
+    "RemoveContactMessageBottom": "Ce Contact ne sera pas averti que vous l'avez supprimé de vos Contacts",
+    "RemoveContactsBulletPoint1": "Envoyez un message direct à ce Contact",
+    "RemoveContactsBulletPoint2": "Obtenez de nouveaux attestations d'identité de ce Contact",
+    "RemoveContactsBulletPoint3": "Soyez informé des mises à jour de vos informations d'identification émises par ce Contact",
+    "RemoveContactsBulletPoint4": "Demander des informations à ce Contact ou ils vous demandent des informations ",
     "DateOfConnection": "Date de connexion : {{ date }}",
     "RemoveTitle": "Supprimer ce Contact",
     "RemoveCaption": "Pour ajouter des attestations d'identité, l'organisation émettrice doit être un Contact.",
     "UnableToRemoveTitle": "Impossible de supprimer le Contact",
     "UnableToRemoveCaption": "Impossible de supprimer car il y a des attestations d'identité émises par ce Contact dans votre portefeuille. Supprimez d'abord les attestations d'identité, puis supprimez ce Contact.",
     "GoToCredentials": "Aller aux attestations d'identité",
-    "ContactRemoved": "Contact supprimé",
-    "GoToCredentialDetail": "Aller au détail de l'attestation",
-    "CredentialName": "Nom du justificatif",
-    "Credentials": "Mes justificatifs avec ce contact",
-    "NoCredentials": "Vous n'avez aucun justificatif de ce contact."
+    "ContactRemoved": "Contact supprimé"
   },
   "WhatAreContacts": {
     "Title": "Que sont les Contacts?",
@@ -531,11 +428,10 @@
     "CredentialDetails": "Détails des attestations",
     "EmptyList": "Votre portefeuille est vide. Vos attestations acceptés seront ajoutés ici.",
     "IssuedBy": "Émis par",
-    "Issued": "Issued (FR)",
     "Credential": "attestation"
   },
   "PushNotifications": {
-    "EnableNotifications": "Activer les Notifications pour recevoir des alertes instantanées",
+    "EnableNotifiactions": "Activer les Notifications pour recevoir des alertes instantanées",
     "BeNotified": "Soyez averti lorsque vous recevez :",
     "ReceiveNotifications": "Recevoir des notifications",
     "BulletFour": "nouveaux messages",
@@ -555,7 +451,6 @@
     "CreatedAt": "Créé à :",
     "Version": "Version",
     "Issued": "Délivré",
-    "IssuedOn": "Émis le",
     "PrivacyPolicy": "Politique de confidentialité",
     "TermsAndConditions": "Conditions d'utilisation",
     "RemoveFromWallet": "Retirer du portefeuille",
@@ -573,14 +468,14 @@
     "HowToGetThisCredentialBackListItem1": "Vous devrez vous rendre auprès de l'organisme qui vous a délivré cette attestation et le redemander.",
     "CredentialRemoved": "Justificatif retiré",
     "IssuedBy": "Émis par:",
-    "RemoveCredential": "Supprimer l'attestation d'identité",
-    "NavigateToIssuerDetailsHint": "Cliquez pour naviguer vers les détails de l'émetteur"
+    "RemoveCredential": "Supprimer l'attestation d'identité"
   },
   "Home": {
+    "Welcome": "Bienvenue",
     "Notification": "Notification",
     "Notifications": "Notifications",
     "NoNewUpdates": "Vous n'avez pas de nouvelles notifications.",
-    "NoCredentials": "Your wallet is empty (FR)",
+    "NoCredentials": "Vous n'avez pas d'attestation(s) dans votre portefeuille.",
     "SeeAll": "Voir tout",
     "YouHave": "Vous avez",
     "Credential": "attestation",
@@ -589,8 +484,7 @@
     "NewMessage": "Nouveau message",
     "SentMessage": "Envoyer un message",
     "ReceivedMessage": "Vous avez reçu un nouveau message",
-    "ViewMessage": "Voir le message",
-    "ScanOfferAddCard": "Scan an offer to add a card to your wallet (FR)"
+    "ViewMessage": "Voir le message"
   },
   "Scan": {
     "SuccessfullyAcceptedConnection": "Connexion acceptée avec succès",
@@ -605,8 +499,6 @@
     "UnableToHandleRedirection": "Impossible de traiter la redirection",
     "Close": "Fermer",
     "Torch": "Flash",
-    "TorchOn": "Flash activé",
-    "TorchOff": "Flash désactivé",
     "ScanHelp": "Aide à la numérisation",
     "ScanNow": "Numériser maintenant",
     "ScanOnySpecial": "Seuls les codes QR spéciaux peuvent être scannés par Bifold Wallet.",
@@ -638,15 +530,6 @@
     "Toggle": "Basculer la capacité d'invitation à la connexion",
     "UseConnectionInviterCapability": "Utiliser la fonction d'invitation à la connexion ?",
     "OpenContact": "Contact ouvert"
-  },
-  "LoadingPlaceholder": {
-    "Connecting": "Connecting...",
-    "SlowLoadingTitle": "This is slower than usual (FR)",
-    "SlowLoadingBody": "Check your internet connection and try again. (FR)",
-    "CredentialOffer": "Loading credential offer... (FR)",
-    "YourOffer": "You're being offered a credential (FR)",
-    "ProofRequest": "Loading proof request... (FR)",
-    "YourRequest": "You'll be requested to share the following information. (FR)"
   },
   "ConnectionAlert": {
     "AddedContacts": "Ajouté aux Contacts",
@@ -687,7 +570,6 @@
     "DeclineTitle": "Refuser l'offre d'attestation d'identité?",
     "Declined": "Refusé",
     "DeclineParagraph1": "Afin de recevoir à nouveau l'offre d'attestation d'identité, vous devrez recommencer le processus d'émission avec le service d'émission.",
-    "DeclineParagraph1WithIssuerName": "If you change your mind you will need to request the card from {{ issuer }} again. (FR)",
     "DeclineParagraph2": "Êtes-vous sûr de vouloir refuser cette offre d'attestation d'identité?",
     "CustomOfferTitle": "Supprimer cette offre?",
     "CustomOfferParagraph1": "La suppression de cette offre supprimera la notification de votre liste.",
@@ -695,7 +577,6 @@
   },
   "ProofRequest": {
     "RequestForProof": "Demande de preuve",
-    "ReceiveProofTitle": "Received an information request from(fr)",
     "JustAMoment": "Juste un moment pendant que nous préparons les choses pour vous...",
     "FromYourWallet": "Depuis votre portefeuille",
     "MissingCredentials": "Il manque des attestations",
@@ -713,7 +594,6 @@
     "RejectThisProof?": "Rejeter cette preuve?",
     "AcceptingProof": "Acceptation de la preuve",
     "MultipleCredentials": "Vous avez le choix entre plusieurs attestations d'identification :",
-    "AvailableCards": "Available cards (FR)",
     "SuccessfullyAcceptedProof": "Preuve acceptée avec succès",
     "SensitiveInformation": "Cette requête contient des données sensibles.",
     "RejectingProof": "Rejet de la preuve",
@@ -724,7 +604,6 @@
     "CredentialMetadataNotFound": "Impossible de trouver les métadonnées des attestations",
     "NewProofRequest": "Nouvelle demande de preuve",
     "NotAvailableInYourWallet": "Non disponible dans votre portefeuille",
-    "MissingAttribute": "{{ name }} is missing (FR)",
     "PredicateNotSatisfied": "Requête non satisfaite",
     "IsRequesting": "demande",
     "IsRequestingSomethingYouDontHaveAvailable": "demande quelque chose que vous n'avez pas à votre disposition",
@@ -748,24 +627,7 @@
     "DeclineBulletPoint3": "Etes-vous sûr vous voulez refuser cette demande de preuve?",
     "NoInfoShared": "Aucune information n'a été partagée",
     "YourInfo": "Votre information n'a pas été partagée",
-    "YouCantRespond": "You can't respond to this proof request. (FR)",
-    "YouCantRespondReasons": "You can't respond due to:  (FR)",
-    "CredentialNotInWallet": "This credential is not present in your wallet. (FR)",
-    "CredentialIsMissing": "missing credentials (FR)",
-    "ProofRequestPredicateError": "requirements aren't met (FR)",
-    "CredentialForProofIsRevoked": "revoked credential (FR)",
-    "ProofRequestStateError": "The proof request received is in: {{state}}, decline this proof and try again. (FR)",
-    "ProofRequestErrorMessage": "Something went wrong with the proof request. (FR)",
-    "PleaseAddress": " Please address them before continuing. (FR)"
-  },
-  "UnsatisfiedProofRequest": {
-    "Title": "Information Request (FR)",
-    "InfoBox": {
-      "Title": "You do not have a card for this request (FR)",
-      "Subtitle": "Check with {{verifierName}} for accepted cards. (FR)"
-    },
-    "VerifierDetail": "Received an information request from: (FR)",
-    "RequestPurpose": " • {{requestPurpose}} (FR)"
+    "YouCantRespond": "You can't respond due to the following reasons. Please address them before continuing. (FR)"
   },
   "Settings": {
     "Version": "Version",
@@ -781,24 +643,15 @@
     "Build": "Créer",
     "WhatAreContacts": "Qu’est-ce qu’un Contact?",
     "ScanMyQR": "Scanner mon code QR",
-    "Developer": "Options de développeur",
-    "AutoLockTime": "Auto lock time (FR)",
-    "Logout": "Déconnexion",
-    "ConfigureMediator": "Configurer le médiateur",
-    "ChangeMediator": "Change mediator (FR)",
-    "ChangeMediatorDescription": "Changing the mediator will restart the app. Do you want to continue? (FR)",
-    "GenericErrorMessages": "Generic error messages (FR)"
-  },
-  "AutoLockTimes": {
-    "FiveMinutes": "Five Minutes (FR)",
-    "ThreeMinutes": "Three Minutes (FR)",
-    "OneMinute": "One Minute (FR)",
-    "Never": "Never (FR)"
+    "Developer": "Options de développeur"
   },
   "TabStack": {
     "Home": "Notifications",
     "Scan": "Numériser",
-    "Credentials": "Justificatifs"
+    "Credentials": "Justificatifs",
+    "Conversation": "Conversation",
+    "Settings": "Paramètres",
+    "Contacts": "Contacts"
   },
   "RootStack": {
     "Contacts": "Contacts",
@@ -811,12 +664,6 @@
   },
   "QRRender": {
     "GenerationError": "Impossible de générer le code QR"
-  },
-  "JSONDetails": {
-    "Share": "Share JSON (FR)",
-    "Copy": "Copy contents (FR)",
-    "CopiedSuccess": "Copied to clipboard (FR)",
-    "CopiedError": "Unable to copy to clipboard (FR)"
   },
   "Record": {
     "Hide": "Masquer",
@@ -836,7 +683,6 @@
     "EnterPIN": "Saisir le NIP",
     "Home": "Notifications",
     "Scan": "Numériser",
-    "ScanHelp": "Aide à la numérisation",
     "Credentials": "Justificatifs",
     "CredentialDetails": "Détails des attestations",
     "Notifications": "Notifications",
@@ -857,7 +703,6 @@
     "ChangePIN": "Changer NIP",
     "CommonDecline": "Refuser",
     "ProofRequests": "Demandes de preuve",
-    "ChangeCard": "Change Card (FR)",
     "ProofRequestDetails": "Détails de la Demande de preuve",
     "SendProofRequest": "Envoyer une demande d'attestation",
     "ChooseProofRequest": "Choisissez une demande d'attestation",
@@ -869,13 +714,14 @@
     "UseBiometry": "Utiliser la biométrie",
     "CustomNotification": "Notification personnalisée",
     "ProofRequesting": "Demande de preuve",
-    "NameWallet": "Nommer le portefeuille",
-    "RenameContact": "Modifier le nom du contact",
-    "HistorySettings": "History Settings FR)",
-    "History": "History (FR)",
-    "HistoryDetails": "History Details (FR)",
-    "UpdateAvailable": "Update Available (FR)",
-    "JSONDetails": "JSON details (FR)"
+    "NameWallet": "Name your wallet (FR)",
+    "RenameContact": "Edit Contact Name (FR)",
+    "Find And Connect Opportunities": "Trouver et connecter des opportunités",
+    "Education": "Éducation",
+    "Institution Detail": "Détail de l'institution",
+    "Military": "Militaire",
+    "Employers": "Employeurs",
+    "State Government": "Gouvernement de l'État"
   },
   "Loading": {
     "TakingTooLong": "Cela prend plus de temps que d'habitude. Vous pouvez retourner à l'accueil ou continuer à attendre.",
@@ -898,7 +744,9 @@
   },
   "NetInfo": {
     "NoInternetConnectionTitle": "Aucune connexion Internet",
-    "NoInternetConnectionMessage": "Vous ne pouvez pas accéder aux services à l'aide de Bifold ou recevoir des informations d'identification tant que vous n'êtes pas de nouveau en ligne.\n\nS'il vous plait, vérifiez votre connexion internet."
+    "NoInternetConnectionMessage": "Vous ne pouvez pas accéder aux services à l'aide de Bifold ou recevoir des informations d'identification tant que vous n'êtes pas de nouveau en ligne.\n\nS'il vous plait, vérifiez votre connexion internet.",
+    "LedgerConnectivityIssueTitle": "Services de portefeuille",
+    "LedgerConnectivityIssueMessage": "Il se peut qu'un pare-feu vous empêche de vous connecter aux services liés au portefeuille."
   },
   "Onboarding": {
     "SkipA11y": "Passer l'introduction à Aries Bifold"
@@ -922,12 +770,10 @@
     "CredentialReceived": "reçu une attestation",
     "ProofRequestSent": "envoyé une demande d'attestation",
     "ProofPresentationReceived": "vous a envoyé des informations",
-    "ProofRequestReceived": "has sent you a proof request (FR)",
+    "ProofRequestReceived": "reçu une demande d'attestation",
     "ProofRequestRejected": "rejeté une demande d'attestation",
     "ProofRequestRejectReceived": "a rejeté une demande d'attestation",
-    "ProofRequestSatisfied": "informations partagées",
-    "Actions": "More (FR)",
-    "Details": "Détails"
+    "ProofRequestSatisfied": "informations partagées"
   },
   "Verifier": {
     "UseVerifierCapability": "Utiliser la fonctionnalité Verifier?",
@@ -967,18 +813,5 @@
     "InvalidPredicateValueDetails": "Doit être un nombre",
     "ConnectionLessLabel": "Anonyme",
     "WaitingForResponse": "Waiting for response... (FR)"
-  },
-  "AppUpdate": {
-    "Heading": "Update Bifold to the latest version (FR)",
-    "Body": "Bifold was updated with new improvements. Update your app now to enjoy the latest features and enhancements. (FR)",
-    "LearnMore": "Learn what's New (FR)",
-    "UpdateNow": "Update the app (FR)",
-    "UpdateLater": "Do this later (FR)"
-  },
-  "Banner": {
-    "AlertsLength": "You have {{ alerts }} alerts (FR)"
-  },
-  "FullScreenErrorModal": {
-    "PrimaryCTA": "Go back to home (FR)"
   }
 }
