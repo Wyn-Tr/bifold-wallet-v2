@@ -1,0 +1,115 @@
+import { useAgent } from '@credo-ts/react-hooks';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { DeviceEventEmitter } from 'react-native';
+import { EventTypes } from '../../../constants';
+import { BifoldError } from '../../../types/error';
+import { acquirePreAuthorizedAccessToken, receiveCredentialFromOpenId4VciOffer, resolveOpenId4VciOffer, } from '../offerResolve';
+import { getCredentialsForProofRequest } from '../resolverProof';
+import { getCredentialConfigurationIds } from '../utils/utils';
+import { setRefreshCredentialMetadata } from '../metadata';
+import { RefreshStatus } from '../refresh/types';
+import { temporaryMetaVanillaObject } from '../metadata';
+export const useOpenID = ({ openIDUri, openIDPresentationUri, }) => {
+    const [openIdRecord, setOpenIdRecord] = useState();
+    const { agent } = useAgent();
+    const { t } = useTranslation();
+    const resolveOpenIDCredential = useCallback(async (uri) => {
+        if (!agent) {
+            return;
+        }
+        try {
+            const resolvedCredentialOffer = await resolveOpenId4VciOffer({
+                agent: agent,
+                uri: uri,
+            });
+            const authServers = resolvedCredentialOffer.metadata.credentialIssuerMetadata.authorization_servers;
+            // const authServer = authServers?.[0]
+            const credentialIssuer = resolvedCredentialOffer.metadata.issuer;
+            const authServer = credentialIssuer;
+            const configID = getCredentialConfigurationIds(resolvedCredentialOffer)?.[0];
+            const tokenEndpoint = resolvedCredentialOffer.metadata.token_endpoint;
+            const issuerMetadata = resolvedCredentialOffer.metadata.credentialIssuerMetadata;
+            const credentialEndpoint = resolvedCredentialOffer.metadata.credential_endpoint;
+            if (!configID) {
+                throw new Error('No credential configuration ID found in the credential offer metadata');
+            }
+            if (!authServer) {
+                throw new Error('No authorization server found in the credential offer metadata');
+            }
+            if (!credentialIssuer) {
+                throw new Error('No credential issuer found in the credential offer metadata');
+            }
+            const tokenResponse = await acquirePreAuthorizedAccessToken({ agent, resolvedCredentialOffer });
+            const refreshToken = tokenResponse.refreshToken;
+            temporaryMetaVanillaObject.tokenResponse = tokenResponse;
+            const credential = await receiveCredentialFromOpenId4VciOffer({
+                agent,
+                resolvedCredentialOffer,
+                tokenResponse: tokenResponse,
+            });
+            if (refreshToken && authServer) {
+                setRefreshCredentialMetadata(credential, {
+                    authServer: authServer,
+                    tokenEndpoint: tokenEndpoint,
+                    refreshToken: refreshToken,
+                    issuerMetadataCache: {
+                        credential_issuer: credentialIssuer,
+                        credential_endpoint: credentialEndpoint,
+                        token_endpoint: tokenEndpoint,
+                        authorization_servers: authServers,
+                        credential_configurations_supported: issuerMetadata?.credential_configurations_supported,
+                    },
+                    credentialIssuer: credentialIssuer,
+                    credentialConfigurationId: configID,
+                    lastCheckedAt: Date.now(),
+                    lastCheckResult: RefreshStatus.Valid,
+                    attemptCount: 0,
+                    resolvedCredentialOffer: resolvedCredentialOffer,
+                });
+            }
+            return credential;
+        }
+        catch (err) {
+            const error = new BifoldError(t('Error.Title1024'), t('Error.Message1024'), err?.message ?? err, 1043);
+            DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error);
+        }
+    }, [agent, t]);
+    const resolveOpenIDPresentationRequest = useCallback(async (uri) => {
+        if (!agent) {
+            return;
+        }
+        try {
+            const record = await getCredentialsForProofRequest({
+                agent: agent,
+                uri: uri,
+            });
+            return record;
+        }
+        catch (err) {
+            const error = new BifoldError(t('Error.Title1043'), t('Error.Message1043'), err?.message ?? err, 1043);
+            DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error);
+        }
+    }, [agent, t]);
+    useEffect(() => {
+        if (!openIDPresentationUri) {
+            return;
+        }
+        resolveOpenIDPresentationRequest(openIDPresentationUri).then((value) => {
+            if (value) {
+                setOpenIdRecord(value);
+            }
+        });
+    }, [openIDPresentationUri, resolveOpenIDPresentationRequest]);
+    useEffect(() => {
+        if (!openIDUri) {
+            return;
+        }
+        resolveOpenIDCredential(openIDUri).then((value) => {
+            if (value) {
+                setOpenIdRecord(value);
+            }
+        });
+    }, [openIDUri, resolveOpenIDCredential]);
+    return openIdRecord;
+};

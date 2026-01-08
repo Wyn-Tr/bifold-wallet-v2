@@ -149,8 +149,6 @@ export function createDCWalletChatConfig(options: {
     useVDCredentialRenderer: true,
     credential: {
       onPress: options.onCredentialPress,
-      onAccept: options.onCredentialAccept,
-      onDecline: options.onCredentialDecline,
     },
     proof: {
       onPress: options.onProofPress,

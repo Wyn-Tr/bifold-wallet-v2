@@ -1,0 +1,31 @@
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useTheme } from '../../contexts/theme';
+import { ThemedText } from './ThemedText';
+const offset = 10;
+const HighlightTextBox = ({ children }) => {
+    const { ColorPalette, OnboardingTheme } = useTheme();
+    const style = StyleSheet.create({
+        icon: {
+            marginRight: offset,
+        },
+        container: {
+            flexDirection: 'row',
+            backgroundColor: ColorPalette.brand.primaryBackground,
+        },
+        accentBox: {
+            marginRight: offset,
+            backgroundColor: ColorPalette.brand.highlight,
+            width: 8,
+        },
+        headerText: {
+            ...OnboardingTheme.bodyText,
+            flexShrink: 1,
+        },
+    });
+    return (<View style={style.container}>
+      <View style={style.accentBox}/>
+      <ThemedText style={[style.headerText, { paddingTop: offset, paddingBottom: offset }]}>{children}</ThemedText>
+    </View>);
+};
+export default HighlightTextBox;

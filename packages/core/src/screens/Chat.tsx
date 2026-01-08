@@ -52,7 +52,6 @@ const Chat: React.FC<ChatProps> = ({ route }) => {
   const headerHeight = useHeaderHeight()
 
 
-  // console.log('====BM====> ', JSON.stringify(basicMessages, null, 2))
 
   // Check if the connection supports WebRTC for video calls
   const { capabilities } = useConnectionCapabilities(connectionId)
