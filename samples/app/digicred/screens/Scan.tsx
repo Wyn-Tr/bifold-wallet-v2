@@ -3,9 +3,7 @@ import { useAgent } from '@credo-ts/react-hooks'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, View, StyleSheet, Text, StatusBar, TouchableOpacity, Share, useWindowDimensions } from 'react-native'
-import { PERMISSIONS, Permission, RESULTS, Rationale, check, request } from 'react-native-permissions'
-import Toast from 'react-native-toast-message'
+import { View, StyleSheet, Text, StatusBar, TouchableOpacity, Share, useWindowDimensions } from 'react-native'
 
 import {
   testIdWithKey,
@@ -18,7 +16,6 @@ import {
   setCameraActive,
 } from '@bifold/core'
 import { QrCodeScanError } from '@bifold/core/src/types/error'
-import { ToastType } from '@bifold/core/src/components/toast/BaseToast'
 import { TOKENS, useServices } from '@bifold/core/src/container-api'
 import { useStore } from '@bifold/core/src/contexts/store'
 import LoadingIndicator from '@bifold/core/src/components/animated/LoadingIndicator'
@@ -26,10 +23,6 @@ import { createConnectionInvitation } from '@bifold/core/src/utils/helpers'
 import { useConnectionByOutOfBandId } from '@bifold/core/src/hooks/connections'
 import { Screens, Stacks } from '@bifold/core/src/types/navigators'
 import { ConnectStackParams } from '@bifold/core/src/types/navigators'
-import type { PermissionStatus } from 'react-native-permissions'
-
-// Type for permission flow function
-type PermissionContract = (permission: Permission, rationale?: Rationale) => Promise<PermissionStatus>
 
 import { GradientBackground } from '../components'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -47,8 +40,6 @@ const Scan: React.FC<ScanProps> = ({ navigation }) => {
   const { t } = useTranslation()
   const { width } = useWindowDimensions()
   const [store] = useStore()
-  const [loading, setLoading] = useState<boolean>(true)
-  const [showDisclosureModal, setShowDisclosureModal] = useState<boolean>(true)
   const [qrCodeScanError, setQrCodeScanError] = useState<QrCodeScanError | null>(null)
   const [torchActive, setTorchActive] = useState(false)
   const [activeTab, setActiveTab] = useState<'scan' | 'myqr'>('scan')
@@ -136,37 +127,6 @@ const Scan: React.FC<ScanProps> = ({ navigation }) => {
     }
   }, [invitation])
 
-  const permissionFlow = useCallback(
-    async (method: PermissionContract, permission: Permission, rationale?: Rationale): Promise<boolean> => {
-      try {
-        const permissionResult = await method(permission, rationale)
-        if (permissionResult === RESULTS.GRANTED) {
-          setShowDisclosureModal(false)
-          return true
-        }
-      } catch (error: unknown) {
-        Toast.show({
-          type: ToastType.Error,
-          text1: t('Global.Failure'),
-          text2: (error as Error)?.message || t('Error.Unknown'),
-          visibilityTime: 2000,
-          position: 'bottom',
-        })
-      }
-      return false
-    },
-    [t]
-  )
-
-  const requestCameraUse = async (rationale?: Rationale): Promise<boolean> => {
-    if (Platform.OS === 'android') {
-      return await permissionFlow(request, PERMISSIONS.ANDROID.CAMERA, rationale)
-    } else if (Platform.OS === 'ios') {
-      return await permissionFlow(request, PERMISSIONS.IOS.CAMERA, rationale)
-    }
-    return false
-  }
-
   // Set camera active flag to prevent splash overlay during camera transitions
   useEffect(() => {
     setCameraActive(true)
@@ -174,77 +134,6 @@ const Scan: React.FC<ScanProps> = ({ navigation }) => {
       setCameraActive(false)
     }
   }, [])
-
-  useEffect(() => {
-    const asyncEffect = async () => {
-      if (Platform.OS === 'android') {
-        await permissionFlow(check, PERMISSIONS.ANDROID.CAMERA)
-      } else if (Platform.OS === 'ios') {
-        await permissionFlow(check, PERMISSIONS.IOS.CAMERA)
-      }
-      setLoading(false)
-    }
-    asyncEffect()
-  }, [permissionFlow])
-
-  // Camera disclosure modal
-  if (showDisclosureModal && !loading) {
-    return (
-      <GradientBackground>
-        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.backButton}
-              testID={testIdWithKey('Back')}
-            >
-              <Icon name="chevron-left" size={24} color={Colors.text.primary} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Scan QR Code</Text>
-            <View style={styles.headerSpacer} />
-          </View>
-          <View style={styles.centerContent}>
-            <View style={styles.iconContainer}>
-              <Icon name="camera" size={48} color={Colors.button.primary} />
-            </View>
-            <Text style={styles.title}>Camera Access Required</Text>
-            <Text style={styles.subtitle}>
-              To scan QR codes and connect with contacts, we need permission to use your camera.
-            </Text>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => requestCameraUse()}
-              testID={testIdWithKey('AllowCamera')}
-            >
-              <Text style={styles.primaryButtonText}>Allow Camera Access</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => navigation.goBack()}
-              testID={testIdWithKey('Cancel')}
-            >
-              <Text style={styles.secondaryButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </GradientBackground>
-    )
-  }
-
-  // Loading state
-  if (loading) {
-    return (
-      <GradientBackground>
-        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-        <View style={styles.container}>
-          <View style={styles.centerContent}>
-            <Text style={styles.subtitle}>Loading...</Text>
-          </View>
-        </View>
-      </GradientBackground>
-    )
-  }
 
   // Scanner view with tabs
   return (
@@ -483,6 +372,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     textAlign: 'center',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
   },
   errorText: {
     color: '#FFFFFF',

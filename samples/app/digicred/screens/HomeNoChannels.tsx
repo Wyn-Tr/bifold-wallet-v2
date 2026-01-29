@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   View,
@@ -26,6 +27,8 @@ import { isSmallScreen, isTablet } from '../utils/devices'
 import { TOKENS, useServices } from '../../../../packages/core/src/container-api'
 import { Screens, Stacks } from '../../../../packages/core/src/types/navigators'
 import LinearGradient from 'react-native-linear-gradient'
+import { PERMISSIONS, RESULTS, request, Permission, check, openSettings } from 'react-native-permissions'
+import { Platform, Alert } from 'react-native'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -88,8 +91,61 @@ const HomeNoChannels = () => {
     }
   }, [fadeAnim, item1Anim, item2Anim, item3Anim, shouldRenderHomeNoChannels, translateYAnim])
 
-  const handleScanPress = useCallback(() => {
-    navigation.navigate(Stacks.ConnectStack as string, { screen: Screens.Scan } as Record<string, unknown>)
+  const handleScanPress = useCallback(async () => {
+    try {
+      // Determine which permission to check based on platform
+      let permission: Permission
+      if (Platform.OS === 'ios') {
+        permission = PERMISSIONS.IOS.CAMERA
+      } else if (Platform.OS === 'android') {
+        permission = PERMISSIONS.ANDROID.CAMERA
+      } else {
+        // If platform not supported, just navigate (shouldn't happen)
+        navigation.navigate(Stacks.ConnectStack as string, { screen: Screens.Scan } as Record<string, unknown>)
+        return
+      }
+
+      // First check current permission status
+      const checkResult = await check(permission)
+
+      // If already granted, navigate directly
+      if (checkResult === RESULTS.GRANTED) {
+        navigation.navigate(Stacks.ConnectStack as string, { screen: Screens.Scan } as Record<string, unknown>)
+        return
+      }
+
+      // If BLOCKED (permanently denied), show alert to go to settings
+      if (checkResult === RESULTS.BLOCKED) {
+        Alert.alert(
+          'Camera Permission Required',
+          'Camera access is needed to scan QR codes. Please enable it in your device settings.',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Open Settings',
+              onPress: () => openSettings(),
+            },
+          ]
+        )
+        return
+      }
+
+      // For DENIED, UNAVAILABLE, or first time - request permission
+      const result = await request(permission)
+
+      // Only navigate if permission granted
+      if (result === RESULTS.GRANTED) {
+        navigation.navigate(Stacks.ConnectStack as string, { screen: Screens.Scan } as Record<string, unknown>)
+      }
+
+      // If denied, just stay on current screen silently
+      // Next time they click, check() will return BLOCKED and show the alert
+    } catch (error) {
+      console.error('Error requesting camera permission:', error)
+    }
   }, [navigation])
 
   const contents = [
