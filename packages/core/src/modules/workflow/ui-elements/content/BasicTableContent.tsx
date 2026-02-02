@@ -10,6 +10,12 @@ interface TableRow {
   [key: string]: string | number
 }
 
+const parseOrder = (order: string | number | undefined): number => {
+  if (order === undefined) return 0
+  if (typeof order === 'number') return order
+  return parseInt(order, 10) || 0
+}
+
 const BasicTableContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
   const header: HeaderColumn[] = item.header || []
   const rows: TableRow[] = item.rows || []
@@ -19,11 +25,8 @@ const BasicTableContent: React.FC<ContentProps> = ({ item, styles, colors }) => 
     return null
   }
 
-  // Sort header by order
   const sortedHeader = [...header].sort((a, b) => {
-    const orderA = a.order as number
-    const orderB = b.order as number
-    return orderA - orderB
+    return parseOrder(a.order) - parseOrder(b.order)
   })
 
   // Get column keys (excluding 'order')

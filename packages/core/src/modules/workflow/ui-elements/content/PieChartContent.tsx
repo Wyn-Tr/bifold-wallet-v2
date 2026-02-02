@@ -5,7 +5,12 @@ import { ContentProps, ContentRegistry } from '../ContentRegistry'
 
 interface SliceItem {
   label: string
-  count: number
+  count: number | string
+}
+
+const parseCount = (count: number | string): number => {
+  if (typeof count === 'number') return count
+  return parseFloat(count) || 0
 }
 
 const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
@@ -21,7 +26,7 @@ const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
   const centerY = size / 2
 
   // Calculate total for percentages
-  const total = slices.reduce((sum, slice) => sum + slice.count, 0)
+  const total = slices.reduce((sum, slice) => sum + parseCount(slice.count), 0)
 
   // Predefined colors for slices
   const sliceColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
@@ -63,7 +68,8 @@ const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
         <Svg width={size} height={size}>
           <G>
             {slices.map((slice, index) => {
-              const percentage = (slice.count / total) * 100
+              const count = parseCount(slice.count)
+              const percentage = (count / total) * 100
               const angle = (percentage / 100) * 360
               const startAngle = currentAngle
               const endAngle = currentAngle + angle
@@ -80,7 +86,8 @@ const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
         {/* Legend */}
         <View style={{ marginTop: 16, width: '100%' }}>
           {slices.map((slice, index) => {
-            const percentage = ((slice.count / total) * 100).toFixed(1)
+            const count = parseCount(slice.count)
+            const percentage = ((count / total) * 100).toFixed(1)
             return (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <View
@@ -93,7 +100,7 @@ const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
                   }}
                 />
                 <Text style={[styles.description, { color: colors.text, fontSize: 13 }]}>
-                  {slice.label}: {slice.count} ({percentage}%)
+                  {slice.label}: {count} ({percentage}%)
                 </Text>
               </View>
             )
