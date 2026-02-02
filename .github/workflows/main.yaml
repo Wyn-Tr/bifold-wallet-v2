@@ -229,4 +229,4 @@ jobs:
           sudo chown -R $USER:$USER /mnt/gradle-cache
 
           # Run the release build
-          ./gradlew --no-daemon bundleRelease
+          ./gradlew --no-daemon bundleRelease -PreactNativeArchitectures=arm64-v8a
