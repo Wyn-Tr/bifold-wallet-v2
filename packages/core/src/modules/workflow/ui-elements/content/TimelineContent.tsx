@@ -3,9 +3,14 @@ import { View, Text } from 'react-native'
 import { ContentProps, ContentRegistry } from '../ContentRegistry'
 
 interface TimelineEntry {
-  order: number
+  order: number | string
   entry: string
   text: string
+}
+
+const parseOrder = (order: number | string): number => {
+  if (typeof order === 'number') return order
+  return parseInt(order, 10) || 0
 }
 
 const TimelineContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
@@ -16,7 +21,7 @@ const TimelineContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
   }
 
   // Sort by order
-  const sortedEntries = [...entries].sort((a, b) => a.order - b.order)
+  const sortedEntries = [...entries].sort((a, b) => parseOrder(a.order) - parseOrder(b.order))
 
   return (
     <View style={styles.fieldContainer}>

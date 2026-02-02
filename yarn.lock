@@ -12433,6 +12433,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-modules-core@patch:expo-modules-core@npm%3A1.11.14#~/.yarn/patches/expo-modules-core-npm-1.11.14-d72efb177e.patch":
+  version: 1.11.14
+  resolution: "expo-modules-core@patch:expo-modules-core@npm%3A1.11.14#~/.yarn/patches/expo-modules-core-npm-1.11.14-d72efb177e.patch::version=1.11.14&hash=481e8a"
+  dependencies:
+    invariant: "npm:^2.2.4"
+  checksum: 10c0/3f726428f5fcc8d1ffad294456ad7d1bf094e61cad0aad65f12524e71cdc1558002c9553db29b802f63d03ef1c946048192c9160238935fc1ff0f1855bc8db91
+  languageName: node
+  linkType: hard
+
 "expo-random@npm:*":
   version: 14.0.1
   resolution: "expo-random@npm:14.0.1"
