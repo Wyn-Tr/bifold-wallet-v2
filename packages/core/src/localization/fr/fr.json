@@ -628,7 +628,8 @@
     "SentMessage": "Envoyer un message",
     "ReceivedMessage": "Vous avez reçu un nouveau message",
     "ViewMessage": "Voir le message",
-    "ScanOfferAddCard": "Scan an offer to add a card to your wallet (FR)"
+    "ScanOfferAddCard": "Scan an offer to add a card to your wallet (FR)",
+    "NewChannel": "Nouveau Canal"
   },
   "Scan": {
     "SuccessfullyAcceptedConnection": "Connexion acceptée avec succès",

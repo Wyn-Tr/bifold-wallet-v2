@@ -645,6 +645,7 @@
     "ViewMessage": "Ver mensaje",
     "ScanOfferAddCard": "Escanee una oferta para agregar una tarjeta a su cartera",
     "Scan": "Escanear código QR",
+    "NewChannel": "Nuevo Canal",
     "NotificationPreview": "Has recibido una notificación..."
   },
   "Scan": {

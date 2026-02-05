@@ -183,12 +183,12 @@ const Home: React.FC = () => {
           <View style={styles.header}>
             <Text style={styles.headerTitle}>{t('Screens.Home')}</Text>
             <TouchableOpacity
-              style={styles.scanButton}
+              style={styles.newChannelButton}
               onPress={handleScanPress}
-              testID={testIdWithKey('ScanButton')}
-              accessibilityLabel={t('Home.Scan')}
+              testID={testIdWithKey('NewChannelButton')}
+              accessibilityLabel={t('Home.NewChannel')}
             >
-              <Icon name="qrcode-scan" size={33} color={DigiCredColors.text.primary} />
+              <Text style={styles.newChannelText}>{t('Home.NewChannel')}</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -221,11 +221,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: DigiCredColors.text.primary,
   },
-  scanButton: {
-    width: 44,
-    height: 44,
+  newChannelButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  newChannelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DigiCredColors.text.primary,
   },
   listContent: {
     alignItems: 'center',
