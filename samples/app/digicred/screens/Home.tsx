@@ -222,15 +222,19 @@ const styles = StyleSheet.create({
     color: DigiCredColors.text.primary,
   },
   newChannelButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#004D4D',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#14FFEC',
   },
   newChannelText: {
     fontSize: 14,
     fontWeight: '600',
-    color: DigiCredColors.text.primary,
+    color: '#FFFFFF',
   },
   listContent: {
     alignItems: 'center',

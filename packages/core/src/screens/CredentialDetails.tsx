@@ -640,19 +640,21 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
             <View style={styles.smallDivider} />
           </View>
 
-          {/* Inline QR Code Section */}
-          <View style={styles.qrSection}>
-            <View style={styles.qrCard}>
-              <QRCode
-                value={qrData}
-                size={180}
-                color="#FFFFFF"
-                backgroundColor="transparent"
-              />
+          {/* Inline QR Code Section - Only show for Student ID, not Transcript */}
+          {!isTranscript && (
+            <View style={styles.qrSection}>
+              <View style={styles.qrCard}>
+                <QRCode
+                  value={qrData}
+                  size={180}
+                  color="#FFFFFF"
+                  backgroundColor="transparent"
+                />
+              </View>
+              <Text style={styles.qrSectionName}>{fullName}</Text>
+              <Text style={styles.qrSectionInfo}>{school || displayName}</Text>
             </View>
-            <Text style={styles.qrSectionName}>{fullName}</Text>
-            <Text style={styles.qrSectionInfo}>{school || displayName}</Text>
-          </View>
+          )}
 
           <View style={styles.detailsSection}>
             <Text style={styles.schoolName}>{displayName}</Text>
