@@ -647,6 +647,7 @@
     "ViewMessage": "View message",
     "ScanOfferAddCard": "Scan an offer to add a card to your wallet",
     "Scan": "Scan QR Code",
+    "NewChannel": "New Channel",
     "NotificationPreview": "You have received a notification...",
     "ListCredentials": "List Credentials",
     "UnknownContact":"Unknown Contact"
@@ -937,7 +938,7 @@
   },
   "TabStack": {
     "Home": "Notifications",
-    "Scan": "Scan",
+    "Scan": "New Channel",
     "Credentials": "Credentials",
     "ListCredentials": "List Credentials"
   },

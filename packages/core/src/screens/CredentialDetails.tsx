@@ -185,7 +185,6 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
 
   const [isOverflowOpen, setIsOverflowOpen] = useState(false)
   const [overflowAnchor, setOverflowAnchor] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
-  const [showQRCode, setShowQRCode] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const [showZoomModal, setShowZoomModal] = useState(false)
   const windowWidth = Dimensions.get('window').width
@@ -264,15 +263,6 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
 
   const cancelRemoveCredential = useCallback(() => {
     setShowRemoveModal(false)
-  }, [])
-
-  const onPresentQRCode = useCallback(() => {
-    closeOverflowMenu()
-    setShowQRCode(true)
-  }, [closeOverflowMenu])
-
-  const onCloseQRCode = useCallback(() => {
-    setShowQRCode(false)
   }, [])
 
   const handleZoomIn = useCallback(() => {
@@ -589,19 +579,6 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
             >
               <Text style={{ color: '#FFFFFF', fontSize: 16 }}>{t('CredentialDetails.RemoveCredential')}</Text>
             </Pressable>
-
-            <Pressable
-              onPress={onPresentQRCode}
-              accessibilityRole="button"
-              accessibilityLabel={t('CredentialDetails.PresentQRCode')}
-              style={({ pressed }) => ({
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                opacity: pressed ? 0.7 : 1,
-              })}
-            >
-              <Text style={{ color: '#FFFFFF', fontSize: 16 }}>{t('CredentialDetails.PresentQRCode')}</Text>
-            </Pressable>
           </View>
         </View>
       </Pressable>
@@ -630,37 +607,11 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
     </Modal>
   )
 
-  const qrCodeModal = (
-    <Modal visible={showQRCode} transparent animationType="fade" onRequestClose={onCloseQRCode}>
-      <Pressable style={styles.qrModalBackdrop} onPress={onCloseQRCode}>
-        <View style={styles.qrModalContainer}>
-          <View style={styles.qrModalCard}>
-            <Text style={styles.qrModalTitle}>{t('CredentialDetails.PresentQRCode')}</Text>
-            <View style={styles.qrCard}>
-              <QRCode
-                value={qrData}
-                size={200}
-                color="#FFFFFF"
-                backgroundColor="transparent"
-              />
-            </View>
-            <Text style={styles.qrModalSubtitle}>{fullName}</Text>
-            <Text style={styles.qrModalInfo}>{school || displayName}</Text>
-            <TouchableOpacity style={styles.qrModalCloseButton} onPress={onCloseQRCode}>
-              <Text style={styles.qrModalCloseButtonText}>{t('Global.Close')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Pressable>
-    </Modal>
-  )
-
   return (
     <GradientBackground>
       <SafeAreaView style={styles.safeArea}>
         {overflowMenu}
         {removeCredentialModal}
-        {qrCodeModal}
 
         {showZoomModal && (
           <ZoomableView isVisible={showZoomModal} onClose={handleZoomOut}>
@@ -688,6 +639,23 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
             <View style={styles.cardContainer}>{renderCredentialCard()}</View>
             <View style={styles.smallDivider} />
           </View>
+
+          {/* Inline QR Code Section - Only show for Student ID, not Transcript */}
+          {!isTranscript && (
+            <View style={styles.qrSection}>
+              <View style={styles.qrCard}>
+                <QRCode
+                  value={qrData}
+                  size={180}
+                  color="#FFFFFF"
+                  backgroundColor="transparent"
+                />
+              </View>
+              <Text style={styles.qrSectionName}>{fullName}</Text>
+              <Text style={styles.qrSectionInfo}>{school || displayName}</Text>
+            </View>
+          )}
+
           <View style={styles.detailsSection}>
             <Text style={styles.schoolName}>{displayName}</Text>
             <Text style={styles.studentCardLabel}>
@@ -854,69 +822,25 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#004D4D',
   },
-  qrModalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
+  qrSection: {
     alignItems: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 20,
   },
-  qrModalContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    width: '100%',
-  },
-  qrModalCard: {
-    width: '90%',
-    maxWidth: 320,
-    padding: 24,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    borderRadius: 20,
-    backgroundColor: '#25272A',
-    borderWidth: 2,
-    borderColor: '#004D4D',
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.48,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  qrModalTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontFamily: 'OpenSans-SemiBold',
-  },
-  qrModalSubtitle: {
+  qrSectionName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
     textAlign: 'center',
     fontFamily: 'OpenSans-SemiBold',
-    marginTop: 8,
+    marginTop: 16,
   },
-  qrModalInfo: {
+  qrSectionInfo: {
     fontSize: 14,
     color: '#AAAAAA',
     textAlign: 'center',
     fontFamily: 'OpenSans-Regular',
-  },
-  qrModalCloseButton: {
-    backgroundColor: '#004D4D',
-    borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    marginTop: 8,
-  },
-  qrModalCloseButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    fontFamily: 'OpenSans-SemiBold',
+    marginTop: 4,
   },
   removeModalBackdrop: {
     flex: 1,

@@ -225,63 +225,27 @@ const TabStack: React.FC = () => {
           options={{
             tabBarIconStyle: styles.tabBarIcon,
             tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  position: 'relative',
-                  flex: 1,
-                  width: 90,
-                }}
-              >
-                <AttachTourStep tourID={BaseTourID.HomeTour} index={0} fill>
-                  <View
+              <AttachTourStep tourID={BaseTourID.HomeTour} index={0}>
+                <View
+                  style={{
+                    ...TabTheme.tabBarContainerStyle,
+                    justifyContent: 'center',
+                  }}
+                  accessible={true}
+                  accessibilityRole={'button'}
+                  accessibilityLabel={t('TabStack.Scan')}
+                >
+                  <Text
                     style={{
-                      position: 'absolute',
-                      flexGrow: 1,
-                      width: 90,
-                      bottom: 0,
-                      minHeight: 90,
-                      margin: 'auto',
+                      ...TabTheme.tabBarTextStyle,
+                      color: focused ? TabTheme.tabBarActiveTintColor : TabTheme.tabBarInactiveTintColor,
+                      fontWeight: focused ? TextTheme.bold.fontWeight : TextTheme.normal.fontWeight,
                     }}
                   >
-                    <AttachTourStep tourID={BaseTourID.CredentialsTour} index={0} fill>
-                      <View
-                        style={{
-                          flexGrow: 1,
-                          justifyContent: 'flex-end',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <View
-                          accessible={true}
-                          accessibilityRole={'button'}
-                          accessibilityLabel={t('TabStack.Scan')}
-                          style={{ ...TabTheme.focusTabIconStyle }}
-                        >
-                          <Assets.svg.tabTwoIcon
-                            height={30}
-                            width={30}
-                            fill={TabTheme.tabBarButtonIconStyle.color}
-                            style={{ paddingLeft: 0.5, paddingRight: 0.5 }}
-                          />
-                        </View>
-
-                        {showLabels && (
-                          <ThemedText
-                            maxFontSizeMultiplier={1.2}
-                            style={{
-                              ...TabTheme.tabBarTextStyle,
-                              color: focused ? TabTheme.tabBarActiveTintColor : TabTheme.tabBarInactiveTintColor,
-                              marginTop: 5,
-                            }}
-                          >
-                            {t('TabStack.Scan')}
-                          </ThemedText>
-                        )}
-                      </View>
-                    </AttachTourStep>
-                  </View>
-                </AttachTourStep>
-              </View>
+                    {t('TabStack.Scan')}
+                  </Text>
+                </View>
+              </AttachTourStep>
             ),
             tabBarShowLabel: false,
             tabBarAccessibilityLabel: t('TabStack.Scan'),
