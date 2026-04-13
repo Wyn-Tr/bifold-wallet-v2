@@ -91,6 +91,12 @@ exports[`Settings Screen Renders correctly 1`] = `
               "value": "5 min",
             },
             Object {
+              "accessibilityLabel": "MyProfile.Title",
+              "onPress": [Function],
+              "testID": "com.ariesbifold:id/MyProfile",
+              "title": "MyProfile.Title",
+            },
+            Object {
               "accessibilityLabel": "Settings.Developer",
               "onPress": [Function],
               "testID": "com.ariesbifold:id/DeveloperOptions",

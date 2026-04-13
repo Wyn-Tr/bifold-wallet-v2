@@ -101,24 +101,30 @@ exports[`ContactDetails Screen Renders correctly 1`] = `
         >
           B
         </Text>
-        <Text
-          maxFontSizeMultiplier={2}
+        <View
           style={
-            Array [
-              Object {
-                "color": "#FFFFFF",
-                "fontSize": 26,
-                "fontWeight": "bold",
-              },
-              Object {
-                "flexShrink": 1,
-                "marginLeft": 20,
-              },
-            ]
+            Object {
+              "flexShrink": 1,
+              "marginLeft": 20,
+            }
           }
         >
-          BestBC College
-        </Text>
+          <Text
+            maxFontSizeMultiplier={2}
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontSize": 26,
+                  "fontWeight": "bold",
+                },
+                undefined,
+              ]
+            }
+          >
+            BestBC College
+          </Text>
+        </View>
       </View>
       <Text
         maxFontSizeMultiplier={2}
@@ -395,24 +401,30 @@ exports[`ContactDetails Screen Renders correctly with alt contact name 1`] = `
         >
           A
         </Text>
-        <Text
-          maxFontSizeMultiplier={2}
+        <View
           style={
-            Array [
-              Object {
-                "color": "#FFFFFF",
-                "fontSize": 26,
-                "fontWeight": "bold",
-              },
-              Object {
-                "flexShrink": 1,
-                "marginLeft": 20,
-              },
-            ]
+            Object {
+              "flexShrink": 1,
+              "marginLeft": 20,
+            }
           }
         >
-          Alt Name
-        </Text>
+          <Text
+            maxFontSizeMultiplier={2}
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontSize": 26,
+                  "fontWeight": "bold",
+                },
+                undefined,
+              ]
+            }
+          >
+            Alt Name
+          </Text>
+        </View>
       </View>
       <Text
         maxFontSizeMultiplier={2}
