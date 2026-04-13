@@ -547,7 +547,8 @@
     "Name": "Name",
     "State": "State",
     "NoWorkflows": "No workflow instances yet",
-    "NoDescription": "No description available"
+    "NoDescription": "No description available",
+    "Workflows": "Workflows"
   },
   "WhatAreContacts": {
     "Title": "What are Contacts?",
@@ -1028,6 +1029,7 @@
     "UpdateAvailable": "Update Available",
     "JSONDetails": "JSON details",
     "WorkflowDetails": "Workflow Details",
+    "WorkflowTemplatePicker": "Start Workflow",
     "ListCredentials": "List Credentials"
   },
   "ListCredentials": {
@@ -1234,6 +1236,12 @@
     "CancelWorkflow": "Cancel Workflow",
     "CancelConfirmation": "Are you sure you want to cancel this workflow? This action cannot be undone.",
     "WorkflowActions": "Workflow Actions"
+  },
+  "WorkflowTemplatePicker": {
+    "LaunchFailed": "Failed to start workflow",
+    "NoDescription": "No description",
+    "Discover": "Discover Templates",
+    "Empty": "No templates available.\nTap Discover to fetch from peer."
   },
   "homeNoChannels": {
     "welcome": "Welcome to your",
