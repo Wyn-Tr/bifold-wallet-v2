@@ -35,6 +35,14 @@ jest.mock('react-native-device-info', () => {
 const connectionPath = path.join(__dirname, '../fixtures/connection-v1.json')
 const connection = JSON.parse(fs.readFileSync(connectionPath, 'utf8'))
 connection.createdAt = new Date('20230303')
+connection.metadata = {
+  get: jest.fn().mockReturnValue(undefined),
+  set: jest.fn(),
+  add: jest.fn(),
+  delete: jest.fn(),
+  data: {},
+  keys: [],
+}
 
 describe('ContactDetails Screen', () => {
   beforeEach(() => {

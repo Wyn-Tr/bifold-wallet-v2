@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 import { useAgent } from '@credo-ts/react-hooks'
+import { useIsFocused } from '@react-navigation/native'
 import type { WorkflowInstanceRecord, WorkflowTemplateRecord } from '@ajna-inc/workflow'
 import { MobileWorkflowService } from '../services/WorkflowService'
 import { useWorkflowEvents } from './useWorkflowEvents'
@@ -16,6 +17,7 @@ export function useWorkflows(connectionId?: string) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
   const appState = useRef(AppState.currentState)
+  const isFocused = useIsFocused()
 
   const service = useMemo(() => {
     if (!agent) return null
@@ -65,6 +67,13 @@ export function useWorkflows(connectionId?: string) {
       refresh()
     }
   }, [store.authentication.didAuthenticate, refresh])
+
+  // Auto-refresh when screen gains focus (catches events that fired while screen was unfocused)
+  useEffect(() => {
+    if (isFocused) {
+      refresh()
+    }
+  }, [isFocused, refresh])
 
   // Auto-refresh when workflow events occur
   useWorkflowEvents({

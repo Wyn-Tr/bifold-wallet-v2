@@ -23,7 +23,6 @@ import { testIdWithKey } from '../utils/testable'
 import { useIncomingCallHandler } from '../hooks/useIncomingCallHandler'
 
 import { BaseTourID } from '../types/tour'
-import { ThemedText } from '../components/texts/ThemedText'
 import { useTabBarTheme } from '../modules/theme/hooks/useTabBarTheme'
 
 const TabStack: React.FC = () => {

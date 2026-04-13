@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAgent } from '@credo-ts/react-hooks'
-import type { WorkflowInstanceRecord } from '@ajna-inc/workflow'
+import type { WorkflowInstanceRecord, WorkflowTemplate } from '@ajna-inc/workflow'
 import { MobileWorkflowService } from '../services/WorkflowService'
+import { computeProgress, orderStatesForProgress } from '../utils/workflowProgress'
 
 export interface WorkflowAction {
   key: string
@@ -38,6 +39,7 @@ export function useWorkflowInstance(instanceId: string) {
   const { agent } = useAgent()
   const [instance, setInstance] = useState<WorkflowInstanceRecord | null>(null)
   const [status, setStatus] = useState<EnrichedWorkflowStatus | null>(null)
+  const [template, setTemplate] = useState<WorkflowTemplate | null>(null)
   const [loading, setLoading] = useState(true)
   const [advancing, setAdvancing] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -59,6 +61,18 @@ export function useWorkflowInstance(instanceId: string) {
       setInstance(instanceRecord)
 
       if (instanceRecord) {
+        // Load template (for progress ordering) — once per instance lifetime
+        const templateId = (instanceRecord as any).templateId as string | undefined
+        const templateVersion = (instanceRecord as any).templateVersion as string | undefined
+        if (templateId) {
+          try {
+            const tplRecord = await service.getTemplate(templateId, templateVersion)
+            if (tplRecord?.template) setTemplate(tplRecord.template)
+          } catch {
+            // Non-fatal: progress bar falls back to state name only
+          }
+        }
+
         // Derive UI profile
         const uiProfile = await service.deriveUiProfile(instanceId)
 
@@ -190,6 +204,17 @@ export function useWorkflowInstance(instanceId: string) {
     return finalStates.includes((status as any).state?.toLowerCase() ?? '')
   }, [status])
 
+  // Progress ordering from template state graph
+  const orderedStates = useMemo(
+    () => (template ? orderStatesForProgress(template.states, template.transitions) : []),
+    [template]
+  )
+
+  const progress = useMemo(
+    () => computeProgress(orderedStates, (status as any)?.state),
+    [orderedStates, status]
+  )
+
   // Check if there are pending actions
   const hasPendingActions = useMemo(() => {
     return actions.length > 0
@@ -198,6 +223,7 @@ export function useWorkflowInstance(instanceId: string) {
   return {
     instance,
     status,
+    template,
     loading,
     advancing,
     error,
@@ -211,5 +237,6 @@ export function useWorkflowInstance(instanceId: string) {
     isComplete,
     hasPendingActions,
     uiProfile: status?.uiProfile,
+    progress,
   }
 }

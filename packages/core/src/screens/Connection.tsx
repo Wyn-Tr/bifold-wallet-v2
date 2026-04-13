@@ -51,7 +51,7 @@ const GoalCodes = {
 } as const
 
 const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
-  const { oobRecordId, openIDUri, openIDPresentationUri, proofId, credentialId } = route.params
+  const { oobRecordId, openIDUri, openIDPresentationUri, proofId, credentialId, workflowInstanceId } = route.params
   const [
     logger,
     { useNotifications },
@@ -380,11 +380,11 @@ const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
     }
 
     if (state.shouldShowProofComponent) {
-      return <ProofRequest proofId={proofId ?? state.notificationRecord.id} navigation={navigation} />
+      return <ProofRequest proofId={proofId ?? state.notificationRecord.id} navigation={navigation} workflowInstanceId={workflowInstanceId} />
     }
 
     if (state.shouldShowOfferComponent) {
-      return <CredentialOffer credentialId={credentialId ?? state.notificationRecord.id} navigation={navigation} />
+      return <CredentialOffer credentialId={credentialId ?? state.notificationRecord.id} navigation={navigation} workflowInstanceId={workflowInstanceId} />
     }
   }
 

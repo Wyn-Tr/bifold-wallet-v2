@@ -24,7 +24,7 @@ import { useTour } from '../contexts/tour/tour-context'
 import { useOutOfBandByConnectionId } from '../hooks/connections'
 import { HistoryCardType, HistoryRecord } from '../modules/history/types'
 import { BifoldError } from '../types/error'
-import { Screens, TabStacks } from '../types/navigators'
+import { Screens, Stacks, TabStacks } from '../types/navigators'
 import { ModalUsage } from '../types/remove'
 import { useAppAgent } from '../utils/agent'
 import {
@@ -44,9 +44,10 @@ import { ThemedText } from '../components/texts/ThemedText'
 type CredentialOfferProps = {
   navigation: any
   credentialId: string
+  workflowInstanceId?: string
 }
 
-const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentialId }) => {
+const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentialId, workflowInstanceId }) => {
   const { agent } = useAppAgent()
   const { t, i18n } = useTranslation()
   const { ColorPalette } = useTheme()
@@ -252,7 +253,14 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
         await logHistoryRecord(type)
       }
 
-      navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+      if (workflowInstanceId) {
+        navigation.getParent()?.navigate(Stacks.ContactStack, {
+          screen: Screens.WorkflowDetails,
+          params: { instanceId: workflowInstanceId },
+        })
+      } else {
+        navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+      }
     } catch (err: unknown) {
       const error = new BifoldError(t('Error.Title1025'), t('Error.Message1025'), (err as Error)?.message ?? err, 1025)
       DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error)
@@ -265,6 +273,7 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
     navigation,
     logHistoryRecord,
     historyEventsLogger.logAttestationRefused,
+    workflowInstanceId,
   ])
 
   const header = () => {
@@ -327,7 +336,7 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
   return (
     <SafeAreaView style={{ flexGrow: 1 }} edges={['bottom', 'left', 'right']}>
       <Record fields={overlay.presentationFields || []} header={header} footer={footer} />
-      <CredentialOfferAccept visible={acceptModalVisible} credentialId={credentialId} />
+      <CredentialOfferAccept visible={acceptModalVisible} credentialId={credentialId} workflowInstanceId={workflowInstanceId} />
       <CommonRemoveModal
         usage={ModalUsage.CredentialOfferDecline}
         visible={declineModalVisible}

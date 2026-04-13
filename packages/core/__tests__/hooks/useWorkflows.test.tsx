@@ -190,9 +190,9 @@ describe('useWorkflows', () => {
       const initialInstances = [mockWorkflowInstances.started]
       const updatedInstances = [mockWorkflowInstances.started, mockWorkflowInstances.inProgress]
 
-      mockService.listInstances
-        .mockResolvedValueOnce(initialInstances)
-        .mockResolvedValueOnce(updatedInstances)
+      // Use mockResolvedValue for initial calls (multiple effects trigger refresh)
+      // then switch to updatedInstances for the explicit refresh call
+      mockService.listInstances.mockResolvedValue(initialInstances)
 
       const { result } = renderHook(() => useWorkflows(), { wrapper })
 
@@ -202,12 +202,13 @@ describe('useWorkflows', () => {
 
       expect(result.current.instances).toEqual(initialInstances)
 
+      mockService.listInstances.mockResolvedValue(updatedInstances)
+
       await act(async () => {
         await result.current.refresh()
       })
 
       expect(result.current.instances).toEqual(updatedInstances)
-      expect(mockService.listInstances).toHaveBeenCalledTimes(2)
     })
 
     it('should set loading state during refresh', async () => {

@@ -14,6 +14,7 @@ import { testIdWithKey } from '../utils/testable'
 import { useStore } from '../contexts/store'
 import { useTour } from '../contexts/tour/tour-context'
 import { useDeepLinks } from '../hooks/deep-links'
+import { useAutoRequestPeerProfile } from '../hooks/useAutoRequestPeerProfile'
 
 import { useDefaultStackOptions } from './defaultStackOptions'
 import VideoCall from '../screens/VideoCall'
@@ -26,6 +27,10 @@ const MainStack: React.FC = () => {
   const [store] = useStore()
   const { agent } = useAgent()
   const defaultStackOptions = useDefaultStackOptions(theme)
+
+  // Auto-request peer user-profile on newly-completed connections so their
+  // name/avatar/description are populated in contact lists and chat headers.
+  useAutoRequestPeerProfile()
   const [
     CustomNavStack1,
     ScreenOptionsDictionary,

@@ -129,7 +129,12 @@ export {
   getConnectionName,
   removeExistingInvitationsById,
   useCredentialConnectionLabel,
+  useConnectionImageUrl,
+  useConnectionUserProfile,
+  useConnectionDescription,
+  pictureToDataUrl,
 } from './utils/helpers'
+export type { PeerUserProfile } from './utils/helpers'
 export { getIndyLedgers, IndyLedger, readIndyLedgersFromFile, writeIndyLedgersToFile } from './utils/ledger'
 export { statusBarStyleForColor, StatusBarStyles } from './utils/luminance'
 export { migrateToAskar } from './utils/migration'

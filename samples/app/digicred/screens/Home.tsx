@@ -18,7 +18,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useConnections, useCredentials } from '@credo-ts/react-hooks'
 import { ConnectionType, CredentialState, DidExchangeState } from '@credo-ts/core'
 
-import { testIdWithKey, useStore, getConnectionName, ColorPalette } from '@bifold/core'
+import {
+  testIdWithKey,
+  useStore,
+  getConnectionName,
+  ColorPalette,
+  useConnectionImageUrl,
+  useConnectionUserProfile,
+} from '@bifold/core'
+import { useWorkflowSubtitles } from '../../../../packages/core/src/hooks/useWorkflowSubtitles'
 
 import { GradientBackground } from '../components'
 import { DigiCredColors } from '../theme'
@@ -28,12 +36,13 @@ import { Screens, Stacks } from '../../../../packages/core/src/types/navigators'
 interface ContactCardProps {
   name: string
   time: string
+  subtitle?: string
   hasNotification?: boolean
   imageUrl?: string
   onPress: () => void
 }
 
-const ContactCard: React.FC<ContactCardProps> = ({ name, time, hasNotification, imageUrl, onPress }) => {
+const ContactCard: React.FC<ContactCardProps> = ({ name, time, subtitle, hasNotification, imageUrl, onPress }) => {
   const { t } = useTranslation()
   const screenWidth = Dimensions.get('window').width
 
@@ -57,6 +66,11 @@ const ContactCard: React.FC<ContactCardProps> = ({ name, time, hasNotification, 
             <Text style={styles.contactName} numberOfLines={2}>
               {name}
             </Text>
+            {subtitle && (
+              <Text style={styles.workflowSubtitle} numberOfLines={1}>
+                {subtitle}
+              </Text>
+            )}
             <Text style={styles.contactTime}>{time}</Text>
             {hasNotification && <Text style={styles.notificationText}>{t('Home.NotificationPreview')}</Text>}
           </View>
@@ -139,14 +153,6 @@ const Home: React.FC = () => {
     })
   }
 
-  const connectionsMap: Record<string, (typeof connections)[number]> = {}
-
-  connections.forEach((conn) => {
-    if (conn.id) {
-      connectionsMap[conn.id] = conn
-    }
-  })
-
   const sortedConnections = useMemo(() => {
     return [...filteredConnections].sort((a, b) => {
       const dateA = new Date(a.updatedAt || a.createdAt).getTime()
@@ -155,25 +161,32 @@ const Home: React.FC = () => {
     })
   }, [filteredConnections])
 
-  const renderContact = ({ item }: { item: (typeof sortedConnections)[0] }) => {
-    const contactName = getConnectionName(item, store.preferences.alternateContactNames) || t('Home.UnknownContact')
-    const connectionId = item.id
-    const connection = connectionId ? connectionsMap[connectionId] : undefined
-    const logoUrl = connection?.imageUrl
+  const connectionIds = useMemo(() => sortedConnections.map((c) => c.id), [sortedConnections])
+  const { subtitles: workflowSubtitles } = useWorkflowSubtitles(connectionIds)
+
+  const ContactRow: React.FC<{ item: (typeof sortedConnections)[0] }> = ({ item }) => {
+    const profile = useConnectionUserProfile(item.id)
+    const imageUrl = useConnectionImageUrl(item.id)
+    const contactName =
+      getConnectionName(item, store.preferences.alternateContactNames, profile) || t('Home.UnknownContact')
     const hasOfferReceived = credentials.some(
-      (c) => c.state === CredentialState.OfferReceived && c.connectionId === connectionId
+      (c) => c.state === CredentialState.OfferReceived && c.connectionId === item.id
     )
+    const subtitle = workflowSubtitles.get(item.id) ?? profile?.description
 
     return (
       <ContactCard
         name={contactName}
         time={formatTime((item.updatedAt || item.createdAt).toISOString())}
+        subtitle={subtitle}
         hasNotification={hasOfferReceived}
-        imageUrl={logoUrl}
+        imageUrl={imageUrl}
         onPress={() => handleContactPress(item.id)}
       />
     )
   }
+
+  const renderContact = ({ item }: { item: (typeof sortedConnections)[0] }) => <ContactRow item={item} />
 
   return (
     <>
@@ -325,6 +338,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: DigiCredColors.text.primary,
     lineHeight: 20,
+  },
+  workflowSubtitle: {
+    fontSize: 12,
+    color: '#8A9A9A',
   },
   contactTime: {
     fontSize: 11,

@@ -26,10 +26,16 @@ import { useTheme } from '../contexts/theme'
 import { BifoldError } from '../types/error'
 import { ContactStackParams, RootStackParams, Screens, TabStacks } from '../types/navigators'
 import { ModalUsage } from '../types/remove'
-import { formatTime, getConnectionName, useConnectionImageUrl } from '../utils/helpers'
+import {
+  formatTime,
+  getConnectionName,
+  useConnectionImageUrl,
+  useConnectionUserProfile,
+} from '../utils/helpers'
 import { TOKENS, useServices } from '../container-api'
 import { toImageSource } from '../utils/credential'
 import { HistoryCardType } from '../modules/history/types'
+import { useWorkflows } from '../hooks/useWorkflows'
 import { ThemedText } from '../components/texts/ThemedText'
 import { ThemedBackground } from '../modules/theme/components/ThemedBackground'
 import { testIdWithKey } from '../utils/testable'
@@ -56,11 +62,22 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ route }) => {
 
   const connection = useConnectionById(connectionId)
   const contactImageUrl = useConnectionImageUrl(connectionId)
+  const peerProfile = useConnectionUserProfile(connectionId)
 
   const connectionCredentials = [
     ...useCredentialByState(CredentialState.CredentialReceived),
     ...useCredentialByState(CredentialState.Done),
   ].filter((credential) => credential.connectionId === connection?.id)
+
+  const { instances: workflowInstances, isAvailable: workflowAvailable } = useWorkflows(connectionId)
+
+  const sortedWorkflows = useMemo(() => {
+    return [...workflowInstances].sort((a, b) => {
+      const aDate = new Date((a as any).updatedAt ?? (a as any).createdAt ?? 0).valueOf()
+      const bDate = new Date((b as any).updatedAt ?? (b as any).createdAt ?? 0).valueOf()
+      return bDate - aDate
+    })
+  }, [workflowInstances])
 
   const { width } = useWindowDimensions()
   const contactImageSize = width * CONTACT_IMG_PERCENTAGE
@@ -125,8 +142,8 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ route }) => {
   })
 
   const contactLabel = useMemo(
-    () => getConnectionName(connection, store.preferences.alternateContactNames),
-    [connection, store.preferences.alternateContactNames]
+    () => getConnectionName(connection, store.preferences.alternateContactNames, peerProfile),
+    [connection, store.preferences.alternateContactNames, peerProfile]
   )
 
   const contactImage = useMemo(() => {
@@ -214,9 +231,17 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ route }) => {
         <View style={[styles.contentContainer, { padding: Spacing.md }]}>
           <View style={styles.contactContainer}>
             {contactImage}
-            <ThemedText variant="headingThree" style={styles.contactLabel}>
-              {contactLabel}
-            </ThemedText>
+            <View style={styles.contactLabel}>
+              <ThemedText variant="headingThree">{contactLabel}</ThemedText>
+              {peerProfile?.description ? (
+                <ThemedText
+                  numberOfLines={2}
+                  style={{ marginTop: 4, opacity: 0.7 }}
+                >
+                  {peerProfile.description}
+                </ThemedText>
+              ) : null}
+            </View>
           </View>
 
           {contactDetailsOptions?.showConnectedTime && (
@@ -260,6 +285,86 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ route }) => {
                   />
                 )}
               />
+            </>
+          )}
+
+          {workflowAvailable && (
+            <>
+              <View
+                style={{
+                  borderTopColor: ColorPalette.grayscale.lightGrey,
+                  borderTopWidth: 1,
+                  marginTop: Spacing.lg,
+                }}
+              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginVertical: Spacing.md,
+                }}
+              >
+                <ThemedText variant="headingFour">{t('ContactDetails.Workflows')}</ThemedText>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate(Screens.WorkflowTemplatePicker, { connectionId })
+                  }
+                  testID={testIdWithKey('NewWorkflow')}
+                >
+                  <ThemedText style={{ color: ColorPalette.brand.primary }}>
+                    {t('ContactDetails.NewWorkflow')}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+
+              {sortedWorkflows.length === 0 ? (
+                <ThemedText style={{ color: ColorPalette.grayscale.lightGrey }}>
+                  {t('ContactDetails.NoWorkflows')}
+                </ThemedText>
+              ) : (
+                sortedWorkflows.map((item, idx) => {
+                  const inst = item as any
+                  const state = (inst.state ?? '')
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                  const name = (inst.templateId ?? '')
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                  return (
+                    <TouchableOpacity
+                      key={inst.instanceId ?? idx}
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 12,
+                        borderBottomColor: ColorPalette.grayscale.lightGrey,
+                        borderBottomWidth: idx < sortedWorkflows.length - 1 ? 1 : 0,
+                      }}
+                      onPress={() =>
+                        navigation.navigate(Screens.WorkflowDetails, {
+                          instanceId: inst.instanceId,
+                        })
+                      }
+                      testID={testIdWithKey(`Workflow-${inst.instanceId}`)}
+                    >
+                      <ThemedText variant="labelTitle" numberOfLines={1} style={{ flex: 1 }}>
+                        {name}
+                      </ThemedText>
+                      <ThemedText
+                        style={{
+                          color: ColorPalette.grayscale.mediumGrey,
+                          fontSize: 13,
+                          marginLeft: Spacing.sm,
+                        }}
+                      >
+                        {state}
+                      </ThemedText>
+                    </TouchableOpacity>
+                  )
+                })
+              )}
             </>
           )}
 

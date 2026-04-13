@@ -76,6 +76,7 @@ import DataRetention from './screens/DataRetention'
 import PINChange from './screens/PINChange'
 import PINChangeSuccess from './screens/PINChangeSuccess'
 import RenameWallet from './screens/RenameWallet'
+import MyProfile from './screens/MyProfile'
 import Tours from './screens/Tours'
 import AutoLock from './screens/AutoLock'
 import ConfigureMediator from './screens/ConfigureMediator'
@@ -85,6 +86,7 @@ import ContactDetails from './screens/ContactDetails'
 import RenameContact from './screens/RenameContact'
 import WhatAreContacts from './screens/WhatAreContacts'
 import WorkflowDetails from './screens/WorkflowDetails'
+import WorkflowTemplatePicker from './screens/WorkflowTemplatePicker'
 import ListCredentials from './screens/ListCredentials'
 import JSONDetails from './screens/JSONDetails'
 import ListProofRequests from './screens/ListProofRequests'
@@ -247,6 +249,7 @@ export class MainContainer implements Container {
     this._container.registerInstance(TOKENS.SCREEN_CONFIGURE_MEDIATOR, ConfigureMediator)
     this._container.registerInstance(TOKENS.SCREEN_TOGGLE_PUSH_NOTIFICATIONS, TogglePushNotifications)
     this._container.registerInstance(TOKENS.SCREEN_HISTORY_SETTINGS, HistorySettings)
+    this._container.registerInstance(TOKENS.SCREEN_MY_PROFILE, MyProfile)
     this._container.registerInstance(TOKENS.SCREEN_HISTORY_PAGE, HistoryPage)
 
     // Contact Screens
@@ -255,6 +258,7 @@ export class MainContainer implements Container {
     this._container.registerInstance(TOKENS.SCREEN_RENAME_CONTACT, RenameContact)
     this._container.registerInstance(TOKENS.SCREEN_WHAT_ARE_CONTACTS, WhatAreContacts)
     this._container.registerInstance(TOKENS.SCREEN_WORKFLOW_DETAILS, WorkflowDetails)
+    this._container.registerInstance(TOKENS.SCREEN_WORKFLOW_TEMPLATE_PICKER, WorkflowTemplatePicker)
 
     // Credential Screens
     this._container.registerInstance(TOKENS.SCREEN_LIST_CREDENTIALS, ListCredentials)
