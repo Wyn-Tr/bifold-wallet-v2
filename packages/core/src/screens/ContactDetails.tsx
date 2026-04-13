@@ -9,7 +9,6 @@ import {
   DeviceEventEmitter,
   FlatList,
   Image,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,

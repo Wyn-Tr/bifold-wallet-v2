@@ -60,13 +60,10 @@ export function useWorkflowSubtitles(connectionIds: string[]): {
             const currentState: string = inst.state ?? ''
 
             // Load template for display hints and title
-            let title = templateId
             let stateLabel: string | undefined
             try {
               const tpl = await service.getTemplate(templateId)
-              if (tpl?.template?.title) {
-                title = tpl.template.title
-              }
+              // template title available if needed in the future
               // Prefer receiver profile display hint text for the current state
               const hints =
                 (tpl?.template as any)?.display_hints?.profiles?.receiver?.states?.[currentState] ??
@@ -101,7 +98,8 @@ export function useWorkflowSubtitles(connectionIds: string[]): {
     } finally {
       setLoading(false)
     }
-  }, [service, connectionIds.join(',')])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [service, connectionIds])
 
   useEffect(() => {
     refresh()

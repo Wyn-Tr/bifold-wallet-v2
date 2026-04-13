@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'

@@ -1,4 +1,4 @@
-import { BasicMessageRecord, ConnectionRecord, CredentialExchangeRecord, ProofExchangeRecord } from '@credo-ts/core'
+import { ConnectionRecord } from '@credo-ts/core'
 
 import { MobileWorkflowService } from '../services/WorkflowService'
 

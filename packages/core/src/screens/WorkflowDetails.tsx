@@ -253,14 +253,14 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route, navigation }) 
       .replace(/\b\w/g, (c: string) => c.toUpperCase())
   }, [status, instance])
 
+  const instanceTemplateId = (instance as any)?.templateId
   useEffect(() => {
-    const templateId = (instance as any)?.templateId
-    if (templateId) {
-      getTemplate(templateId).then(tpl => {
+    if (instanceTemplateId) {
+      getTemplate(instanceTemplateId).then(tpl => {
         if (tpl?.template?.title) setTemplateTitle(tpl.template.title)
       }).catch(() => {})
     }
-  }, [(instance as any)?.templateId, getTemplate])
+  }, [instanceTemplateId, getTemplate])
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: templateTitle ?? fallbackName })
