@@ -17,6 +17,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@2060.io/credo-ts-didcomm-user-profile@npm:0.0.7":
+  version: 0.0.7
+  resolution: "@2060.io/credo-ts-didcomm-user-profile@npm:0.0.7"
+  dependencies:
+    class-transformer: "npm:0.5.1"
+    class-validator: "npm:0.14.1"
+    reflect-metadata: "npm:^0.1.13"
+    rxjs: "npm:^7.2.0"
+    tsyringe: "npm:^4.8.0"
+  peerDependencies:
+    "@credo-ts/core": ^0.5.13
+  checksum: 10c0/7695b71808c2ff4708fb5928b75dd403e42d442ff0cad02ddff67bfd63ba70a758d7bdbf62ee33502f3f96622fc29aacccbd01f58b26c351d02492027dd10dfb
+  languageName: node
+  linkType: hard
+
 "@2060.io/ffi-napi@npm:^4.0.9":
   version: 4.0.9
   resolution: "@2060.io/ffi-napi@npm:4.0.9"
@@ -2204,6 +2219,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@bifold/core@workspace:packages/core"
   dependencies:
+    "@2060.io/credo-ts-didcomm-user-profile": "npm:0.0.7"
     "@ajna-inc/webrtc": "npm:0.2.1"
     "@ajna-inc/workflow": "patch:@ajna-inc/workflow@npm%3A0.5.37#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.37-rncompat.patch"
     "@babel/core": "npm:~7.22.20"

@@ -493,7 +493,13 @@
     "NoCredentials": "Você não tem nenhuma credencial com esse Contato.",
     "StartVideoCall": "Iniciar Videochamada",
     "ListCredentials": "Listar Credenciais",
-    "RemoveContactAction": "Remover contato"
+    "RemoveContactAction": "Remover contato",
+    "ChannelDescription": "Descrição do canal",
+    "NewWorkflow": "Novo fluxo de trabalho",
+    "Name": "Nome",
+    "State": "Estado",
+    "NoWorkflows": "Nenhuma instância de fluxo de trabalho",
+    "NoDescription": "Nenhuma descrição disponível"
   },
   "WhatAreContacts": {
     "Title": "O que são Contatos?",
@@ -910,6 +916,18 @@
   "RenameContact": {
     "ThisContactName": "Este nome de contato só é visualizado em sua Lista de Contatos.",
     "ContactName": "Nome do contato"
+  },
+  "MyProfile": {
+    "Title": "Meu perfil",
+    "DisplayName": "Nome exibido",
+    "Description": "Descrição",
+    "PreferredLanguage": "Idioma preferido",
+    "DisplayPicture": "Foto de perfil",
+    "ChoosePicture": "Escolher foto",
+    "ClearPicture": "Remover foto",
+    "Save": "Salvar",
+    "Saved": "Perfil salvo",
+    "SaveFailed": "Falha ao salvar o perfil"
   },
   "NetInfo": {
     "NoInternetConnectionTitle": "Sem conexão com a internet",

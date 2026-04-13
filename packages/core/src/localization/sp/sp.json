@@ -537,7 +537,13 @@
     "NoCredentials": "No tienes ninguna credencial de este contacto.",
     "StartVideoCall": "Iniciar videollamada",
     "ListCredentials": "Listar Credenciales",
-    "RemoveContactAction": "Eliminar contacto"
+    "RemoveContactAction": "Eliminar contacto",
+    "ChannelDescription": "Descripción del canal",
+    "NewWorkflow": "Nuevo flujo de trabajo",
+    "Name": "Nombre",
+    "State": "Estado",
+    "NoWorkflows": "No hay instancias de flujo de trabajo",
+    "NoDescription": "No hay descripción disponible"
   },
   "WhatAreContacts": {
     "Title": "¿Qué son los Contactos?",
@@ -1039,6 +1045,18 @@
     "CharCountDescription": "Has excedido el conteo máximo de caracteres de 50 caracteres. Por favor, reduce tu conteo de caracteres.",
     "EmptyNameTitle": "El nombre del contacto no puede estar vacío",
     "EmptyNameDescription": "Este es el nombre que verás para este contacto en tu lista de contactos.\n\nPor favor, ingresa un nombre de contacto."
+  },
+  "MyProfile": {
+    "Title": "Mi perfil",
+    "DisplayName": "Nombre para mostrar",
+    "Description": "Descripción",
+    "PreferredLanguage": "Idioma preferido",
+    "DisplayPicture": "Foto de perfil",
+    "ChoosePicture": "Elegir foto",
+    "ClearPicture": "Quitar foto",
+    "Save": "Guardar",
+    "Saved": "Perfil guardado",
+    "SaveFailed": "Error al guardar el perfil"
   },
   "NetInfo": {
     "NoInternetConnectionTitle": "Sin conexión a internet",

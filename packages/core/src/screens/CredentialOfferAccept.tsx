@@ -10,7 +10,7 @@ import Button, { ButtonType } from '../components/buttons/Button'
 import SafeAreaModal from '../components/modals/SafeAreaModal'
 import { useAnimatedComponents } from '../contexts/animated-components'
 import { useTheme } from '../contexts/theme'
-import { Screens, TabStacks } from '../types/navigators'
+import { Screens, Stacks, TabStacks } from '../types/navigators'
 import { testIdWithKey } from '../utils/testable'
 import { TOKENS, useServices } from '../container-api'
 import { ThemedText } from '../components/texts/ThemedText'
@@ -26,9 +26,10 @@ export interface CredentialOfferAcceptProps {
   visible: boolean
   credentialId: string
   confirmationOnly?: boolean
+  workflowInstanceId?: string
 }
 
-const CredentialOfferAccept: React.FC<CredentialOfferAcceptProps> = ({ visible, credentialId, confirmationOnly }) => {
+const CredentialOfferAccept: React.FC<CredentialOfferAcceptProps> = ({ visible, credentialId, confirmationOnly, workflowInstanceId }) => {
   const { t } = useTranslation()
   const { agent } = useAgent()
   const [shouldShowDelayMessage, setShouldShowDelayMessage] = useState<boolean>(false)
@@ -72,12 +73,26 @@ const CredentialOfferAccept: React.FC<CredentialOfferAcceptProps> = ({ visible, 
   }
 
   const onBackToHomeTouched = useCallback(() => {
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
-  }, [navigation])
+    if (workflowInstanceId) {
+      navigation.getParent()?.navigate(Stacks.ContactStack, {
+        screen: Screens.WorkflowDetails,
+        params: { instanceId: workflowInstanceId },
+      })
+    } else {
+      navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    }
+  }, [navigation, workflowInstanceId])
 
   const onDoneTouched = useCallback(() => {
-    navigation.getParent()?.navigate(TabStacks.CredentialStack, { screen: Screens.Credentials })
-  }, [navigation])
+    if (workflowInstanceId) {
+      navigation.getParent()?.navigate(Stacks.ContactStack, {
+        screen: Screens.WorkflowDetails,
+        params: { instanceId: workflowInstanceId },
+      })
+    } else {
+      navigation.getParent()?.navigate(TabStacks.CredentialStack, { screen: Screens.Credentials })
+    }
+  }, [navigation, workflowInstanceId])
 
   useEffect(() => {
     if (!credential) {

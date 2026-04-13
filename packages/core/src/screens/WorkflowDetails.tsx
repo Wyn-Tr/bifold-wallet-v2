@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { CredentialState, ProofState } from '@credo-ts/core'
+import { useCredentialByState, useProofByState } from '@credo-ts/react-hooks'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   ScrollView,
@@ -18,8 +20,9 @@ import Button, { ButtonType } from '../components/buttons/Button'
 import { ThemedText } from '../components/texts/ThemedText'
 import { useTheme } from '../contexts/theme'
 import { useWorkflowInstance, WorkflowAction, WorkflowUiHint } from '../hooks/useWorkflowInstance'
+import { useWorkflowTemplates } from '../hooks/useWorkflows'
 import { useWorkflowEvents } from '../hooks/useWorkflowEvents'
-import { ContactStackParams, Screens } from '../types/navigators'
+import { ContactStackParams, Screens, Stacks } from '../types/navigators'
 import { testIdWithKey } from '../utils/testable'
 
 type WorkflowDetailsProps = StackScreenProps<ContactStackParams, Screens.WorkflowDetails>
@@ -130,7 +133,7 @@ function flattenContextForDisplay(
   return result
 }
 
-const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
+const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route, navigation }) => {
   const { instanceId } = route.params as { instanceId: string }
   const { t } = useTranslation()
   const { ColorPalette, SettingsTheme } = useTheme()
@@ -148,10 +151,10 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
     actions,
     uiHints,
     isComplete,
-    uiProfile,
     pause,
     resume,
     cancel,
+    progress,
   } = useWorkflowInstance(instanceId)
 
   // Clear form when workflow state changes
@@ -178,6 +181,44 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
     }, [refresh]),
   })
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AUTO-NAVIGATE: When a credential offer or proof request arrives for this
+  // workflow's connection, navigate to the accept/reject screen automatically
+  // ═══════════════════════════════════════════════════════════════════════════
+  const connectionId = (instance as any)?.connectionId as string | undefined
+  const credentialOffers = useCredentialByState(CredentialState.OfferReceived)
+  const proofRequests = useProofByState(ProofState.RequestReceived)
+  const navigatedIdsRef = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!connectionId) return
+
+    // Check for credential offers on this connection
+    const offer = credentialOffers.find(
+      (c) => c.connectionId === connectionId && !navigatedIdsRef.current.has(c.id)
+    )
+    if (offer) {
+      navigatedIdsRef.current.add(offer.id)
+      navigation.navigate(Stacks.ConnectionStack as any, {
+        screen: Screens.Connection,
+        params: { credentialId: offer.id, workflowInstanceId: instanceId },
+      })
+      return
+    }
+
+    // Check for proof requests on this connection
+    const proof = proofRequests.find(
+      (p) => p.connectionId === connectionId && !navigatedIdsRef.current.has(p.id)
+    )
+    if (proof) {
+      navigatedIdsRef.current.add(proof.id)
+      navigation.navigate(Stacks.ConnectionStack as any, {
+        screen: Screens.Connection,
+        params: { proofId: proof.id, workflowInstanceId: instanceId },
+      })
+    }
+  }, [connectionId, credentialOffers, proofRequests, instanceId, navigation])
+
   // State configuration for icons and colors using theme
   const successColor = SettingsTheme.newSettingColors.successColor || ColorPalette.semantic.success
   const errorColor = SettingsTheme.newSettingColors.deleteBtn
@@ -202,13 +243,28 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
     return stateConfig[statusValue] ?? stateConfig.default
   }, [status, stateConfig])
 
-  const _templateName = useMemo(() => {
+  const { getTemplate } = useWorkflowTemplates()
+  const [templateTitle, setTemplateTitle] = useState<string | null>(null)
+
+  const fallbackName = useMemo(() => {
     const templateId = (status as any)?.template_id ?? (instance as any)?.templateId ?? 'Workflow'
     return templateId
       .replace(/[-_]/g, ' ')
       .replace(/\b\w/g, (c: string) => c.toUpperCase())
   }, [status, instance])
-  void _templateName // Reserved for future use
+
+  useEffect(() => {
+    const templateId = (instance as any)?.templateId
+    if (templateId) {
+      getTemplate(templateId).then(tpl => {
+        if (tpl?.template?.title) setTemplateTitle(tpl.template.title)
+      }).catch(() => {})
+    }
+  }, [(instance as any)?.templateId, getTemplate])
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ title: templateTitle ?? fallbackName })
+  }, [templateTitle, fallbackName, navigation])
 
   const currentState = useMemo(() => {
     const state = (status as any)?.state ?? 'Unknown'
@@ -216,8 +272,6 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
       .replace(/[-_]/g, ' ')
       .replace(/\b\w/g, (c: string) => c.toUpperCase())
   }, [status])
-
-  const currentSection = (status as any)?.section ?? ''
 
   const handleAction = useCallback(
     async (event: string, input?: Record<string, unknown>) => {
@@ -361,54 +415,47 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
       marginTop: 20,
       minWidth: 120,
     },
-    stateCard: {
+    progressCard: {
       backgroundColor: ColorPalette.brand.secondaryBackground,
       borderRadius: 12,
-      padding: 24,
-      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
       marginBottom: 16,
       borderWidth: 1,
       borderColor: ColorPalette.grayscale.lightGrey,
     },
-    stateIcon: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 12,
-    },
-    stateName: {
-      fontSize: 20,
-      fontWeight: '600',
-      color: ColorPalette.brand.text,
-      marginBottom: 4,
-      textAlign: 'center',
-    },
-    sectionName: {
-      fontSize: 14,
-      color: ColorPalette.grayscale.mediumGrey,
-      marginBottom: 12,
-    },
-    statusBadge: {
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 16,
-      marginBottom: 8,
-    },
-    statusBadgeText: {
-      fontSize: 12,
-      fontWeight: '600',
-      textTransform: 'capitalize',
-    },
-    roleContainer: {
+    progressHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      justifyContent: 'space-between',
+      marginBottom: 10,
     },
-    roleText: {
-      fontSize: 12,
+    progressHeaderLeft: {
+      flex: 1,
+      marginRight: 12,
+    },
+    progressStep: {
+      fontSize: 11,
+      fontWeight: '600',
       color: ColorPalette.grayscale.mediumGrey,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: 2,
+    },
+    progressStateName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: ColorPalette.brand.text,
+    },
+    progressBarTrack: {
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: ColorPalette.grayscale.lightGrey,
+      overflow: 'hidden',
+    },
+    progressBarFill: {
+      height: '100%',
+      borderRadius: 3,
     },
     section: {
       marginBottom: 16,
@@ -494,22 +541,6 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
       color: ColorPalette.grayscale.mediumGrey,
       flex: 0.6,
       textAlign: 'right',
-    },
-    completeCard: {
-      backgroundColor: `${successColor}15`,
-      borderRadius: 12,
-      padding: 16,
-      alignItems: 'center',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      gap: 8,
-      borderWidth: 1,
-      borderColor: `${successColor}30`,
-    },
-    completeText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: successColor,
     },
     actionsContainer: {
       paddingTop: 12,
@@ -652,34 +683,29 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
           keyboardDismissMode="interactive"
           automaticallyAdjustKeyboardInsets={true}
         >
-          {/* State Card */}
-          <View style={styles.stateCard}>
-            <View style={[styles.stateIcon, { backgroundColor: color + '20' }]}>
-              <Icon name={icon} size={36} color={color} />
-            </View>
-            <ThemedText style={styles.stateName}>{currentState}</ThemedText>
-            {currentSection ? (
-              <ThemedText style={styles.sectionName}>{currentSection}</ThemedText>
-            ) : null}
-
-            {/* Status Badge */}
-            <View style={[styles.statusBadge, { backgroundColor: color + '20' }]}>
-              <ThemedText style={[styles.statusBadgeText, { color }]}>
-                {(status as any).status ?? 'Active'}
-              </ThemedText>
-            </View>
-
-            {/* Role Indicator */}
-            {uiProfile && (
-              <View style={styles.roleContainer}>
-                <Icon
-                  name={uiProfile === 'sender' ? 'send' : 'inbox'}
-                  size={14}
-                  color={ColorPalette.grayscale.mediumGrey}
-                />
-                <ThemedText style={styles.roleText}>
-                  You are the {uiProfile === 'sender' ? 'Initiator' : 'Participant'}
+          {/* Progress Card */}
+          <View style={styles.progressCard}>
+            <View style={styles.progressHeader}>
+              <View style={styles.progressHeaderLeft}>
+                {progress.total > 0 ? (
+                  <ThemedText style={styles.progressStep}>
+                    Step {progress.step} of {progress.total}
+                  </ThemedText>
+                ) : null}
+                <ThemedText style={styles.progressStateName} numberOfLines={1}>
+                  {currentState}
                 </ThemedText>
+              </View>
+              <Icon name={icon} size={22} color={color} />
+            </View>
+            {progress.total > 0 && (
+              <View style={styles.progressBarTrack}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: `${progress.percent}%`, backgroundColor: color },
+                  ]}
+                />
               </View>
             )}
           </View>
@@ -712,14 +738,6 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route }) => {
                   </View>
                 ))}
               </View>
-            </View>
-          )}
-
-          {/* Completed State */}
-          {isComplete && (
-            <View style={styles.completeCard}>
-              <Icon name="check-circle" size={32} color={successColor} />
-              <ThemedText style={styles.completeText}>Workflow Complete</ThemedText>
             </View>
           )}
 

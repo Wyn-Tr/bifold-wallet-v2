@@ -77,6 +77,7 @@ import { CredentialErrors } from '../types/credentials'
 type ProofRequestProps = {
   navigation: any
   proofId: string
+  workflowInstanceId?: string
 }
 
 type CredentialListProps = {
@@ -86,7 +87,7 @@ type CredentialListProps = {
   missing: boolean
 }
 
-const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId }) => {
+const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId, workflowInstanceId }) => {
   const { agent } = useAppAgent()
   const { t } = useTranslation()
   const { assertNetworkConnected } = useNetwork()
@@ -617,7 +618,14 @@ const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId }) => {
     if (historyEventsLogger.logInformationNotSent) {
       logHistoryRecord(HistoryCardType.InformationNotSent)
     }
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    if (workflowInstanceId) {
+      navigation.getParent()?.navigate(Stacks.ContactStack, {
+        screen: Screens.WorkflowDetails,
+        params: { instanceId: workflowInstanceId },
+      })
+    } else {
+      navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    }
   }, [
     agent,
     proof,
@@ -627,6 +635,7 @@ const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId }) => {
     toggleDeclineModalVisible,
     historyEventsLogger.logInformationNotSent,
     logHistoryRecord,
+    workflowInstanceId,
   ])
 
   const handleCancelTouched = useCallback(async () => {
@@ -652,6 +661,13 @@ const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId }) => {
   }, [navigation])
 
   const onProofAcceptDismiss = useCallback(() => {
+    if (workflowInstanceId) {
+      navigation.getParent()?.navigate(Stacks.ContactStack, {
+        screen: Screens.WorkflowDetails,
+        params: { instanceId: workflowInstanceId },
+      })
+      return
+    }
     // Navigate back to chat if we have a connectionId, otherwise go to home
     // Use reset to clear the ProofRequest screen from the stack
     if (proof?.connectionId) {
@@ -678,7 +694,7 @@ const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId }) => {
         })
       )
     }
-  }, [navigation, proof?.connectionId])
+  }, [navigation, proof?.connectionId, workflowInstanceId])
 
   const callViewJSONDetails = useCallback(() => {
     navigation.navigate(Stacks.ContactStack, {

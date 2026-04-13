@@ -8,7 +8,12 @@ import { useStore } from '../../contexts/store'
 import { useTheme } from '../../contexts/theme'
 import { useChatMessagesByConnection } from '../../hooks/chat-messages'
 import { ContactStackParams, Screens, Stacks } from '../../types/navigators'
-import { formatTime, getConnectionName } from '../../utils/helpers'
+import {
+  formatTime,
+  getConnectionName,
+  pictureToDataUrl,
+  useConnectionUserProfile,
+} from '../../utils/helpers'
 import { testIdWithKey } from '../../utils/testable'
 import { TOKENS, useServices } from '../../container-api'
 import { ThemedText } from '../texts/ThemedText'
@@ -49,6 +54,14 @@ const ContactListItem: React.FC<ContactListItemProps> = ({ contact, navigation }
       width: 30,
       height: 30,
     },
+    avatarImageProfile: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+    },
+    descriptionText: {
+      opacity: 0.7,
+    },
     contactNameContainer: {
       flex: 1,
       paddingVertical: 4,
@@ -71,9 +84,18 @@ const ContactListItem: React.FC<ContactListItemProps> = ({ contact, navigation }
     })
   }, [navigation, contact, enableChat])
 
+  const profile = useConnectionUserProfile(contact.id)
+  const profileImageUrl = useMemo(
+    () =>
+      pictureToDataUrl(profile?.displayPicture ?? undefined) ||
+      pictureToDataUrl(profile?.displayIcon ?? undefined) ||
+      contact.imageUrl ||
+      undefined,
+    [profile, contact.imageUrl]
+  )
   const contactLabel = useMemo(
-    () => getConnectionName(contact, store.preferences.alternateContactNames),
-    [contact, store.preferences.alternateContactNames]
+    () => getConnectionName(contact, store.preferences.alternateContactNames, profile),
+    [contact, store.preferences.alternateContactNames, profile]
   )
   const contactLabelAbbr = useMemo(() => contactLabel?.charAt(0).toUpperCase(), [contactLabel])
 
@@ -86,10 +108,8 @@ const ContactListItem: React.FC<ContactListItemProps> = ({ contact, navigation }
     >
       <View style={styles.container}>
         <View style={styles.avatarContainer}>
-          {contact.imageUrl ? (
-            <View>
-              <Image style={styles.avatarImage} source={{ uri: contact.imageUrl }} />
-            </View>
+          {profileImageUrl ? (
+            <Image style={styles.avatarImageProfile} source={{ uri: profileImageUrl }} />
           ) : (
             <ThemedText allowFontScaling={false} variant="headingFour" style={styles.avatarPlaceholder}>
               {contactLabelAbbr}
@@ -105,6 +125,11 @@ const ContactListItem: React.FC<ContactListItemProps> = ({ contact, navigation }
               {message && <ThemedText>{formatTime(message.createdAt, { shortMonth: true, trim: true })}</ThemedText>}
             </View>
           </View>
+          {profile?.description ? (
+            <ThemedText numberOfLines={1} ellipsizeMode="tail" style={styles.descriptionText}>
+              {profile.description}
+            </ThemedText>
+          ) : null}
           <View>
             {message && !hasOnlyInitialMessage && (
               <ThemedText numberOfLines={1} ellipsizeMode={'tail'}>

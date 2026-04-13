@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import {
   DeviceEventEmitter,
   FlatList,
+  Image,
   StyleSheet,
   View,
   Text,
@@ -23,6 +24,9 @@ import {
   BifoldError,
   TOKENS,
   useServices,
+  useConnectionImageUrl,
+  useConnectionUserProfile,
+  getConnectionName,
 } from '@bifold/core'
 import { ContactStackParams } from '@bifold/core/src/types/navigators'
 import { BifoldAgent } from '@bifold/core/src/utils/agent'
@@ -47,7 +51,11 @@ interface ContactItemProps {
 }
 
 const ContactItem: React.FC<ContactItemProps> = ({ contact, onPress }) => {
-  const label = contact.theirLabel || contact.alias || 'Unknown Contact'
+  const [store] = useStore()
+  const profile = useConnectionUserProfile(contact.id)
+  const imageUrl = useConnectionImageUrl(contact.id)
+  const label =
+    getConnectionName(contact, store.preferences.alternateContactNames, profile) || 'Unknown Contact'
   const initial = label.charAt(0).toUpperCase()
 
   return (
@@ -58,15 +66,25 @@ const ContactItem: React.FC<ContactItemProps> = ({ contact, onPress }) => {
       testID={testIdWithKey(`Contact-${contact.id}`)}
     >
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{initial}</Text>
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.avatarImage} />
+        ) : (
+          <Text style={styles.avatarText}>{initial}</Text>
+        )}
       </View>
       <View style={styles.contactInfo}>
         <Text style={styles.contactName} numberOfLines={1}>
           {label}
         </Text>
-        <Text style={styles.contactStatus}>
-          {contact.state === DidExchangeState.Completed ? 'Connected' : contact.state}
-        </Text>
+        {profile?.description ? (
+          <Text style={styles.contactDescription} numberOfLines={1}>
+            {profile.description}
+          </Text>
+        ) : (
+          <Text style={styles.contactStatus}>
+            {contact.state === DidExchangeState.Completed ? 'Connected' : contact.state}
+          </Text>
+        )}
       </View>
       <Icon name="chevron-right" size={24} color={Colors.text.secondary} />
     </TouchableOpacity>
@@ -229,6 +247,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  contactDescription: {
+    fontSize: 13,
+    color: Colors.text.secondary,
   },
   contactInfo: {
     flex: 1,

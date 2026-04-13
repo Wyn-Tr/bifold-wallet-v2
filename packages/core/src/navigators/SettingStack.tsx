@@ -34,6 +34,7 @@ const SettingStack: React.FC = () => {
     PINChangeSuccessScreen,
     TogglePushNotifications,
     HistorySettings,
+    MyProfileScreen,
     // Wallet Backup/Restore Screens
     ExportWalletIntro,
     ExportWallet,
@@ -59,6 +60,7 @@ const SettingStack: React.FC = () => {
     TOKENS.SCREEN_PIN_CHANGE_SUCCESS,
     TOKENS.SCREEN_TOGGLE_PUSH_NOTIFICATIONS,
     TOKENS.SCREEN_HISTORY_SETTINGS,
+    TOKENS.SCREEN_MY_PROFILE,
     // Wallet Backup/Restore Screens
     TOKENS.SCREEN_EXPORT_WALLET_INTRO,
     TOKENS.SCREEN_EXPORT_WALLET,
@@ -213,6 +215,15 @@ const SettingStack: React.FC = () => {
           title: t('Screens.HistorySettings'),
           headerBackTestID: testIdWithKey('Back'),
           ...ScreenOptionsDictionary[Screens.HistorySettings],
+        }}
+      />
+      <Stack.Screen
+        name={Screens.MyProfile}
+        component={MyProfileScreen}
+        options={{
+          title: t('MyProfile.Title'),
+          headerBackTestID: testIdWithKey('Back'),
+          ...ScreenOptionsDictionary[Screens.MyProfile],
         }}
       />
       <Stack.Screen

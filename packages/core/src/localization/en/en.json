@@ -541,7 +541,13 @@
     "NoCredentials": "You don't have any credentials from this contact.",
     "StartVideoCall": "Start Video Call",
     "ListCredentials": "List Credentials",
-    "RemoveContactAction": "Remove Contact"
+    "RemoveContactAction": "Remove Contact",
+    "ChannelDescription": "Channel Description",
+    "NewWorkflow": "New Workflow",
+    "Name": "Name",
+    "State": "State",
+    "NoWorkflows": "No workflow instances yet",
+    "NoDescription": "No description available"
   },
   "WhatAreContacts": {
     "Title": "What are Contacts?",
@@ -1057,6 +1063,18 @@
     "CharCountDescription": "You've exceeded the maximum character count of 50 characters. Please reduce your character count.",
     "EmptyNameTitle": "Contact name can't be empty",
     "EmptyNameDescription": "This is the name you will see for this Contact in your Contacts list. Please enter a contact name."
+  },
+  "MyProfile": {
+    "Title": "My Profile",
+    "DisplayName": "Display name",
+    "Description": "Description",
+    "PreferredLanguage": "Preferred language",
+    "DisplayPicture": "Profile picture",
+    "ChoosePicture": "Choose picture",
+    "ClearPicture": "Clear picture",
+    "Save": "Save",
+    "Saved": "Profile saved",
+    "SaveFailed": "Failed to save profile"
   },
   "NetInfo": {
     "NoInternetConnectionTitle": "No internet connection",

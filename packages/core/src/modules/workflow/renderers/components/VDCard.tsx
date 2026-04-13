@@ -440,8 +440,28 @@ export const VDCard: React.FC<VDCardProps> = ({
                         },
                       ]}
                     >
-                      {getLastSubstring(credDefId || ':')}
+                      {(() => {
+                        const tag = getLastSubstring(credDefId || ':')
+                        // Show school/schema name if tag is "default", otherwise show the tag
+                        if (tag.toLowerCase() === 'default') return school || fullName || tag
+                        return tag
+                      })()}
                     </ThemedText>
+                    {fullName && school && (
+                      <ThemedText
+                        style={[
+                          styles.defaultText,
+                          {
+                            color: SettingsTheme.newSettingColors.headerTitle,
+                            fontSize: getScaledDimension(14, ratioFactor),
+                            opacity: 0.8,
+                            marginTop: getScaledDimension(4, ratioFactor),
+                          },
+                        ]}
+                      >
+                        {fullName}
+                      </ThemedText>
+                    )}
                   </View>
                 ) : (
                   <>

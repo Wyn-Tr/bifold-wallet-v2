@@ -53,6 +53,10 @@ import { WorkflowModule } from '@ajna-inc/workflow'
 // Ajna WebRTC Module for DIDComm-based video calls
 import { WebRTCModule } from '@ajna-inc/webrtc'
 
+// 2060 User Profile Module for DIDComm user-profile exchange (wire-compatible
+// with the ACA-Py `user_profile_protocol` plugin running in CRMS).
+import { UserProfileModule } from '@2060.io/credo-ts-didcomm-user-profile'
+
 export interface WebRTCIceServer {
   urls: string | string[]
   username?: string
@@ -156,6 +160,10 @@ export function getAgentModules({ indyNetworks, mediatorInvitationUrl, txnCache,
     openId4VcHolder: new OpenId4VcHolderModule(),
     // Basic messages module for DIDComm messaging
     basicMessages: new BasicMessagesModule(),
+    // User profile module (DIDComm https://didcomm.org/user-profile/1.0).
+    // autoSendProfile defaults to true, so peers that request our profile get
+    // it automatically.
+    userProfile: new UserProfileModule(),
     // Workflow module for DIDComm-based state machines
     workflow: new WorkflowModule({
       enableProblemReport: true,

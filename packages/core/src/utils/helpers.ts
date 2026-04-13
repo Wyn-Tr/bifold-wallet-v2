@@ -254,12 +254,44 @@ export function formatIfDate(format: string | undefined, value: string | number 
   return value
 }
 
+/**
+ * Peer user profile as stored on a connection record's `UserProfile` metadata
+ * key by the 2060 user-profile module (wire-compatible with the ACA-Py
+ * `user_profile_protocol` plugin).
+ */
+export interface PeerUserProfile {
+  displayName?: string
+  description?: string
+  preferredLanguage?: string
+  displayPicture?: { mimeType?: string; base64?: string }
+  displayIcon?: { mimeType?: string; base64?: string }
+}
+
+/**
+ * Read the peer user profile stored on a connection's `UserProfile` metadata
+ * key. Returns undefined when no profile has been received yet.
+ */
+export function useConnectionUserProfile(connectionId: string | undefined): PeerUserProfile | undefined {
+  const connection = useConnectionById(connectionId ?? '')
+  if (!connection) return undefined
+  return connection.metadata.get('UserProfile') as PeerUserProfile | undefined
+}
+
+/** Convert a PictureData-shaped object to a `data:` URL usable by <Image>. */
+export function pictureToDataUrl(pic?: { mimeType?: string; base64?: string }): string | undefined {
+  if (!pic?.base64) return undefined
+  const mime = pic.mimeType || 'image/png'
+  return `data:${mime};base64,${pic.base64}`
+}
+
 export function getConnectionName(
   connection: ConnectionRecord | undefined,
-  alternateContactNames: Record<string, string>
+  alternateContactNames: Record<string, string>,
+  peerProfile?: PeerUserProfile
 ): string {
   return (
     (connection?.id && alternateContactNames[connection?.id]) ||
+    peerProfile?.displayName ||
     connection?.theirLabel ||
     connection?.alias ||
     connection?.id ||
@@ -283,10 +315,25 @@ export function useCredentialConnectionLabel(credential?: CredentialExchangeReco
 
 export function useConnectionImageUrl(connectionId: string) {
   const connection = useConnectionById(connectionId)
+  const profile = useConnectionUserProfile(connectionId)
   if (!connection) {
     return undefined
   }
-  return connection.imageUrl ?? undefined
+  return (
+    pictureToDataUrl(profile?.displayPicture) ||
+    pictureToDataUrl(profile?.displayIcon) ||
+    connection.imageUrl ||
+    undefined
+  )
+}
+
+/**
+ * Read the peer user-profile description (from the connection's `UserProfile`
+ * metadata). Returns undefined when absent.
+ */
+export function useConnectionDescription(connectionId: string | undefined): string | undefined {
+  const profile = useConnectionUserProfile(connectionId)
+  return profile?.description
 }
 
 export function firstValidCredential(

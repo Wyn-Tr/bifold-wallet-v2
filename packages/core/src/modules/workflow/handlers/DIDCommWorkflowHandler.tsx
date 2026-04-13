@@ -59,15 +59,28 @@ export class DIDCommWorkflowHandler extends BaseWorkflowHandler<WorkflowInstance
     // Try to get a friendly name based on template ID
     const templateId = record.templateId || ''
 
+    let label: string
     // Common template patterns
     if (templateId.includes('credential') || templateId.includes('issuance')) {
-      return t('Workflow.CredentialWorkflow' as any) || 'Credential Workflow'
-    }
-    if (templateId.includes('proof') || templateId.includes('verification')) {
-      return t('Workflow.ProofWorkflow' as any) || 'Proof Workflow'
+      label = t('Workflow.CredentialWorkflow' as any) || 'Credential Workflow'
+    } else if (templateId.includes('proof') || templateId.includes('verification')) {
+      label = t('Workflow.ProofWorkflow' as any) || 'Proof Workflow'
+    } else {
+      label = t('Workflow.Workflow' as any) || 'Workflow'
     }
 
-    return t('Workflow.Workflow' as any) || 'Workflow'
+    // Append state for more informative preview
+    const stateLabel = this.getStateLabel(record, t)
+    return `${label} - ${stateLabel}`
+  }
+
+  private getStateLabel(record: WorkflowInstanceRecord, t: TFunction): string {
+    const s = ((record as any).state || '').toLowerCase()
+    if (s === 'done' || s === 'completed') return t('Workflow.Completed' as any) || 'Completed'
+    if (s === 'failed' || s === 'error') return t('Workflow.Failed' as any) || 'Failed'
+    if (s === 'cancelled') return t('Workflow.Cancelled' as any) || 'Cancelled'
+    if (s === 'paused') return t('Workflow.Paused' as any) || 'Paused'
+    return t('Workflow.InProgress' as any) || 'In Progress'
   }
 
   getCallbackType(record: WorkflowInstanceRecord): CallbackType | undefined {

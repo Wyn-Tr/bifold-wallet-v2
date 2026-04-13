@@ -1,7 +1,7 @@
 import { ConnectionRecord, ConnectionType, DidExchangeState } from '@credo-ts/core'
 import { useAgent, useConnections } from '@credo-ts/react-hooks'
 import { StackNavigationProp } from '@react-navigation/stack'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DeviceEventEmitter, StyleSheet, View, FlatList } from 'react-native'
 
@@ -10,6 +10,7 @@ import EmptyListContacts from '../components/misc/EmptyListContacts'
 import { EventTypes } from '../constants'
 import { useStore } from '../contexts/store'
 import { useTheme } from '../contexts/theme'
+import { MobileWorkflowService } from '../services/WorkflowService'
 import { BifoldError } from '../types/error'
 import { ContactStackParams, Screens, Stacks } from '../types/navigators'
 import { BifoldAgent } from '../utils/agent'
@@ -33,6 +34,16 @@ const ListContacts: React.FC<ListContactsProps> = ({ navigation }) => {
     TOKENS.COMPONENT_CONTACT_LIST_ITEM,
     TOKENS.OBJECT_SCREEN_CONFIG,
   ])
+
+  const workflowService = useMemo(() => {
+    if (!agent) return undefined
+    try {
+      const service = new MobileWorkflowService(agent)
+      return service.isAvailable ? service : undefined
+    } catch {
+      return undefined
+    }
+  }, [agent])
   const style = StyleSheet.create({
     list: {
       backgroundColor: ColorPalette.brand.secondaryBackground,
@@ -47,7 +58,7 @@ const ListContacts: React.FC<ListContactsProps> = ({ navigation }) => {
   useEffect(() => {
     const fetchAndSetConnections = async () => {
       if (!agent) return
-      let orderedContacts = await fetchContactsByLatestMessage(agent as BifoldAgent, connectionRecords)
+      let orderedContacts = await fetchContactsByLatestMessage(agent as BifoldAgent, connectionRecords, workflowService)
 
       // if developer mode is disabled, filter out mediator connections and connections in the hide list
       if (!store.preferences.developerModeEnabled) {
@@ -68,7 +79,7 @@ const ListContacts: React.FC<ListContactsProps> = ({ navigation }) => {
       const error = new BifoldError(t('Error.Title1046'), t('Error.Message1046'), (err as Error)?.message ?? err, 1046)
       DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error)
     })
-  }, [agent, connectionRecords, store.preferences.developerModeEnabled, contactHideList, t])
+  }, [agent, connectionRecords, store.preferences.developerModeEnabled, contactHideList, t, workflowService])
 
   const onPressAddContact = useCallback(() => {
     navigation.getParent()?.navigate(Stacks.ConnectStack, { screen: Screens.Scan, params: { defaultToConnect: true } })

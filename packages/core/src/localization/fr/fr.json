@@ -523,7 +523,13 @@
     "NoCredentials": "Vous n'avez aucun justificatif de ce contact.",
     "StartVideoCall": "Démarrer l'appel vidéo",
     "ListCredentials": "Lister les justificatifs d'identité",
-    "RemoveContactAction": "Supprimer le contact"
+    "RemoveContactAction": "Supprimer le contact",
+    "ChannelDescription": "Description du canal",
+    "NewWorkflow": "Nouveau flux de travail",
+    "Name": "Nom",
+    "State": "État",
+    "NoWorkflows": "Aucune instance de flux de travail",
+    "NoDescription": "Aucune description disponible"
   },
   "WhatAreContacts": {
     "Title": "Que sont les Contacts?",
@@ -943,6 +949,18 @@
   "RenameContact": {
     "ThisContactName": "Ce nom de contact n'est affiché que dans votre Liste de Contacts.",
     "ContactName": "Nom du contact"
+  },
+  "MyProfile": {
+    "Title": "Mon profil",
+    "DisplayName": "Nom affiché",
+    "Description": "Description",
+    "PreferredLanguage": "Langue préférée",
+    "DisplayPicture": "Photo de profil",
+    "ChoosePicture": "Choisir une photo",
+    "ClearPicture": "Supprimer la photo",
+    "Save": "Enregistrer",
+    "Saved": "Profil enregistré",
+    "SaveFailed": "Échec de l'enregistrement du profil"
   },
   "NetInfo": {
     "NoInternetConnectionTitle": "Aucune connexion Internet",

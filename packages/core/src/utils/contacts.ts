@@ -1,36 +1,57 @@
 import { BasicMessageRecord, ConnectionRecord, CredentialExchangeRecord, ProofExchangeRecord } from '@credo-ts/core'
 
+import { MobileWorkflowService } from '../services/WorkflowService'
+
 import { BifoldAgent } from './agent'
+
+interface DateRecord {
+  createdAt: Date
+  updatedAt?: Date
+}
 
 interface ConnectionWithMessages {
   conn: ConnectionRecord
-  msgs: (BasicMessageRecord | CredentialExchangeRecord | ProofExchangeRecord)[]
+  msgs: DateRecord[]
 }
 
 interface ConnectionWithLatestMessage {
   conn: ConnectionRecord
-  latestMsg: BasicMessageRecord | CredentialExchangeRecord | ProofExchangeRecord
+  latestMsg: DateRecord
 }
 
 /**
  * Function to fetch contacts (connections) in order of latest chat message without using hooks
  * @param agent - Credo agent
+ * @param connections - Connection records to sort
+ * @param workflowService - Optional workflow service to include workflow instances in sorting
  * @returns ConnectionRecord[] sorted by most recent message
  */
 export const fetchContactsByLatestMessage = async (
   agent: BifoldAgent,
-  connections: ConnectionRecord[]
+  connections: ConnectionRecord[],
+  workflowService?: MobileWorkflowService
 ): Promise<ConnectionRecord[]> => {
   const connectionsWithMessages = await Promise.all<ConnectionWithMessages>(
     connections.map(
-      async (conn: ConnectionRecord): Promise<ConnectionWithMessages> => ({
-        conn,
-        msgs: [
+      async (conn: ConnectionRecord): Promise<ConnectionWithMessages> => {
+        const msgs: DateRecord[] = [
           ...(await agent.basicMessages.findAllByQuery({ connectionId: conn.id })),
           ...(await agent.proofs.findAllByQuery({ connectionId: conn.id })),
           ...(await agent.credentials.findAllByQuery({ connectionId: conn.id })),
-        ],
-      })
+        ]
+
+        // Include workflow instances if service is available
+        if (workflowService) {
+          try {
+            const instances = await workflowService.listInstances(conn.id)
+            msgs.push(...instances)
+          } catch {
+            // Workflow module may not be available — ignore
+          }
+        }
+
+        return { conn, msgs }
+      }
     )
   )
 
@@ -44,7 +65,7 @@ export const fetchContactsByLatestMessage = async (
           return accDate > curDate ? acc : cur
         },
         // Initial value if no messages exist for this connection is a placeholder with the date the connection was created
-        { createdAt: pair.conn.createdAt } as BasicMessageRecord | CredentialExchangeRecord | ProofExchangeRecord
+        { createdAt: pair.conn.createdAt } as DateRecord
       ),
     }
   })

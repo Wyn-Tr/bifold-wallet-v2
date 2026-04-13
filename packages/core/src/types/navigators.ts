@@ -67,11 +67,13 @@ export enum Screens {
   IncomingCall = 'Incoming Call',
   VideoCall = 'Video Call',
   WorkflowDetails = 'Workflow Details',
+  WorkflowTemplatePicker = 'Workflow Template Picker',
   ExportWalletIntro = 'Export Wallet Intro',
   ExportWallet = 'Export Wallet',
   ImportWallet = 'Import Wallet',
   ImportWalletScan = 'Import Wallet Scan',
   ImportWalletResult = 'Import Wallet Result',
+  MyProfile = 'My Profile',
 }
 
 export enum Stacks {
@@ -123,6 +125,7 @@ export type RootStackParams = {
     video?: boolean
   }
   [Screens.WorkflowDetails]: { instanceId: string }
+  [Screens.WorkflowTemplatePicker]: { connectionId: string }
 }
 
 export type TabStackParams = {
@@ -160,6 +163,7 @@ export type ContactStackParams = {
   [Screens.ProofRequest]: { proofId: string }
   [Screens.JSONDetails]: { jsonBlob: any }
   [Screens.WorkflowDetails]: { instanceId: string }
+  [Screens.WorkflowTemplatePicker]: { connectionId: string }
 }
 
 export type ProofRequestsStackParams = {
@@ -214,6 +218,7 @@ export type SettingStackParams = {
   [Screens.ImportWallet]: undefined
   [Screens.ImportWalletScan]: { pin: string }
   [Screens.ImportWalletResult]: { status: 'success' | 'error'; errorMessage?: string }
+  [Screens.MyProfile]: undefined
 }
 
 export type NotificationStackParams = {
@@ -234,6 +239,7 @@ export type DeliveryStackParams = {
     credentialId?: string
     openIDUri?: string
     openIDPresentationUri?: string
+    workflowInstanceId?: string
   }
   [Screens.MobileVerifierLoading]: { proofId: string; connectionId: string }
   [Screens.ProofDetails]: { recordId: string }

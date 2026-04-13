@@ -303,12 +303,36 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
   const firstName = getAttrValue(attributes, 'first', 'firstname', 'first_name') || ''
   const lastName = getAttrValue(attributes, 'last', 'lastname', 'last_name') || ''
   const fullName =
-    getAttrValue(attributes, 'fullname', 'studentfullname', 'full_name') ||
+    getAttrValue(attributes, 'fullname', 'studentfullname', 'full_name', 'name') ||
     `${firstName} ${lastName}`.trim() ||
+    // For generic credentials, use the first non-empty attribute value as display name
+    (attributes.length > 0 ? attributes[0]?.value || '' : '') ||
     t('CredentialDetails.DefaultName')
-  const studentId = getAttrValue(attributes, 'studentid', 'studentnumber', 'student_id') || ''
+  const studentId = getAttrValue(attributes, 'studentid', 'studentnumber', 'student_id', 'idnumber', 'id_number') || ''
   const school = getAttrValue(attributes, 'schoolname', 'school', 'institution') || ''
   const rawIssueDate = getAttrValue(attributes, 'issuedate', 'issue_date')
+
+  // Detect if this is a known schema type or a generic credential
+  const isKnownSchema = !!(firstName || lastName || school ||
+    getAttrValue(attributes, 'fullname', 'studentfullname', 'full_name') ||
+    (schemaId && isSchemaSupported(schemaId)))
+  // For generic credentials, collect all attributes for display
+  const genericAttributes = !isKnownSchema ? attributes.filter((a) => a.name && a.value) : []
+  // Resolve a meaningful credential name from schema or cred_def
+  const credentialTitle = (() => {
+    if (schemaId) {
+      try {
+        const parts = schemaId.split(':')
+        // Indy schema format: did:2:name:version
+        if (parts.length >= 4) return parts[parts.length - 2]
+      } catch { /* ignore */ }
+    }
+    if (credDefId) {
+      const tag = credDefId.split(':').pop()
+      if (tag && tag.toLowerCase() !== 'default') return tag
+    }
+    return ''
+  })()
 
   const formatDate = (dateStr: string | undefined): string => {
     if (!dateStr) {
@@ -399,7 +423,7 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
   const displayName =
     isTranscript && credDefId
       ? credDefId.split(':').pop()?.replace(' Transcript', '') || school || t('CredentialDetails.Transcript')
-      : school || t('CredentialDetails.StudentCard')
+      : school || credentialTitle || t('CredentialDetails.StudentCard')
 
   const transcriptData = parseTranscriptData(attributes)
   const yearStart = getAttrValue(attributes, 'yearstart', 'year_start') || transcriptData.yearStart
@@ -652,16 +676,31 @@ const CredentialDetails: React.FC<CredentialDetailsProps> = () => {
                 />
               </View>
               <Text style={styles.qrSectionName}>{fullName}</Text>
-              <Text style={styles.qrSectionInfo}>{school || displayName}</Text>
+              <Text style={styles.qrSectionInfo}>{school || credentialTitle || displayName}</Text>
             </View>
           )}
 
           <View style={styles.detailsSection}>
             <Text style={styles.schoolName}>{displayName}</Text>
             <Text style={styles.studentCardLabel}>
-              {isTranscript ? t('CredentialDetails.Transcript') : t('CredentialDetails.StudentCard')}
+              {isTranscript ? t('CredentialDetails.Transcript') : (credentialTitle || t('CredentialDetails.StudentCard'))}
             </Text>
-            <Text style={styles.studentName}>{fullName}</Text>
+            {genericAttributes.length > 0 ? (
+              <>
+                {genericAttributes.map((attr, index) => (
+                  <View key={index} style={{ marginBottom: 8 }}>
+                    <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginBottom: 2 }}>
+                      {attr.name}
+                    </Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 17, fontWeight: '600' }}>
+                      {attr.value}
+                    </Text>
+                  </View>
+                ))}
+              </>
+            ) : (
+              <Text style={styles.studentName}>{fullName}</Text>
+            )}
             <View style={styles.dateContainer}>
               <View style={styles.dateBox}>
                 <Text style={styles.dateLabel}>{t('CredentialDetails.IssuedOn')}</Text>

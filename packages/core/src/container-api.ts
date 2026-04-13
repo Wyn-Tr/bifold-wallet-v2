@@ -109,6 +109,7 @@ export const SCREEN_TOKENS = {
   SCREEN_CONFIGURE_MEDIATOR: 'screen.configure-mediator',
   SCREEN_TOGGLE_PUSH_NOTIFICATIONS: 'screen.toggle-push-notifications',
   SCREEN_HISTORY_SETTINGS: 'screen.history-settings',
+  SCREEN_MY_PROFILE: 'screen.my-profile',
 
   // Contact Screens
   SCREEN_LIST_CONTACTS: 'screen.list-contacts',
@@ -116,6 +117,7 @@ export const SCREEN_TOKENS = {
   SCREEN_RENAME_CONTACT: 'screen.rename-contact',
   SCREEN_WHAT_ARE_CONTACTS: 'screen.what-are-contacts',
   SCREEN_WORKFLOW_DETAILS: 'screen.workflow-details',
+  SCREEN_WORKFLOW_TEMPLATE_PICKER: 'screen.workflow-template-picker',
 
   // Credential Screens
   SCREEN_LIST_CREDENTIALS: 'screen.list-credentials',
@@ -393,11 +395,13 @@ export type TokenMapping = {
   [TOKENS.SCREEN_CONFIGURE_MEDIATOR]: React.FC
   [TOKENS.SCREEN_TOGGLE_PUSH_NOTIFICATIONS]: React.FC
   [TOKENS.SCREEN_HISTORY_SETTINGS]: React.FC
+  [TOKENS.SCREEN_MY_PROFILE]: React.FC
   [TOKENS.SCREEN_LIST_CONTACTS]: React.FC
   [TOKENS.SCREEN_CONTACT_DETAILS]: React.FC<any>
   [TOKENS.SCREEN_RENAME_CONTACT]: React.FC<any>
   [TOKENS.SCREEN_WHAT_ARE_CONTACTS]: React.FC
   [TOKENS.SCREEN_WORKFLOW_DETAILS]: React.FC<any>
+  [TOKENS.SCREEN_WORKFLOW_TEMPLATE_PICKER]: React.FC<any>
   [TOKENS.SCREEN_LIST_CREDENTIALS]: React.FC
   [TOKENS.SCREEN_JSON_DETAILS]: React.FC<any>
   [TOKENS.SCREEN_OPENID_CREDENTIAL_DETAILS]: React.FC<any>

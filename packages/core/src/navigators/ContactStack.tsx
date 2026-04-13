@@ -27,6 +27,7 @@ const ContactStack: React.FC = () => {
     CredentialDetails,
     ProofDetails,
     WorkflowDetails,
+    WorkflowTemplatePicker,
   ] = useServices([
     TOKENS.OBJECT_SCREEN_CONFIG,
     // Injectable screens
@@ -39,6 +40,7 @@ const ContactStack: React.FC = () => {
     TOKENS.SCREEN_CREDENTIAL_DETAILS,
     TOKENS.SCREEN_PROOF_DETAILS,
     TOKENS.SCREEN_WORKFLOW_DETAILS,
+    TOKENS.SCREEN_WORKFLOW_TEMPLATE_PICKER,
   ])
 
   return (
@@ -128,6 +130,14 @@ const ContactStack: React.FC = () => {
         options={{
           title: t('Screens.WorkflowDetails') || 'Workflow Details',
           ...ScreenOptionsDictionary[Screens.WorkflowDetails],
+        }}
+      />
+      <Stack.Screen
+        name={Screens.WorkflowTemplatePicker}
+        component={WorkflowTemplatePicker}
+        options={{
+          title: t('Screens.WorkflowTemplatePicker') || 'Start Workflow',
+          ...ScreenOptionsDictionary[Screens.WorkflowTemplatePicker],
         }}
       />
     </Stack.Navigator>

@@ -59,7 +59,7 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: samples/app/ios/Pods
-          key: ${{ runner.os }}-pods-${{ env.cacheId }}-${{ hashFiles('**/Podfile.lock ') }}
+          key: ${{ runner.os }}-pods-${{ env.cacheId }}-${{ hashFiles('**/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-${{ env.cacheId }}-
 
