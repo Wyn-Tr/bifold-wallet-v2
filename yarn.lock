@@ -80,9 +80,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ajna-inc/workflow@npm:0.5.37":
-  version: 0.5.37
-  resolution: "@ajna-inc/workflow@npm:0.5.37"
+"@ajna-inc/workflow@npm:0.5.38":
+  version: 0.5.38
+  resolution: "@ajna-inc/workflow@npm:0.5.38"
   dependencies:
     ajv: "npm:^8.17.1"
     ajv-formats: "npm:^3.0.1"
@@ -90,13 +90,13 @@ __metadata:
     semver: "npm:^7.6.3"
   peerDependencies:
     "@credo-ts/core": ^0.5.0
-  checksum: 10c0/407aa8b53747d61ea357bbc7a09215b74e52ec3508650c0e9ceb4edca698b674e4aef5675af419a9f569d011b05e5fcb673c8659b2204d109dee4bbc56960170
+  checksum: 10c0/52b13dac1d0d348496fc22c8440f33b60ec109f860e3cecbdc86f09c6609e49e01fc4dd10223b9de0f6b78398c0bc61cd8e62e786092c3f61be8cf2825d01a61
   languageName: node
   linkType: hard
 
-"@ajna-inc/workflow@patch:@ajna-inc/workflow@npm%3A0.5.37#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.37-rncompat.patch":
-  version: 0.5.37
-  resolution: "@ajna-inc/workflow@patch:@ajna-inc/workflow@npm%3A0.5.37#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.37-rncompat.patch::version=0.5.37&hash=76b28c"
+"@ajna-inc/workflow@patch:@ajna-inc/workflow@npm%3A0.5.38#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.38-rncompat.patch":
+  version: 0.5.38
+  resolution: "@ajna-inc/workflow@patch:@ajna-inc/workflow@npm%3A0.5.38#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.38-rncompat.patch::version=0.5.38&hash=76b28c"
   dependencies:
     ajv: "npm:^8.17.1"
     ajv-formats: "npm:^3.0.1"
@@ -104,7 +104,7 @@ __metadata:
     semver: "npm:^7.6.3"
   peerDependencies:
     "@credo-ts/core": ^0.5.0
-  checksum: 10c0/5d1f18340f97f76541e9db74e58dec34a9bb9eabceac01cfb2c1f7b0449ab9a6983136c4b1e189cbf39a2d46eadbd71c5ec93e56649b729a65937805b8eb035e
+  checksum: 10c0/e83b96e377d0314197a6677abfb49b5872833ec8f977fdb898ee03761ce3e46a28e2f7c970ba0c198b26688f16666322ed4a882a7f27352e9eadc0169cc39a02
   languageName: node
   linkType: hard
 
@@ -2221,7 +2221,7 @@ __metadata:
   dependencies:
     "@2060.io/credo-ts-didcomm-user-profile": "npm:0.0.7"
     "@ajna-inc/webrtc": "npm:0.2.1"
-    "@ajna-inc/workflow": "patch:@ajna-inc/workflow@npm%3A0.5.37#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.37-rncompat.patch"
+    "@ajna-inc/workflow": "patch:@ajna-inc/workflow@npm%3A0.5.38#~/.yarn/patches/@ajna-inc-workflow-npm-0.5.38-rncompat.patch"
     "@babel/core": "npm:~7.22.20"
     "@babel/runtime": "npm:~7.23.9"
     "@bifold/oca": "npm:2.11.8"
