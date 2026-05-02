@@ -13,12 +13,16 @@ const parseCount = (count: number | string): number => {
   return parseFloat(count) || 0
 }
 
-const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
-  const slices: SliceItem[] = item.slices || []
+const DEFAULT_SLICES: SliceItem[] = [
+  { label: 'Category A', count: 40 },
+  { label: 'Category B', count: 30 },
+  { label: 'Category C', count: 20 },
+  { label: 'Category D', count: 10 },
+]
 
-  if (slices.length === 0) {
-    return null
-  }
+const PieChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
+  const rawSlices: SliceItem[] = item.slices || []
+  const slices = rawSlices.length > 0 ? rawSlices : DEFAULT_SLICES
 
   const size = 200
   const radius = size / 2

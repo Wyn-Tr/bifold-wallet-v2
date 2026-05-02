@@ -118,6 +118,7 @@ export const SCREEN_TOKENS = {
   SCREEN_WHAT_ARE_CONTACTS: 'screen.what-are-contacts',
   SCREEN_WORKFLOW_DETAILS: 'screen.workflow-details',
   SCREEN_WORKFLOW_TEMPLATE_PICKER: 'screen.workflow-template-picker',
+  SCREEN_WORKFLOW_APP: 'screen.workflow-app',
 
   // Credential Screens
   SCREEN_LIST_CREDENTIALS: 'screen.list-credentials',
@@ -402,6 +403,7 @@ export type TokenMapping = {
   [TOKENS.SCREEN_WHAT_ARE_CONTACTS]: React.FC
   [TOKENS.SCREEN_WORKFLOW_DETAILS]: React.FC<any>
   [TOKENS.SCREEN_WORKFLOW_TEMPLATE_PICKER]: React.FC<any>
+  [TOKENS.SCREEN_WORKFLOW_APP]: React.FC<any>
   [TOKENS.SCREEN_LIST_CREDENTIALS]: React.FC
   [TOKENS.SCREEN_JSON_DETAILS]: React.FC<any>
   [TOKENS.SCREEN_OPENID_CREDENTIAL_DETAILS]: React.FC<any>

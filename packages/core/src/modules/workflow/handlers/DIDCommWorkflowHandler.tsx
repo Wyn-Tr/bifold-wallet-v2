@@ -8,7 +8,7 @@
 import { ConnectionRecord } from '@credo-ts/core'
 import type { WorkflowInstanceRecord } from '@ajna-inc/workflow'
 import { StackNavigationProp } from '@react-navigation/stack'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { TFunction } from 'react-i18next'
 
@@ -56,7 +56,6 @@ export class DIDCommWorkflowHandler extends BaseWorkflowHandler<WorkflowInstance
   }
 
   getLabel(record: WorkflowInstanceRecord, t: TFunction): string {
-    // Try to get a friendly name based on template ID
     const templateId = record.templateId || ''
 
     let label: string
@@ -66,10 +65,14 @@ export class DIDCommWorkflowHandler extends BaseWorkflowHandler<WorkflowInstance
     } else if (templateId.includes('proof') || templateId.includes('verification')) {
       label = t('Workflow.ProofWorkflow' as any) || 'Proof Workflow'
     } else {
-      label = t('Workflow.Workflow' as any) || 'Workflow'
+      // Humanize the template ID (replace dashes/underscores, title case)
+      // Skip if it looks like a UUID
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(templateId)
+      label = isUuid
+        ? (t('Workflow.Workflow' as any) || 'Workflow')
+        : templateId.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
     }
 
-    // Append state for more informative preview
     const stateLabel = this.getStateLabel(record, t)
     return `${label} - ${stateLabel}`
   }
@@ -181,6 +184,15 @@ const WorkflowBubble: React.FC<WorkflowBubbleProps> = ({
 }) => {
   const { ColorPalette, SettingsTheme } = useTheme()
 
+  // Try to get a friendly display name for the template
+  const displayName = useMemo(() => {
+    // If it looks like a UUID, just show "Workflow"
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(templateId)
+    if (isUuid) return null
+    // Otherwise humanize the template ID
+    return templateId.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
+  }, [templateId])
+
   // Get status color based on state using theme colors
   const getStatusColor = () => {
     const s = state.toLowerCase()
@@ -279,9 +291,11 @@ const WorkflowBubble: React.FC<WorkflowBubbleProps> = ({
       {/* Body */}
       <View style={styles.body}>
         {/* Template info */}
-        <ThemedText style={styles.templateText} numberOfLines={1}>
-          {templateId.split('/').pop() || templateId}
-        </ThemedText>
+        {displayName && (
+          <ThemedText style={styles.templateText} numberOfLines={1}>
+            {displayName}
+          </ThemedText>
+        )}
 
         {/* Current section */}
         {section && (

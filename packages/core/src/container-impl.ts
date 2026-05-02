@@ -87,6 +87,7 @@ import RenameContact from './screens/RenameContact'
 import WhatAreContacts from './screens/WhatAreContacts'
 import WorkflowDetails from './screens/WorkflowDetails'
 import WorkflowTemplatePicker from './screens/WorkflowTemplatePicker'
+import WorkflowAppScreen from './screens/WorkflowAppScreen'
 import ListCredentials from './screens/ListCredentials'
 import JSONDetails from './screens/JSONDetails'
 import ListProofRequests from './screens/ListProofRequests'
@@ -259,6 +260,7 @@ export class MainContainer implements Container {
     this._container.registerInstance(TOKENS.SCREEN_WHAT_ARE_CONTACTS, WhatAreContacts)
     this._container.registerInstance(TOKENS.SCREEN_WORKFLOW_DETAILS, WorkflowDetails)
     this._container.registerInstance(TOKENS.SCREEN_WORKFLOW_TEMPLATE_PICKER, WorkflowTemplatePicker)
+    this._container.registerInstance(TOKENS.SCREEN_WORKFLOW_APP, WorkflowAppScreen)
 
     // Credential Screens
     this._container.registerInstance(TOKENS.SCREEN_LIST_CREDENTIALS, ListCredentials)

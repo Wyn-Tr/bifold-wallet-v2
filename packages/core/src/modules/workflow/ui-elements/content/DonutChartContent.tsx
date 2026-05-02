@@ -13,12 +13,14 @@ const parseCount = (count: number | string): number => {
   return parseFloat(count) || 0
 }
 
-const DonutChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
-  const slices: SliceItem[] = item.slices || []
+const DEFAULT_SLICES: SliceItem[] = [
+  { label: 'Complete', count: 65 },
+  { label: 'Remaining', count: 35 },
+]
 
-  if (slices.length === 0) {
-    return null
-  }
+const DonutChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
+  const rawSlices: SliceItem[] = item.slices || []
+  const slices = rawSlices.length > 0 ? rawSlices : DEFAULT_SLICES
 
   const size = 200
   const radius = size / 2

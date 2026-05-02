@@ -128,6 +128,11 @@ export type ActionMenuContentType = // Content types
     | 'date-field'
     | 'slider-field'
     | 'mcq'
+    // Layout container types
+    | 'row'
+    | 'section'
+    | 'spacer'
+    | 'divider'
 
 export interface ActionMenuContentItem {
   type: ActionMenuContentType
@@ -171,6 +176,28 @@ export interface ActionMenuContentItem {
   location?: string
   notes?: string
   title?: string
+
+  // Grid layout properties
+  /** Column span in 12-column grid (1-12). Defaults to 12 (full width). */
+  col?: number
+  /** Nested children for container types ('row', 'section', 'card') */
+  children?: ActionMenuContentItem[]
+  /** Display mode: 'bubble' (chat bubble, default) | 'screen' (full-screen app view) */
+  displayMode?: 'bubble' | 'screen'
+  /** Horizontal alignment within grid cell */
+  align?: 'start' | 'center' | 'end' | 'stretch'
+  /** Vertical alignment within grid cell */
+  valign?: 'top' | 'center' | 'bottom'
+  /** Padding within item's grid cell (dp) */
+  padding?: number
+  /** Background color (hex string) */
+  bgColor?: string
+  /** Pin item to bottom of screen (full-screen mode only) */
+  sticky?: 'bottom'
+  /** Screen title (used when displayMode is 'screen') */
+  screenTitle?: string
+  /** Gap between children in dp (for container types) */
+  gap?: number
 }
 
 /**
@@ -194,6 +221,10 @@ export interface ActionMenuFormField {
 export interface ActionMenuMessage {
   displayData: ActionMenuContentItem[]
   workflowID: string
+  /** Display mode for the entire message: 'screen' renders as full-screen app view */
+  displayMode?: 'bubble' | 'screen'
+  /** Screen title when displayMode is 'screen' */
+  screenTitle?: string
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

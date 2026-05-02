@@ -13,12 +13,15 @@ const parseOrder = (order: number | string): number => {
   return parseInt(order, 10) || 0
 }
 
-const TimelineContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
-  const entries: TimelineEntry[] = item.entries || []
+const DEFAULT_ENTRIES: TimelineEntry[] = [
+  { order: 1, entry: 'Step 1', text: 'Application submitted' },
+  { order: 2, entry: 'Step 2', text: 'Under review' },
+  { order: 3, entry: 'Step 3', text: 'Approved' },
+]
 
-  if (entries.length === 0) {
-    return null
-  }
+const TimelineContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
+  const rawEntries: TimelineEntry[] = item.entries || []
+  const entries = rawEntries.length > 0 ? rawEntries : DEFAULT_ENTRIES
 
   // Sort by order
   const sortedEntries = [...entries].sort((a, b) => parseOrder(a.order) - parseOrder(b.order))

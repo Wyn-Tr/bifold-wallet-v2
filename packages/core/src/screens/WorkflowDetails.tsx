@@ -22,6 +22,7 @@ import { useTheme } from '../contexts/theme'
 import { useWorkflowInstance, WorkflowAction, WorkflowUiHint } from '../hooks/useWorkflowInstance'
 import { useWorkflowTemplates } from '../hooks/useWorkflows'
 import { useWorkflowEvents } from '../hooks/useWorkflowEvents'
+import { ContentRegistry } from '../modules/workflow/ui-elements'
 import { ContactStackParams, Screens, Stacks } from '../types/navigators'
 import { testIdWithKey } from '../utils/testable'
 
@@ -626,6 +627,30 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({ route, navigation }) 
 
     if (hint.type === 'divider') {
       return <View key={index} style={{ height: 1, backgroundColor: ColorPalette.grayscale.lightGrey, marginVertical: 12 }} />
+    }
+
+    // Delegate all other types to ContentRegistry (warning, image, pie-chart, row, etc.)
+    if (ContentRegistry.has(hint.type)) {
+      return (
+        <View key={index} style={{ marginBottom: 8 }}>
+          {ContentRegistry.render(hint.type, {
+            item: hint as any,
+            // Dispatch any nested item's `event` directly. Falls back to the wrapper's `event`
+            // when an inner component passes its container's actionID (legacy path).
+            onAction: (actionId: string, data?: any) => {
+              const evt = actionId || (hint.event as string | undefined)
+              if (evt) handleAction(evt, data)
+            },
+            styles,
+            colors: {
+              primary: ColorPalette.brand.primary,
+              text: ColorPalette.brand.text,
+              background: ColorPalette.brand.secondaryBackground,
+              border: ColorPalette.brand.primary,
+            },
+          })}
+        </View>
+      )
     }
 
     return null

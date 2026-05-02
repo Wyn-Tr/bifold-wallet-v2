@@ -68,6 +68,7 @@ export enum Screens {
   VideoCall = 'Video Call',
   WorkflowDetails = 'Workflow Details',
   WorkflowTemplatePicker = 'Workflow Template Picker',
+  WorkflowAppScreen = 'Workflow App Screen',
   ExportWalletIntro = 'Export Wallet Intro',
   ExportWallet = 'Export Wallet',
   ImportWallet = 'Import Wallet',
@@ -126,6 +127,13 @@ export type RootStackParams = {
   }
   [Screens.WorkflowDetails]: { instanceId: string }
   [Screens.WorkflowTemplatePicker]: { connectionId: string }
+  [Screens.WorkflowAppScreen]: {
+    content: any[]
+    workflowID: string
+    connectionId: string
+    screenTitle?: string
+    onActionPress?: (actionId: string, workflowID: string, data?: any) => void
+  }
 }
 
 export type TabStackParams = {
@@ -164,6 +172,13 @@ export type ContactStackParams = {
   [Screens.JSONDetails]: { jsonBlob: any }
   [Screens.WorkflowDetails]: { instanceId: string }
   [Screens.WorkflowTemplatePicker]: { connectionId: string }
+  [Screens.WorkflowAppScreen]: {
+    content: any[]
+    workflowID: string
+    connectionId: string
+    screenTitle?: string
+    onActionPress?: (actionId: string, workflowID: string, data?: any) => void
+  }
 }
 
 export type ProofRequestsStackParams = {
