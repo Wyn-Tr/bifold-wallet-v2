@@ -13,6 +13,8 @@ module.exports = {
     '^uuid$': require.resolve('uuid'),
     '@credo-ts/core': require.resolve('@credo-ts/core'),
     '@credo-ts/anoncreds': require.resolve('@credo-ts/anoncreds'),
+    '^@ajna-inc/openbadges/build/cryptosuites/contextPreprocessor$':
+      '<rootDir>/__mocks__/@ajna-inc/openbadges-contextPreprocessor.js',
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',

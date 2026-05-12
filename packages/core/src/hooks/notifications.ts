@@ -20,7 +20,9 @@ import {
 } from '../types/metadata'
 import { useOpenID } from '../modules/openid/hooks/openid'
 import { CustomNotification } from '../types/notification'
-import { OpenId4VPRequestRecord } from '../modules/openid/types'
+import { OpenId4VPRequestRecord, OpenId4VciPendingCredentialOffer } from '../modules/openid/types'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../modules/openid/jsonLd/JsonLdCredentialRecord'
 import { useExpiredNotifications } from '../modules/openid/hooks/useExpiredNotifications'
 
 export type NotificationsInputProps = {
@@ -36,7 +38,10 @@ export type NotificationItemType =
   | SdJwtVcRecord
   | W3cCredentialRecord
   | MdocRecord
+  | OpenBadgeCredentialRecord
+  | JsonLdCredentialRecord
   | OpenId4VPRequestRecord
+  | OpenId4VciPendingCredentialOffer
 
 export type NotificationReturnType = Array<NotificationItemType>
 
@@ -90,7 +95,15 @@ export const useNotifications = ({
       }
     })
 
-    const openIDCreds: Array<SdJwtVcRecord | W3cCredentialRecord | MdocRecord | OpenId4VPRequestRecord> = []
+    const openIDCreds: Array<
+      | SdJwtVcRecord
+      | W3cCredentialRecord
+      | MdocRecord
+      | OpenBadgeCredentialRecord
+      | JsonLdCredentialRecord
+      | OpenId4VPRequestRecord
+      | OpenId4VciPendingCredentialOffer
+    > = []
     if (openIDCredRecieved) {
       openIDCreds.push(openIDCredRecieved)
     }

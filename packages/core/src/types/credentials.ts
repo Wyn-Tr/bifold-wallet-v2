@@ -1,4 +1,6 @@
 import { CredentialExchangeRecord, MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../modules/openid/jsonLd/JsonLdCredentialRecord'
 
 export enum CredentialErrors {
   Revoked, // Credential has been revoked
@@ -11,3 +13,5 @@ export type GenericCredentialExchangeRecord =
   | W3cCredentialRecord
   | SdJwtVcRecord
   | MdocRecord
+  | OpenBadgeCredentialRecord
+  | JsonLdCredentialRecord

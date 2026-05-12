@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { View, Text, StyleSheet, FlatList, StatusBar, TouchableOpacity } from 'react-native'
 import { useNavigation, useIsFocused } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { AnonCredsCredentialMetadataKey } from '@credo-ts/anoncreds'
 import {
   ConnectionRecord,
@@ -11,6 +12,8 @@ import {
   SdJwtVcRecord,
   W3cCredentialRecord,
 } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '@bifold/core/src/modules/openid/jsonLd/JsonLdCredentialRecord'
 import { useConnections, useCredentialByState } from '@credo-ts/react-hooks'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useStore, useTour, DispatchAction, testIdWithKey, CredentialCard } from '@bifold/core'
@@ -31,6 +34,14 @@ const ListCredentials: React.FC = () => {
   const [store, dispatch] = useStore()
   const { start, stop } = useTour()
   const screenIsFocused = useIsFocused()
+  // The DigiCred custom tab bar (samples/app/digicred/components/TabBar.tsx)
+  // is absolutely positioned with `bottom: 0` and a `height: 65` container,
+  // wrapped in `paddingBottom: Math.max(insets.bottom, 16)`. React Navigation's
+  // `useBottomTabBarHeight()` doesn't reflect that — it returns the platform
+  // default (~49) — so we compute the real visual height ourselves from the
+  // pieces we know about.
+  const insets = useSafeAreaInsets()
+  const tabBarVisualHeight = 65 + Math.max(insets.bottom, 16)
   const { records: connections } = useConnections()
   const connectionsMap: Record<string, ConnectionRecord> = {}
   connections.forEach((conn) => {
@@ -46,14 +57,26 @@ const ListCredentials: React.FC = () => {
     ])
 
   const {
-    openIdState: { w3cCredentialRecords, sdJwtVcRecords },
+    openIdState: { w3cCredentialRecords, sdJwtVcRecords, openBadgeCredentialRecords, jsonLdCredentialRecords },
+    refreshOpenBadgeCredentials,
+    refreshJsonLdCredentials,
   } = useOpenIDCredentials()
+
+  // Defensive refetch when this screen comes into focus.
+  useEffect(() => {
+    if (screenIsFocused) {
+      refreshOpenBadgeCredentials().catch(() => undefined)
+      refreshJsonLdCredentials().catch(() => undefined)
+    }
+  }, [screenIsFocused, refreshOpenBadgeCredentials, refreshJsonLdCredentials])
 
   let credentials: GenericCredentialExchangeRecord[] = [
     ...useCredentialByState(CredentialState.CredentialReceived),
     ...useCredentialByState(CredentialState.Done),
     ...w3cCredentialRecords,
     ...sdJwtVcRecords,
+    ...openBadgeCredentialRecords,
+    ...jsonLdCredentialRecords,
   ]
 
   const CredentialListFooter = credentialListFooter as React.FC<CredentialListFooterProps>
@@ -89,6 +112,9 @@ const ListCredentials: React.FC = () => {
     const connectionId = (cred as CredentialExchangeRecord).connectionId
     const connection = connectionId ? connectionsMap[connectionId] : undefined
     const logoUrl = connection?.imageUrl
+    const credType = (cred as { type?: string }).type
+    const isOpenBadge = credType === 'OpenBadgeCredentialRecord'
+    const isJsonLd = credType === 'JsonLdCredentialRecord'
 
     return (
       <CredentialCard
@@ -98,7 +124,10 @@ const ListCredentials: React.FC = () => {
           (cred as CredentialExchangeRecord).revocationNotification?.revocationDate && [CredentialErrors.Revoked]
         }
         onPress={() => {
-          if (cred instanceof W3cCredentialRecord) {
+          if (isOpenBadge || isJsonLd) {
+            // Both raw-JSON record types use the same details screen.
+            navigation.navigate(Screens.OpenBadgeDetails, { credentialId: cred.id })
+          } else if (cred instanceof W3cCredentialRecord) {
             navigation.navigate(Screens.OpenIDCredentialDetails, {
               credentialId: cred.id,
               type: OpenIDCredentialType.W3cCredential,
@@ -150,6 +179,11 @@ const ListCredentials: React.FC = () => {
               {renderCardItem(credential)}
             </View>
           )}
+          // Shrink the FlatList's viewport by half the tab bar height so the
+          // scroll area ends roughly at the vertical midpoint of the floating
+          // tab bar — content can scroll behind the top half of the bar but
+          // never below it.
+          style={{ flex: 1, marginBottom: tabBarVisualHeight / 2 }}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={renderEmptyState}
@@ -180,14 +214,14 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 100,
     flexGrow: 1,
   },
   cardContainer: {
     marginTop: 15,
   },
   lastCard: {
-    marginBottom: 45,
+    // Last-card margin no longer needed — FlatList paddingBottom is computed
+    // from the tab bar height so the last card never tucks behind the bar.
   },
   emptyState: {
     flex: 1,

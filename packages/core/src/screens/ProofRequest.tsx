@@ -624,7 +624,10 @@ const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId, workfl
         params: { instanceId: workflowInstanceId },
       })
     } else {
-      navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+      navigation.getParent()?.navigate(Stacks.TabStack, {
+        screen: TabStacks.HomeStack,
+        params: { screen: Screens.Home },
+      })
     }
   }, [
     agent,
@@ -657,7 +660,10 @@ const ProofRequest: React.FC<ProofRequestProps> = ({ navigation, proofId, workfl
   }, [toggleCancelModalVisible, agent, proof, t, goalCode])
 
   const onCancelDone = useCallback(() => {
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    navigation.getParent()?.navigate(Stacks.TabStack, {
+      screen: TabStacks.HomeStack,
+      params: { screen: Screens.Home },
+    })
   }, [navigation])
 
   const onProofAcceptDismiss = useCallback(() => {

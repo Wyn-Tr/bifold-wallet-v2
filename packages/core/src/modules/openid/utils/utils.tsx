@@ -106,18 +106,45 @@ export function isDateString(value: string) {
   return value.length === 'yyyy-mm-dd'.length && value.match(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/)
 }
 
-export function isW3CProofRequest(type: string): boolean {
-  if (type === 'jwt_vc') {
-    return true
+export type NormalizedClaimFormat = 'w3c' | 'sd-jwt' | 'mdoc' | 'unknown'
+
+export function normalizeClaimFormat(type?: string): NormalizedClaimFormat {
+  const t = (type || '').toLowerCase()
+
+  if (
+    t === 'jwt_vc' ||
+    t === 'jwt_vc_json' ||
+    t === 'jwt_vc_json-ld' ||
+    t === 'jwt_vp' ||
+    t === 'jwt_vp_json' ||
+    t === 'jwt_vp_json-ld' ||
+    t === 'ldp_vc' ||
+    t === 'ldp_vp'
+  ) {
+    return 'w3c'
   }
-  return false
+
+  if (t === 'vc+sd-jwt' || t === 'sd-jwt-vc' || t === 'sd-jwt_vc' || t === 'sd-jwt-vp') {
+    return 'sd-jwt'
+  }
+
+  if (t === 'mso_mdoc' || t === 'mdoc') {
+    return 'mdoc'
+  }
+
+  return 'unknown'
 }
 
-export function isSdJwtProofRequest(type: string): boolean {
-  if (type === 'vc+sd-jwt') {
-    return true
-  }
-  return false
+export function isW3CProofRequest(type?: string): boolean {
+  return normalizeClaimFormat(type) === 'w3c'
+}
+
+export function isSdJwtProofRequest(type?: string): boolean {
+  return normalizeClaimFormat(type) === 'sd-jwt'
+}
+
+export function isMdocProofRequest(type?: string): boolean {
+  return normalizeClaimFormat(type) === 'mdoc'
 }
 
 export function getCredentialConfigurationIds(resolved: OpenId4VciResolvedCredentialOffer): string[] {

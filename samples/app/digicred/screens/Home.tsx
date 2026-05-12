@@ -26,6 +26,7 @@ import {
   useConnectionImageUrl,
   useConnectionUserProfile,
 } from '@bifold/core'
+import { useOpenIDCredentials } from '@bifold/core/src/modules/openid/context/OpenIDCredentialRecordProvider'
 import { useWorkflowSubtitles } from '../../../../packages/core/src/hooks/useWorkflowSubtitles'
 
 import { GradientBackground } from '../components'
@@ -93,6 +94,14 @@ const Home: React.FC = () => {
   const [config] = useServices([TOKENS.CONFIG])
   const contactHideList = config?.contactHideList
   const { records: credentials = [] } = useCredentials()
+  const {
+    openIdState: { w3cCredentialRecords, sdJwtVcRecords, openBadgeCredentialRecords, jsonLdCredentialRecords },
+  } = useOpenIDCredentials()
+  const hasOpenIdCredentials =
+    w3cCredentialRecords.length > 0 ||
+    sdJwtVcRecords.length > 0 ||
+    openBadgeCredentialRecords.length > 0 ||
+    jsonLdCredentialRecords.length > 0
   const [hadContacts, setHadContacts] = useState(false)
 
   const connectionsResult = useConnections()
@@ -122,15 +131,19 @@ const Home: React.FC = () => {
   }, [filteredConnections])
 
   useEffect(() => {
-    if (isFocused && hadContacts && filteredConnections.length === 0) {
+    // Only fall back to the welcome screen if the wallet is genuinely empty —
+    // no contacts AND no OID4VCI credentials. Otherwise a user who only has
+    // JSON-LD / SD-JWT / OpenBadge credentials (no DIDComm contacts) gets
+    // pushed back to the onboarding-style welcome flow.
+    if (isFocused && hadContacts && filteredConnections.length === 0 && !hasOpenIdCredentials) {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: Stacks.HomeNoChannelStack}],
+          routes: [{ name: Stacks.HomeNoChannelStack }],
         })
       )
     }
-  }, [filteredConnections, navigation, hadContacts, isFocused])
+  }, [filteredConnections, navigation, hadContacts, isFocused, hasOpenIdCredentials])
 
   const handleScanPress = useCallback(() => {
     navigation.navigate(Stacks.ConnectStack as string, { screen: Screens.Scan } as Record<string, unknown>)

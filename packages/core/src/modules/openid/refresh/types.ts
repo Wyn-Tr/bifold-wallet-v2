@@ -6,6 +6,8 @@ import {
   SdJwtVcRecord,
   W3cCredentialRecord,
 } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { OpenId4VciResolvedCredentialOffer } from '@credo-ts/openid4vc'
 
 export type IssuerMetadataCache = {
@@ -52,7 +54,7 @@ export type RefreshOrchestratorOpts = {
   autoStart?: boolean
   onError?: (e: unknown) => void
   listRecords?: () => Promise<any[]>
-  toLite?: (rec: W3cCredentialRecord | SdJwtVcRecord | MdocRecord) => {
+  toLite?: (rec: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord) => {
     id: string
     format: ClaimFormat
     createdAt?: string
@@ -66,7 +68,9 @@ export interface IRefreshOrchestrator {
   stop(): void
   runOnce(reason?: string): Promise<void>
   isRunning(): boolean
-  resolveFull(id: string): W3cCredentialRecord | SdJwtVcRecord | MdocRecord | undefined
+  resolveFull(
+    id: string
+  ): W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord | undefined
 }
 
 export enum OpenIDCustomNotificationType {

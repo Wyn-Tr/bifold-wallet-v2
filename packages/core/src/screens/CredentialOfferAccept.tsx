@@ -1,6 +1,6 @@
 import { CredentialState } from '@credo-ts/core'
 import { useCredentialById, useAgent } from '@credo-ts/react-hooks'
-import { useNavigation } from '@react-navigation/native'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AccessibilityInfo, ScrollView, StyleSheet, View } from 'react-native'
@@ -27,9 +27,27 @@ export interface CredentialOfferAcceptProps {
   credentialId: string
   confirmationOnly?: boolean
   workflowInstanceId?: string
+  /**
+   * Optional handlers fired when the user taps "Done" / "Back to home" inside
+   * the modal. When provided, the modal delegates navigation entirely to the
+   * parent — which lets the parent dismiss the modal *before* dispatching a
+   * navigation reset, avoiding the visual flicker that happens when
+   * MainStack tears down DeliveryStack with the modal still mounted on top.
+   * If omitted, the modal falls back to its built-in CommonActions.reset
+   * navigation (kept for the legacy AnonCreds offer flow).
+   */
+  onDone?: () => void
+  onBackToHome?: () => void
 }
 
-const CredentialOfferAccept: React.FC<CredentialOfferAcceptProps> = ({ visible, credentialId, confirmationOnly, workflowInstanceId }) => {
+const CredentialOfferAccept: React.FC<CredentialOfferAcceptProps> = ({
+  visible,
+  credentialId,
+  confirmationOnly,
+  workflowInstanceId,
+  onDone,
+  onBackToHome,
+}) => {
   const { t } = useTranslation()
   const { agent } = useAgent()
   const [shouldShowDelayMessage, setShouldShowDelayMessage] = useState<boolean>(false)
@@ -72,27 +90,99 @@ const CredentialOfferAccept: React.FC<CredentialOfferAcceptProps> = ({ visible, 
     throw new Error('Unable to fetch credential from Credo')
   }
 
+  // Reset the parent navigator (MainStack) to a single TabStack route. This
+  // unmounts the DeliveryStack (offer screen + this modal) so when the user
+  // gets to the destination tab the offer flow is gone — preventing the
+  // "credential added" modal from re-popping over the credentials list.
+  const resetParentToTab = useCallback(
+    (tabScreen: string, innerScreen: string, innerParams?: Record<string, unknown>) => {
+      const parent = navigation.getParent()
+      if (!parent) return
+      parent.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: Stacks.TabStack,
+              state: {
+                index: 0,
+                routes: [
+                  {
+                    name: tabScreen,
+                    state: {
+                      index: 0,
+                      routes: [{ name: innerScreen, params: innerParams }],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      )
+    },
+    [navigation]
+  )
+
   const onBackToHomeTouched = useCallback(() => {
-    if (workflowInstanceId) {
-      navigation.getParent()?.navigate(Stacks.ContactStack, {
-        screen: Screens.WorkflowDetails,
-        params: { instanceId: workflowInstanceId },
-      })
-    } else {
-      navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    if (onBackToHome) {
+      onBackToHome()
+      return
     }
-  }, [navigation, workflowInstanceId])
+    if (workflowInstanceId) {
+      navigation.getParent()?.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: Stacks.ContactStack,
+              state: {
+                index: 0,
+                routes: [
+                  {
+                    name: Screens.WorkflowDetails,
+                    params: { instanceId: workflowInstanceId },
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      )
+    } else {
+      resetParentToTab(TabStacks.HomeStack, Screens.Home)
+    }
+  }, [navigation, workflowInstanceId, resetParentToTab, onBackToHome])
 
   const onDoneTouched = useCallback(() => {
-    if (workflowInstanceId) {
-      navigation.getParent()?.navigate(Stacks.ContactStack, {
-        screen: Screens.WorkflowDetails,
-        params: { instanceId: workflowInstanceId },
-      })
-    } else {
-      navigation.getParent()?.navigate(TabStacks.CredentialStack, { screen: Screens.Credentials })
+    if (onDone) {
+      onDone()
+      return
     }
-  }, [navigation, workflowInstanceId])
+    if (workflowInstanceId) {
+      navigation.getParent()?.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: Stacks.ContactStack,
+              state: {
+                index: 0,
+                routes: [
+                  {
+                    name: Screens.WorkflowDetails,
+                    params: { instanceId: workflowInstanceId },
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      )
+    } else {
+      resetParentToTab(TabStacks.CredentialStack, Screens.Credentials)
+    }
+  }, [navigation, workflowInstanceId, resetParentToTab, onDone])
 
   useEffect(() => {
     if (!credential) {

@@ -57,7 +57,13 @@ import {
 } from './anonCredsProofRequestMapper'
 import { fallbackDefaultCredentialNameValue, defaultCredDefTag } from './cred-def'
 import { getEffectiveCredentialName } from './credential'
-import { isOpenIdCredentialOffer, isOpenIdPresentationRequest } from './parsers'
+import {
+  couldBeVcApiUrl,
+  isOpenIdCredentialOffer,
+  isOpenIdPresentationRequest,
+  probeVcApiExchange,
+  unwrapVcPlaygroundInteractions,
+} from './parsers'
 import { isMediatorInvitation } from './mediatorhelpers'
 
 export { parsedCredDefNameFromCredential } from './cred-def'
@@ -1229,6 +1235,69 @@ export const connectFromScanOrDeepLink = async (
       })
 
       return
+    }
+
+    // Plain HTTPS URL → could be a VC-API exchange (VC Playground "Issue via
+    // VC API" flow). Try the URL we scanned first — VC Playground's
+    // `/interactions/<encoded-real-url>` wrapper does its own auth/forwarding
+    // server-side, so the wallet should POST directly to the wrapper, not to
+    // the underlying issuer (which rejects unauthenticated requests). Fall
+    // back to unwrapping only if the wrapper itself doesn't respond.
+    const couldBeVcApi = couldBeVcApiUrl(uri)
+    // eslint-disable-next-line no-console
+    console.log('[VC-API dispatch] URI →', JSON.stringify({ uri, couldBeVcApi }))
+    if (couldBeVcApi) {
+      let exchangeUrl = uri
+      let probe = await probeVcApiExchange(uri)
+      // eslint-disable-next-line no-console
+      console.log(
+        '[VC-API dispatch] probe (wrapper) →',
+        JSON.stringify({ uri, probeKeys: probe ? Object.keys(probe) : null })
+      )
+      if (!probe) {
+        const unwrapped = unwrapVcPlaygroundInteractions(uri)
+        if (unwrapped && unwrapped !== uri) {
+          probe = await probeVcApiExchange(unwrapped)
+          // eslint-disable-next-line no-console
+          console.log(
+            '[VC-API dispatch] probe (unwrapped) →',
+            JSON.stringify({ uri: unwrapped, probeKeys: probe ? Object.keys(probe) : null })
+          )
+          if (probe) exchangeUrl = unwrapped
+        }
+      }
+      if (probe) {
+        // VC Playground returns a protocol-discovery response with both an
+        // OID4VCI offer URI and a raw VC-API exchange URL. Prefer OID4VCI
+        // when offered — we have a working bridge for it, and the raw VC-API
+        // path requires capability-invocation auth headers we don't compute.
+        const protocols = (probe as { protocols?: Record<string, unknown> }).protocols
+        if (protocols && typeof protocols === 'object') {
+          const oidUri = (protocols as { OID4VCI?: unknown }).OID4VCI
+          if (typeof oidUri === 'string' && oidUri.startsWith('openid-credential-offer://')) {
+            // eslint-disable-next-line no-console
+            console.log('[VC-API dispatch] handing off to OID4VCI →', oidUri)
+            navigation.navigate(Stacks.ConnectionStack as any, {
+              screen: Screens.Connection,
+              params: { oobRecordId: '', openIDUri: oidUri },
+            })
+            return
+          }
+          const vcApiUrl = (protocols as { vcapi?: unknown }).vcapi
+          if (typeof vcApiUrl === 'string') {
+            navigation.navigate(Stacks.ConnectionStack as any, {
+              screen: Screens.VcApiExchange,
+              params: { exchangeUrl: vcApiUrl, initialResponse: undefined },
+            })
+            return
+          }
+        }
+        navigation.navigate(Stacks.ConnectionStack as any, {
+          screen: Screens.VcApiExchange,
+          params: { exchangeUrl, initialResponse: probe },
+        })
+        return
+      }
     }
 
     const aUrl = processBetaUrlIfRequired(uri)

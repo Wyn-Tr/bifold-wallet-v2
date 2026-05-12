@@ -20,6 +20,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useCredentials, useConnections } from '@credo-ts/react-hooks'
 import { CredentialState, ConnectionType, DidExchangeState } from '@credo-ts/core'
 import { useStore } from '@bifold/core'
+import { useOpenIDCredentials } from '@bifold/core/src/modules/openid/context/OpenIDCredentialRecordProvider'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import HomeNoChannelModal from '../components/HomeNoChannelModal'
@@ -43,6 +44,13 @@ const HomeNoChannels = () => {
 
   const { records: credentials = [], loading: credLoading } = useCredentials()
   const { records: connections = [], loading: connLoading } = useConnections()
+  // OID4VCI / OpenID credentials live in their own provider, not in
+  // useCredentials(). We need to count them too — otherwise a wallet that
+  // only holds JSON-LD / SD-JWT / OpenBadge credentials looks empty and the
+  // welcome screen pops back up after the user already received credentials.
+  const {
+    openIdState: { w3cCredentialRecords, sdJwtVcRecords, openBadgeCredentialRecords, jsonLdCredentialRecords },
+  } = useOpenIDCredentials()
   const loading = credLoading || connLoading
 
   const [shouldRenderHomeNoChannels, setShouldRenderHomeNoChannels] = useState<boolean | null>(null)
@@ -54,6 +62,11 @@ const HomeNoChannels = () => {
       const hasCredential = credentials.some(
         (c) => c.state === CredentialState.CredentialReceived || c.state === CredentialState.Done
       )
+      const hasOpenIdCredential =
+        w3cCredentialRecords.length > 0 ||
+        sdJwtVcRecords.length > 0 ||
+        openBadgeCredentialRecords.length > 0 ||
+        jsonLdCredentialRecords.length > 0
 
       const hasConnection = connections.some((conn) => {
         if (conn.connectionTypes.includes(ConnectionType.Mediator)) return false
@@ -62,13 +75,24 @@ const HomeNoChannels = () => {
         return !(!store.preferences.developerModeEnabled && conn.state !== DidExchangeState.Completed)
       })
 
-      if (hasCredential || hasConnection) {
+      if (hasCredential || hasOpenIdCredential || hasConnection) {
         navigation.replace(Stacks.TabStack)
       } else {
         setShouldRenderHomeNoChannels(true)
       }
     }
-  }, [loading, credentials, connections, contactHideList, store.preferences.developerModeEnabled, navigation])
+  }, [
+    loading,
+    credentials,
+    connections,
+    w3cCredentialRecords,
+    sdJwtVcRecords,
+    openBadgeCredentialRecords,
+    jsonLdCredentialRecords,
+    contactHideList,
+    store.preferences.developerModeEnabled,
+    navigation,
+  ])
 
   const fadeAnim = useRef(new Animated.Value(0)).current
   const translateYAnim = useRef(new Animated.Value(30)).current

@@ -41,12 +41,13 @@ export const getAttributeField = (display: W3cCredentialDisplay, searchKey: stri
   const credentialSubject = display.credentialSubject
 
   if (credentialSubject) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [key, value] of Object.entries(credentialSubject)) {
-      if (key !== searchKey || !value) continue
-      const { display } = value
-      const { name } = display[0]
-      attributeName = name
+      if (key !== searchKey || !value || typeof value !== 'object') continue
+      const display = (value as { display?: Array<{ name?: string }> }).display
+      const displayName = Array.isArray(display) ? display[0]?.name : undefined
+      if (displayName) {
+        attributeName = displayName
+      }
     }
   }
 

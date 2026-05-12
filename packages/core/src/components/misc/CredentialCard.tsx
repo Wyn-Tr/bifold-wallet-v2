@@ -3,6 +3,9 @@ import { TouchableOpacity, View, Text, Image, StyleSheet, Dimensions, ViewStyle 
 import { getCredentialIdentifiers } from '../../utils/credential'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { CredentialExchangeRecord, MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../../modules/openid/jsonLd/JsonLdCredentialRecord'
+import { getCredentialForDisplay } from '../../modules/openid/display'
 import { CredentialErrors } from '../../types/credentials'
 import { AnonCredsCredentialMetadataKey } from '@credo-ts/anoncreds'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +15,14 @@ const CARD_HEIGHT = 125
 const LOGO_SIZE = 60
 
 interface CredentialCardCustomProps {
-  credential: CredentialExchangeRecord | W3cCredentialRecord | SdJwtVcRecord | MdocRecord | undefined
+  credential:
+    | CredentialExchangeRecord
+    | W3cCredentialRecord
+    | SdJwtVcRecord
+    | MdocRecord
+    | OpenBadgeCredentialRecord
+    | JsonLdCredentialRecord
+    | undefined
   onPress: () => void
   logoUrl?: string
   credentialErrors?: CredentialErrors[]
@@ -67,6 +77,29 @@ const CredentialCard: React.FC<CredentialCardCustomProps> = ({ credential, logoU
     if (credName && credName !== 'Credential' && credName.trim() !== '') return credName
     if (credDefTag && credDefTag.toLowerCase() !== 'default' && credDefTag !== 'Credential') return credDefTag
     if (schemaName && schemaName !== 'Credential') return schemaName
+    // OpenBadge JSON-LD record: derive from the credential's type array (last
+    // entry is the most specific, e.g. "AlumniCredential").
+    const credType = (credential as { type?: string })?.type
+    if (credType === 'OpenBadgeCredentialRecord' || credType === 'JsonLdCredentialRecord') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const types = (((credential as any).credential ?? {}) as any).type as string[] | undefined
+      if (Array.isArray(types) && types.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const credJson = ((credential as any).credential ?? {}) as { name?: string }
+        if (credJson.name) return credJson.name
+        const last = types[types.length - 1]
+        if (last && last !== 'VerifiableCredential') return last
+      }
+    }
+    if (credType === 'SdJwtVcRecord') {
+      try {
+        const display = getCredentialForDisplay(credential as SdJwtVcRecord)
+        if (display.display?.name && display.display.name !== 'Credential') return display.display.name
+        if (display.metadata?.type && display.metadata.type !== 'Credential') return display.metadata.type
+      } catch {
+        // no-op
+      }
+    }
     return credDefTag || schemaName || 'Credential'
   }
   const displayName = getDisplayName()

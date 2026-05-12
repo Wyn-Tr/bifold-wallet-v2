@@ -12,7 +12,7 @@ import ScreenLayout from '../../../layout/ScreenLayout'
 import { DeliveryStackParams, Screens } from '../../../types/navigators'
 import { testIdWithKey } from '../../../utils/testable'
 import { useOpenIDCredentials } from '../context/OpenIDCredentialRecordProvider'
-import { isSdJwtProofRequest, isW3CProofRequest } from '../utils/utils'
+import { isMdocProofRequest, isSdJwtProofRequest, isW3CProofRequest } from '../utils/utils'
 
 type Props = StackScreenProps<DeliveryStackParams, Screens.OpenIDProofCredentialSelect>
 type TypedCred = {
@@ -28,7 +28,7 @@ const OpenIDProofCredentialSelect: React.FC<Props> = ({ route, navigation }: Pro
   const altCredentials = route.params.altCredIDs
   const onCredChange = route.params.onCredChange
   const { ColorPalette, SelectedCredTheme } = useTheme()
-  const { getW3CCredentialById, getSdJwtCredentialById } = useOpenIDCredentials()
+  const { getW3CCredentialById, getSdJwtCredentialById, getMdocCredentialById } = useOpenIDCredentials()
 
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
@@ -48,6 +48,8 @@ const OpenIDProofCredentialSelect: React.FC<Props> = ({ route, navigation }: Pro
           credential = await getW3CCredentialById(id)
         } else if (isSdJwtProofRequest(claimFormat)) {
           credential = await getSdJwtCredentialById(id)
+        } else if (isMdocProofRequest(claimFormat)) {
+          credential = await getMdocCredentialById(id)
         }
 
         if (credential) {
@@ -61,7 +63,7 @@ const OpenIDProofCredentialSelect: React.FC<Props> = ({ route, navigation }: Pro
       setLoading(false)
     }
     fetchCreds()
-  }, [altCredentials, getW3CCredentialById, getSdJwtCredentialById])
+  }, [altCredentials, getW3CCredentialById, getSdJwtCredentialById, getMdocCredentialById])
 
   const styles = StyleSheet.create({
     pageContainer: {

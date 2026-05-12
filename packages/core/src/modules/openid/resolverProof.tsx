@@ -2,6 +2,9 @@ import { Agent, DifPexCredentialsForRequest, Jwt, X509ModuleConfig } from '@cred
 import { ParseInvitationResult } from '../../utils/parsers'
 import q from 'query-string'
 import { OpenId4VPRequestRecord } from './types'
+import { OpenIdVpError } from './errors'
+import { preflightVpRequest } from './preflightVp'
+import { validateSubmissionRequirements } from './submissionRequirements'
 import { getHostNameFromUrl } from './utils/utils'
 import { OpenId4VcSiopVerifiedAuthorizationRequest } from '@credo-ts/openid4vc'
 import { Linking } from 'react-native'
@@ -244,15 +247,70 @@ export const shareProof = async ({
   const credentials = Object.fromEntries(
     credentialsForRequest.requirements.flatMap((requirement) =>
       requirement.submissionEntry.map((entry) => {
-        const credentialId = selectedCredentials[entry.inputDescriptorId].id
-        const credential =
-          entry.verifiableCredentials.find((vc) => vc.credentialRecord.id === credentialId) ??
-          entry.verifiableCredentials[0]
+        const selected = selectedCredentials[entry.inputDescriptorId]
+        if (!selected) {
+          throw new OpenIdVpError('descriptor_missing_selection', `No selected credential for descriptor ${entry.inputDescriptorId}`, {
+            descriptorId: entry.inputDescriptorId,
+          })
+        }
+
+        const credential = entry.verifiableCredentials.find((vc) => vc.credentialRecord.id === selected.id)
+        if (!credential) {
+          throw new OpenIdVpError(
+            'descriptor_no_candidates',
+            `Selected credential ${selected.id} not available for descriptor ${entry.inputDescriptorId}`,
+            { descriptorId: entry.inputDescriptorId, credentialId: selected.id }
+          )
+        }
 
         return [entry.inputDescriptorId, [credential.credentialRecord]]
       })
     )
   )
+
+  const inputDescriptors = credentialsForRequest.requirements.flatMap((requirement) =>
+    requirement.submissionEntry.map((entry) => ({ id: entry.inputDescriptorId }))
+  )
+
+  const preflightIssues = preflightVpRequest({
+    inputDescriptors,
+    selectedCredentials,
+    verifierVpFormats: ((authorizationRequest as unknown as Record<string, unknown>)?.presentation_definition as any)?.format,
+    holderCapabilities: {
+      supportsDidKey: true,
+      supportsDidJwk: true,
+      supportsJwkBinding: true,
+      supportedSigningAlgs: ['EdDSA', 'ES256'],
+    },
+  })
+
+  if (preflightIssues.length > 0) {
+    throw new OpenIdVpError('preflight_failed', preflightIssues.map((issue) => issue.message).join('; '), {
+      issues: preflightIssues.map((issue) => issue.code),
+    })
+  }
+
+  const presentationDefinition =
+    (authorizationRequest as unknown as { presentation_definition?: Record<string, unknown> }).presentation_definition ||
+    undefined
+
+  const rawSubmissionRequirements = (presentationDefinition?.submission_requirements as any[] | undefined) || undefined
+  const descriptorGroupMap: Record<string, string[]> = {}
+  const inputDescriptorsRaw = (presentationDefinition?.input_descriptors as any[] | undefined) || []
+  for (const descriptor of inputDescriptorsRaw) {
+    const groups = Array.isArray(descriptor?.group) ? descriptor.group : descriptor?.group ? [descriptor.group] : []
+    for (const group of groups) {
+      if (!descriptorGroupMap[group]) descriptorGroupMap[group] = []
+      descriptorGroupMap[group].push(descriptor.id)
+    }
+  }
+
+  const srErrors = validateSubmissionRequirements(rawSubmissionRequirements as any, selectedCredentials as any, descriptorGroupMap)
+  if (srErrors.length > 0) {
+    throw new OpenIdVpError('submission_requirements_unsatisfied', srErrors.map((err) => err.message).join('; '), {
+      issues: srErrors.map((err) => err.code),
+    })
+  }
 
   try {
     // Temp solution to add and remove the trusted certicaite

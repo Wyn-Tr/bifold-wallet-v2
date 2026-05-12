@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import HeaderRightHome from '../components/buttons/HeaderHome'
 import IconButton, { ButtonLocation } from '../components/buttons/IconButton'
 import { useTheme } from '../contexts/theme'
+import VcApiExchange from '../screens/VcApiExchange'
 import { DeliveryStackParams, Screens } from '../types/navigators'
 import { testIdWithKey } from '../utils/testable'
 
@@ -78,6 +79,11 @@ const DeliveryStack: React.FC = () => {
           ),
           ...ScreenOptionsDictionary[Screens.OpenIDProofCredentialSelect],
         })}
+      />
+      <Stack.Screen
+        name={Screens.VcApiExchange}
+        component={VcApiExchange}
+        options={{ title: t('Screens.CredentialOffer') }}
       />
     </Stack.Navigator>
   )

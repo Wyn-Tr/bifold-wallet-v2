@@ -6,6 +6,7 @@ import {
   SdJwtVcRecord,
   W3cCredentialRecord,
 } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
 import { CommonActions } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useCallback, useEffect, useReducer } from 'react'
@@ -25,7 +26,7 @@ import { EventTypes } from '../constants'
 import { testIdWithKey } from '../utils/testable'
 import Toast from 'react-native-toast-message'
 import { ToastType } from '../components/toast/BaseToast'
-import { OpenId4VPRequestRecord } from '../modules/openid/types'
+import { OpenId4VPRequestRecord, OpenId4VciPendingCredentialOffer } from '../modules/openid/types'
 import { useAppAgent } from '../utils/agent'
 import { HistoryCardType, HistoryRecord } from '../modules/history/types'
 
@@ -51,7 +52,8 @@ const GoalCodes = {
 } as const
 
 const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
-  const { oobRecordId, openIDUri, openIDPresentationUri, proofId, credentialId, workflowInstanceId } = route.params
+  const { oobRecordId, openIDUri, openIDPresentationUri, proofId, credentialId, workflowInstanceId } =
+    route.params ?? {}
   const [
     logger,
     { useNotifications },
@@ -131,7 +133,10 @@ const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
           })
         )
       } else {
-        navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+        navigation.getParent()?.navigate(Stacks.TabStack, {
+          screen: TabStacks.HomeStack,
+          params: { screen: Screens.Home },
+        })
         Toast.show({
           type: ToastType.Success,
           text1: t('Connection.ConnectionCompleted'),
@@ -143,7 +148,10 @@ const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
 
   const onDismissModalTouched = useCallback(() => {
     dispatch({ inProgress: false })
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    navigation.getParent()?.navigate(Stacks.TabStack, {
+      screen: TabStacks.HomeStack,
+      params: { screen: Screens.Home },
+    })
   }, [dispatch, navigation])
 
   useEffect(() => {
@@ -301,7 +309,10 @@ const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
     if (
       (state.notificationRecord as W3cCredentialRecord).type === 'W3cCredentialRecord' ||
       (state.notificationRecord as SdJwtVcRecord).type === 'SdJwtVcRecord' ||
-      (state.notificationRecord as MdocRecord).type === 'MdocRecord'
+      (state.notificationRecord as MdocRecord).type === 'MdocRecord' ||
+      (state.notificationRecord as OpenBadgeCredentialRecord).type === 'OpenBadgeCredentialRecord' ||
+      (state.notificationRecord as { type?: string }).type === 'JsonLdCredentialRecord' ||
+      (state.notificationRecord as OpenId4VciPendingCredentialOffer).type === 'OpenId4VciPendingCredentialOffer'
     ) {
       logger?.info(`Connection: Handling OpenID4VCi Credential, navigate to CredentialOffer`)
       dispatch({ inProgress: false })
@@ -345,6 +356,9 @@ const Connection: React.FC<ConnectionProps> = ({ navigation, route }) => {
         (notification as W3cCredentialRecord).type === 'W3cCredentialRecord' ||
         (notification as SdJwtVcRecord).type === 'SdJwtVcRecord' ||
         (notification as MdocRecord).type === 'MdocRecord' ||
+        (notification as OpenBadgeCredentialRecord).type === 'OpenBadgeCredentialRecord' ||
+        (notification as { type?: string }).type === 'JsonLdCredentialRecord' ||
+        (notification as OpenId4VciPendingCredentialOffer).type === 'OpenId4VciPendingCredentialOffer' ||
         (notification as OpenId4VPRequestRecord).type === 'OpenId4VPRequestRecord'
       ) {
         dispatch({ notificationRecord: notification })

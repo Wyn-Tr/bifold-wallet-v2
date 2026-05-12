@@ -46,26 +46,40 @@ const ListCredentials: React.FC = () => {
   })
 
   const {
-    openIdState: { w3cCredentialRecords, sdJwtVcRecords },
+    openIdState: { w3cCredentialRecords, sdJwtVcRecords, openBadgeCredentialRecords, jsonLdCredentialRecords },
+    refreshOpenBadgeCredentials,
   } = useOpenIDCredentials()
 
+  // Defensive refetch when this screen comes into focus. Subscriptions usually
+  // keep the list current, but a missed event would otherwise leave the list
+  // out of sync until app relaunch.
+  useEffect(() => {
+    if (screenIsFocused) {
+      refreshOpenBadgeCredentials().catch(() => undefined)
+    }
+  }, [screenIsFocused, refreshOpenBadgeCredentials])
+
+  const credsReceived = useCredentialByState(CredentialState.CredentialReceived)
+  const credsDone = useCredentialByState(CredentialState.Done)
   let credentials: GenericCredentialExchangeRecord[] = [
-    ...useCredentialByState(CredentialState.CredentialReceived),
-    ...useCredentialByState(CredentialState.Done),
+    ...credsReceived,
+    ...credsDone,
     ...w3cCredentialRecords,
     ...sdJwtVcRecords,
+    ...openBadgeCredentialRecords,
+    ...jsonLdCredentialRecords,
   ]
 
   const CredentialEmptyList = credentialEmptyList as React.FC<EmptyListProps>
   const CredentialListFooter = credentialListFooter as React.FC<CredentialListFooterProps>
 
-  // Filter out hidden credentials when not in dev mode
   if (!store.preferences.developerModeEnabled) {
     credentials = credentials.filter((r) => {
       const credDefId = r.metadata.get(AnonCredsCredentialMetadataKey)?.credentialDefinitionId
       return !credentialHideList?.includes(credDefId)
     })
   }
+
 
   useEffect(() => {
     const shouldShowTour = enableToursConfig && store.tours.enableTours && !store.tours.seenCredentialsTour
@@ -87,6 +101,9 @@ const ListCredentials: React.FC = () => {
   const renderCardItem = (cred: GenericCredentialExchangeRecord) => {
     const connectionId = 'connectionId' in cred ? cred.connectionId : undefined
     const logoUrl = connectionId ? connectionsMap[connectionId]?.imageUrl?.trim() : undefined
+    const credType = (cred as { type?: string }).type
+    const isOpenBadge = credType === 'OpenBadgeCredentialRecord'
+    const isJsonLd = credType === 'JsonLdCredentialRecord'
     return (
       <CredentialCard
         credential={cred as CredentialExchangeRecord}
@@ -95,12 +112,22 @@ const ListCredentials: React.FC = () => {
         }
         logoUrl={logoUrl}
         onPress={() => {
-          if (cred instanceof W3cCredentialRecord) {
+          if (isOpenBadge) {
+            navigation.navigate(Screens.OpenIDCredentialDetails, {
+              credentialId: cred.id,
+              type: OpenIDCredentialType.OpenBadge,
+            })
+          } else if (isJsonLd) {
+            navigation.navigate(Screens.OpenIDCredentialDetails, {
+              credentialId: cred.id,
+              type: OpenIDCredentialType.JsonLd,
+            })
+          } else if (credType === 'W3cCredentialRecord' || cred instanceof W3cCredentialRecord) {
             navigation.navigate(Screens.OpenIDCredentialDetails, {
               credentialId: cred.id,
               type: OpenIDCredentialType.W3cCredential,
             })
-          } else if (cred instanceof SdJwtVcRecord) {
+          } else if (credType === 'SdJwtVcRecord' || cred instanceof SdJwtVcRecord) {
             navigation.navigate(Screens.OpenIDCredentialDetails, {
               credentialId: cred.id,
               type: OpenIDCredentialType.SdJwtVc,
@@ -113,11 +140,13 @@ const ListCredentials: React.FC = () => {
     )
   }
 
+  const sortedCredentials = credentials.sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf())
+
   return (
     <View style={{ flex: 1}}>
       <FlatList
         style={{ backgroundColor: ColorPalette.brand.primaryBackground }}
-        data={credentials.sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf())}
+        data={sortedCredentials}
         keyExtractor={(credential) => credential.id}
         renderItem={({ item: credential, index }) => {
           return (

@@ -553,6 +553,8 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
             style={
               Object {
                 "backgroundColor": "#313132",
+                "borderTopLeftRadius": 18,
+                "borderTopRightRadius": 18,
                 "paddingBottom": 26,
                 "paddingHorizontal": 25,
                 "paddingVertical": 16,
@@ -623,59 +625,97 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
                 CredentialOffer.IsOfferingYouACredential
               </ThemedText>
             </View>
-            <View
-              style={
-                Object {
-                  "marginBottom": 16,
-                  "marginHorizontal": 15,
-                }
-              }
-            >
-              <CredentialCard
-                credential={
+            <React.Fragment>
+              <View
+                style={
                   Object {
-                    "_tags": Object {},
-                    "autoAcceptCredential": undefined,
-                    "connectionId": "b4b1b9cd-a445-4bb3-9645-a2377471965a",
-                    "createdAt": "2024-09-04T18:50:29.771Z",
-                    "credentialAttributes": Array [
-                      Object {
-                        "mime-type": "text/plain",
-                        "name": "student_first_name",
-                        "value": "Alice",
-                      },
-                      Object {
-                        "mime-type": "text/plain",
-                        "name": "student_last_name",
-                        "value": "Smith",
-                      },
-                      Object {
-                        "mime-type": "text/plain",
-                        "name": "expiry_date",
-                        "value": "20280820",
-                      },
-                    ],
-                    "credentials": Array [],
-                    "errorMessage": undefined,
-                    "id": "99bbf805-fc82-44dc-82eb-e3eb1e7f8ab7",
-                    "linkedAttachments": undefined,
-                    "metadata": Object {
-                      "_anoncreds/credential": Object {
-                        "credentialDefinitionId": "QEquAHkM35w4XVT3Ku5yat:3:CL:834668:student_card",
-                        "schemaId": "QEquAHkM35w4XVT3Ku5yat:2:student_card:1.6",
-                      },
-                    },
-                    "parentThreadId": undefined,
-                    "protocolVersion": "v1",
-                    "revocationNotification": undefined,
-                    "role": "holder",
-                    "state": "offer-received",
-                    "threadId": "735df561-5346-4cb0-b11f-44a49984c0c3",
+                    "backgroundColor": "#313132",
+                    "borderRadius": 16,
+                    "marginBottom": 12,
+                    "marginHorizontal": 15,
+                    "paddingHorizontal": 18,
+                    "paddingVertical": 16,
                   }
                 }
-                onPress={[Function]}
-              />
-            </View>
+              >
+                <ThemedText
+                  style={
+                    Object {
+                      "color": "#606060",
+                      "fontSize": 12,
+                      "fontWeight": "700",
+                      "letterSpacing": 0.5,
+                      "marginBottom": 6,
+                      "textTransform": "uppercase",
+                    }
+                  }
+                >
+                  Credential Preview
+                </ThemedText>
+                <ThemedText
+                  style={
+                    Object {
+                      "color": "#FFFFFF",
+                    }
+                  }
+                >
+                  Review the credential details below before accepting issuance.
+                </ThemedText>
+              </View>
+              <View
+                style={
+                  Object {
+                    "marginBottom": 16,
+                    "marginHorizontal": 15,
+                  }
+                }
+              >
+                <CredentialCard
+                  credential={
+                    Object {
+                      "_tags": Object {},
+                      "autoAcceptCredential": undefined,
+                      "connectionId": "b4b1b9cd-a445-4bb3-9645-a2377471965a",
+                      "createdAt": "2024-09-04T18:50:29.771Z",
+                      "credentialAttributes": Array [
+                        Object {
+                          "mime-type": "text/plain",
+                          "name": "student_first_name",
+                          "value": "Alice",
+                        },
+                        Object {
+                          "mime-type": "text/plain",
+                          "name": "student_last_name",
+                          "value": "Smith",
+                        },
+                        Object {
+                          "mime-type": "text/plain",
+                          "name": "expiry_date",
+                          "value": "20280820",
+                        },
+                      ],
+                      "credentials": Array [],
+                      "errorMessage": undefined,
+                      "id": "99bbf805-fc82-44dc-82eb-e3eb1e7f8ab7",
+                      "linkedAttachments": undefined,
+                      "metadata": Object {
+                        "_anoncreds/credential": Object {
+                          "credentialDefinitionId": "QEquAHkM35w4XVT3Ku5yat:3:CL:834668:student_card",
+                          "schemaId": "QEquAHkM35w4XVT3Ku5yat:2:student_card:1.6",
+                        },
+                      },
+                      "parentThreadId": undefined,
+                      "protocolVersion": "v1",
+                      "revocationNotification": undefined,
+                      "role": "holder",
+                      "state": "offer-received",
+                      "threadId": "735df561-5346-4cb0-b11f-44a49984c0c3",
+                    }
+                  }
+                  onPress={[Function]}
+                />
+              </View>
+            </React.Fragment>
           </React.Fragment>
         </RecordHeader>
       }
@@ -798,6 +838,58 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
                 </Text>
                  
                 CredentialOffer.IsOfferingYouACredential
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#313132",
+                  "borderRadius": 16,
+                  "marginBottom": 12,
+                  "marginHorizontal": 15,
+                  "paddingHorizontal": 18,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontSize": 18,
+                      "fontWeight": "normal",
+                    },
+                    Object {
+                      "color": "#606060",
+                      "fontSize": 12,
+                      "fontWeight": "700",
+                      "letterSpacing": 0.5,
+                      "marginBottom": 6,
+                      "textTransform": "uppercase",
+                    },
+                  ]
+                }
+              >
+                Credential Preview
+              </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontSize": 18,
+                      "fontWeight": "normal",
+                    },
+                    Object {
+                      "color": "#FFFFFF",
+                    },
+                  ]
+                }
+              >
+                Review the credential details below before accepting issuance.
               </Text>
             </View>
             <View
@@ -1379,6 +1471,8 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
               style={
                 Object {
                   "backgroundColor": "#313132",
+                  "borderTopLeftRadius": 18,
+                  "borderTopRightRadius": 18,
                   "paddingBottom": 26,
                   "paddingHorizontal": 25,
                   "paddingVertical": 16,

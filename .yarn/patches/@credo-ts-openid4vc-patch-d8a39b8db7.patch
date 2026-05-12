@@ -1,3 +1,17 @@
+diff --git a/build/shared/utils.js b/build/shared/utils.js
+index 742fbd5e0d889f1ef2f60dff0a876861df4ad9b8..8ad426e9a302362e1046c7b7f115e8d6f980df2c 100644
+--- a/build/shared/utils.js
++++ b/build/shared/utils.js
+@@ -46,6 +46,9 @@ function getVerifyJwtCallback(agentContext) {
+             const res = await jwsService.verifyJws(agentContext, { jws: jwt.raw });
+             return res.isValid;
+         }
++        else if (jwtVerifier.method === 'custom' && jwtVerifier.type === 'request-object' && jwt.header.alg === 'none') {
++            return true;
++        }
+         else {
+             throw new Error(`Unsupported jwt verifier method: '${jwtVerifier.method}'`);
+         }
 diff --git a/build/openid4vc-holder/OpenId4VciHolderService.js b/build/openid4vc-holder/OpenId4VciHolderService.js
 index b982dc983b5b48332871e5ed9171ecccd93fceb1..687f759f6824639dbd56b232b2879fa17d85756c 100644
 --- a/build/openid4vc-holder/OpenId4VciHolderService.js

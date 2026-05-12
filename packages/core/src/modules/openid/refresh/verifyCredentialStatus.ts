@@ -1,9 +1,11 @@
 // modules/openid/refresh/verifyCredentialStatus.ts
 import type { MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import type { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import type { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { getListFromStatusListJWT, getStatusListFromJWT } from '@sd-jwt/jwt-status-list'
 import type { BifoldLogger } from '../../../services/logger'
 
-type AnyCred = W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+type AnyCred = W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
 
 /**
  * Verifies credential status for Sd-JWT credentials using status lists.

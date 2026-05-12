@@ -16,7 +16,7 @@ import { useTheme } from '../../../contexts/theme'
 import ScreenLayout from '../../../layout/ScreenLayout'
 import ProofRequestAccept from '../../../screens/ProofRequestAccept'
 import { BifoldError } from '../../../types/error'
-import { DeliveryStackParams, Screens, TabStacks } from '../../../types/navigators'
+import { DeliveryStackParams, Screens, Stacks, TabStacks } from '../../../types/navigators'
 import { ModalUsage } from '../../../types/remove'
 import { buildFieldsFromW3cCredsCredential } from '../../../utils/oca'
 import { testIdWithKey } from '../../../utils/testable'
@@ -28,7 +28,7 @@ import {
   FormattedSubmissionEntry,
 } from '../displayProof'
 import { shareProof } from '../resolverProof'
-import { isSdJwtProofRequest, isW3CProofRequest } from '../utils/utils'
+import { isMdocProofRequest, isSdJwtProofRequest, isW3CProofRequest } from '../utils/utils'
 
 type OpenIDProofPresentationProps = StackScreenProps<DeliveryStackParams, Screens.OpenIDProofPresentation>
 
@@ -61,7 +61,7 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
   const [satistfiedCredentialsSubmission, setSatistfiedCredentialsSubmission] = useState<SatisfiedCredentialsFormat>()
   const [selectedCredentialsSubmission, setSelectedCredentialsSubmission] = useState<SelectedCredentialsFormat>()
 
-  const { getW3CCredentialById, getSdJwtCredentialById } = useOpenIDCredentials()
+  const { getW3CCredentialById, getSdJwtCredentialById, getMdocCredentialById } = useOpenIDCredentials()
 
   const { ColorPalette, ListItems, TextTheme } = useTheme()
   const { t } = useTranslation()
@@ -148,6 +148,8 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
             credential = await getW3CCredentialById(id)
           } else if (isSdJwtProofRequest(claimFormat)) {
             credential = await getSdJwtCredentialById(id)
+          } else if (isMdocProofRequest(claimFormat)) {
+            credential = await getMdocCredentialById(id)
           }
           if (credential && inputDescriptorID) {
             creds.push(credential)
@@ -157,7 +159,7 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
       setCredentialsRequested(creds)
     }
     fetchCreds()
-  }, [satistfiedCredentialsSubmission, getW3CCredentialById, getSdJwtCredentialById])
+  }, [satistfiedCredentialsSubmission, getW3CCredentialById, getSdJwtCredentialById, getMdocCredentialById])
 
   //Once satisfied credentials are set and all credentials fetched, we select the first one of each submission to display on screen
   useEffect(() => {
@@ -194,18 +196,28 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
       setAcceptModalVisible(true)
     } catch (err: unknown) {
       setButtonsVisible(true)
-      const error = new BifoldError(t('Error.Title1027'), t('Error.Message1027'), (err as Error)?.message ?? err, 1027)
+      const details = (() => {
+        const maybe = err as { code?: string; message?: string }
+        return maybe?.code ? `[${maybe.code}] ${maybe?.message ?? ''}` : (err as Error)?.message ?? err
+      })()
+      const error = new BifoldError(t('Error.Title1027'), t('Error.Message1027'), details, 1027)
       DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error)
     }
   }
 
   const handleDeclineTouched = async () => {
     toggleDeclineModalVisible()
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    navigation.getParent()?.navigate(Stacks.TabStack, {
+      screen: TabStacks.HomeStack,
+      params: { screen: Screens.Home },
+    })
   }
 
   const handleDismiss = async () => {
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    navigation.getParent()?.navigate(Stacks.TabStack, {
+      screen: TabStacks.HomeStack,
+      params: { screen: Screens.Home },
+    })
   }
 
   // Re-construct the selected credentials object based on user alt credential

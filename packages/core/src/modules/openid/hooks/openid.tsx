@@ -1,4 +1,6 @@
 import { MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { useAgent } from '@credo-ts/react-hooks'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -6,16 +8,10 @@ import { DeviceEventEmitter } from 'react-native'
 import { EventTypes } from '../../../constants'
 import { BifoldError } from '../../../types/error'
 import {
-  acquirePreAuthorizedAccessToken,
-  receiveCredentialFromOpenId4VciOffer,
   resolveOpenId4VciOffer,
 } from '../offerResolve'
 import { getCredentialsForProofRequest } from '../resolverProof'
-import { OpenId4VPRequestRecord } from '../types'
-import { getCredentialConfigurationIds } from '../utils/utils'
-import { setRefreshCredentialMetadata } from '../metadata'
-import { RefreshStatus } from '../refresh/types'
-import { temporaryMetaVanillaObject } from '../metadata'
+import { OpenId4VPRequestRecord, OpenId4VciPendingCredentialOffer } from '../types'
 
 type OpenIDContextProps = {
   openIDUri?: string
@@ -25,9 +21,23 @@ type OpenIDContextProps = {
 export const useOpenID = ({
   openIDUri,
   openIDPresentationUri,
-}: OpenIDContextProps): SdJwtVcRecord | W3cCredentialRecord | MdocRecord | OpenId4VPRequestRecord | undefined => {
+}: OpenIDContextProps):
+  | SdJwtVcRecord
+  | W3cCredentialRecord
+  | MdocRecord
+  | OpenBadgeCredentialRecord
+  | JsonLdCredentialRecord
+  | OpenId4VPRequestRecord
+  | OpenId4VciPendingCredentialOffer
+  | undefined => {
   const [openIdRecord, setOpenIdRecord] = useState<
-    SdJwtVcRecord | W3cCredentialRecord | MdocRecord | OpenId4VPRequestRecord
+    | SdJwtVcRecord
+    | W3cCredentialRecord
+    | MdocRecord
+    | OpenBadgeCredentialRecord
+    | JsonLdCredentialRecord
+    | OpenId4VPRequestRecord
+    | OpenId4VciPendingCredentialOffer
   >()
 
   const { agent } = useAgent()
@@ -44,59 +54,61 @@ export const useOpenID = ({
           uri: uri,
         })
 
-        const authServers = resolvedCredentialOffer.metadata.credentialIssuerMetadata.authorization_servers
-        // const authServer = authServers?.[0]
-        const credentialIssuer = resolvedCredentialOffer.metadata.issuer
-        const authServer = credentialIssuer
-        const configID = getCredentialConfigurationIds(resolvedCredentialOffer)?.[0]
-        const tokenEndpoint = resolvedCredentialOffer.metadata.token_endpoint
-        const issuerMetadata = resolvedCredentialOffer.metadata.credentialIssuerMetadata
-        const credentialEndpoint = resolvedCredentialOffer.metadata.credential_endpoint
-
-        if (!configID) {
-          throw new Error('No credential configuration ID found in the credential offer metadata')
-        }
-        if (!authServer) {
-          throw new Error('No authorization server found in the credential offer metadata')
-        }
-        if (!credentialIssuer) {
-          throw new Error('No credential issuer found in the credential offer metadata')
+        const offerPayload = resolvedCredentialOffer.credentialOfferPayload as {
+          grants?: Record<string, unknown>
+          user_pin_required?: boolean | string
         }
 
-        const tokenResponse = await acquirePreAuthorizedAccessToken({ agent, resolvedCredentialOffer })
-        const refreshToken = tokenResponse.refreshToken
+        const preAuthGrant = offerPayload?.grants?.['urn:ietf:params:oauth:grant-type:pre-authorized_code'] as
+          | { tx_code?: { input_mode?: 'numeric' | 'text'; length?: number; description?: string }; user_pin_required?: boolean }
+          | undefined
 
-        temporaryMetaVanillaObject.tokenResponse = tokenResponse
+        const previewAttributes = (() => {
+          const payload = resolvedCredentialOffer.credentialOfferPayload as unknown as Record<string, unknown> | undefined
+          const previewCandidates = [
+            payload?.credential_preview,
+            payload?.credentialPreview,
+            payload?.preview,
+            payload?.claims,
+            payload?.credentialSubject,
+            Array.isArray(payload?.credentials)
+              ? (payload?.credentials as Array<Record<string, unknown>>)[0]?.credentialSubject
+              : undefined,
+          ]
 
-        const credential = await receiveCredentialFromOpenId4VciOffer({
-          agent,
+          for (const candidate of previewCandidates) {
+            if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+              return candidate as Record<string, unknown>
+            }
+          }
+
+          return undefined
+        })()
+
+        const pendingOffer: OpenId4VciPendingCredentialOffer = {
+          type: 'OpenId4VciPendingCredentialOffer',
+          createdAt: new Date().toISOString(),
           resolvedCredentialOffer,
-          tokenResponse: tokenResponse,
-        })
-
-        if (refreshToken && authServer) {
-          setRefreshCredentialMetadata(credential, {
-            authServer: authServer,
-            tokenEndpoint: tokenEndpoint,
-            refreshToken: refreshToken,
-            issuerMetadataCache: {
-              credential_issuer: credentialIssuer,
-              credential_endpoint: credentialEndpoint,
-              token_endpoint: tokenEndpoint,
-              authorization_servers: authServers,
-              credential_configurations_supported: issuerMetadata?.credential_configurations_supported,
-            },
-            credentialIssuer: credentialIssuer,
-            credentialConfigurationId: configID,
-            lastCheckedAt: Date.now(),
-            lastCheckResult: RefreshStatus.Valid,
-            attemptCount: 0,
-            resolvedCredentialOffer: resolvedCredentialOffer,
-          })
+          txCode: preAuthGrant?.tx_code,
+          userPinRequired:
+            preAuthGrant?.user_pin_required === true ||
+            offerPayload?.user_pin_required === true ||
+            offerPayload?.user_pin_required === 'true',
+          previewAttributes,
         }
 
-        return credential
+        return pendingOffer
       } catch (err: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const e = err as any
+        // eslint-disable-next-line no-console
+        console.log('[OID4VCI] receive failed →', JSON.stringify({
+          message: e?.message,
+          name: e?.name,
+          status: e?.response?.status,
+          responseBody: e?.response?.data ?? e?.response?.body,
+          stack: e?.stack ? String(e.stack).split('\n').slice(0, 6).join('\n') : undefined,
+        }))
         const error = new BifoldError(
           t('Error.Title1024'),
           t('Error.Message1024'),
@@ -121,6 +133,15 @@ export const useOpenID = ({
         })
         return record
       } catch (err: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const e = err as any
+        // eslint-disable-next-line no-console
+        console.log('[OID4VP] presentation resolve failed →', JSON.stringify({
+          message: e?.message,
+          name: e?.name,
+          status: e?.response?.status,
+          responseBody: e?.response?.data ?? e?.response?.body,
+        }))
         const error = new BifoldError(
           t('Error.Title1043'),
           t('Error.Message1043'),
