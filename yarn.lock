@@ -3231,7 +3231,7 @@ __metadata:
 
 "@credo-ts/openid4vc@patch:@credo-ts/openid4vc@patch%3A@credo-ts/openid4vc@npm%253A0.5.17%23~/.yarn/patches/@credo-ts-openid4vc-npm-0.5.17-f06f0ed3b3.patch%3A%3Aversion=0.5.17&hash=ffc58d#~/.yarn/patches/@credo-ts-openid4vc-patch-d8a39b8db7.patch":
   version: 0.5.17
-  resolution: "@credo-ts/openid4vc@patch:@credo-ts/openid4vc@patch%3A@credo-ts/openid4vc@npm%253A0.5.17%23~/.yarn/patches/@credo-ts-openid4vc-npm-0.5.17-f06f0ed3b3.patch%3A%3Aversion=0.5.17&hash=ffc58d#~/.yarn/patches/@credo-ts-openid4vc-patch-d8a39b8db7.patch::version=0.5.17&hash=21cd31"
+  resolution: "@credo-ts/openid4vc@patch:@credo-ts/openid4vc@patch%3A@credo-ts/openid4vc@npm%253A0.5.17%23~/.yarn/patches/@credo-ts-openid4vc-npm-0.5.17-f06f0ed3b3.patch%3A%3Aversion=0.5.17&hash=ffc58d#~/.yarn/patches/@credo-ts-openid4vc-patch-d8a39b8db7.patch::version=0.5.17&hash=643b90"
   dependencies:
     "@credo-ts/core": "npm:0.5.17"
     "@sphereon/did-auth-siop": "npm:0.16.1-fix.173"
@@ -3242,7 +3242,7 @@ __metadata:
     "@sphereon/ssi-types": "npm:0.30.2-next.135"
     class-transformer: "npm:^0.5.1"
     rxjs: "npm:^7.8.0"
-  checksum: 10c0/c28085895317d1257acecabc1876cd850e05572a8ad321914b9b8f69df659d734efbb26f81755e9565e0a1d319f5bd880fe0bd0ec2e27f3472aca45602368174
+  checksum: 10c0/daf3f6e4b8acfb1e429c624f5c805f97cfc9e3f40a01d75a157faeec8167a0b6f9af8279f06f90ab6756aefc2f4994141771857a4476a7e1c1227154cc991224
   languageName: node
   linkType: hard
 
