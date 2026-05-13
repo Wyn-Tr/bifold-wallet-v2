@@ -9,6 +9,7 @@ import {
   ConnectionRecord,
   CredentialExchangeRecord,
   CredentialState,
+  MdocRecord,
   SdJwtVcRecord,
   W3cCredentialRecord,
 } from '@credo-ts/core'
@@ -57,7 +58,13 @@ const ListCredentials: React.FC = () => {
     ])
 
   const {
-    openIdState: { w3cCredentialRecords, sdJwtVcRecords, openBadgeCredentialRecords, jsonLdCredentialRecords },
+    openIdState: {
+      w3cCredentialRecords,
+      sdJwtVcRecords,
+      mdocVcRecords,
+      openBadgeCredentialRecords,
+      jsonLdCredentialRecords,
+    },
     refreshOpenBadgeCredentials,
     refreshJsonLdCredentials,
   } = useOpenIDCredentials()
@@ -75,6 +82,7 @@ const ListCredentials: React.FC = () => {
     ...useCredentialByState(CredentialState.Done),
     ...w3cCredentialRecords,
     ...sdJwtVcRecords,
+    ...mdocVcRecords,
     ...openBadgeCredentialRecords,
     ...jsonLdCredentialRecords,
   ]
@@ -136,6 +144,11 @@ const ListCredentials: React.FC = () => {
             navigation.navigate(Screens.OpenIDCredentialDetails, {
               credentialId: cred.id,
               type: OpenIDCredentialType.SdJwtVc,
+            })
+          } else if (cred instanceof MdocRecord) {
+            navigation.navigate(Screens.OpenIDCredentialDetails, {
+              credentialId: cred.id,
+              type: OpenIDCredentialType.Mdoc,
             })
           } else {
             navigation.navigate(Screens.CredentialDetails, { credentialId: cred.id })

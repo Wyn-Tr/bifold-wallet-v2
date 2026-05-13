@@ -116,6 +116,29 @@ const removeSdJwtRecord = (record: SdJwtVcRecord, state: OpenIDCredentialRecordS
   }
 }
 
+const addMdocRecord = (record: MdocRecord, state: OpenIDCredentialRecordState): OpenIDCredentialRecordState => {
+  const newRecordsState = [...state.mdocVcRecords]
+  newRecordsState.unshift(record)
+
+  return {
+    ...state,
+    mdocVcRecords: newRecordsState,
+  }
+}
+
+const removeMdocRecord = (record: MdocRecord, state: OpenIDCredentialRecordState): OpenIDCredentialRecordState => {
+  const newRecordsState = [...state.mdocVcRecords]
+  const index = newRecordsState.findIndex((r) => r.id === record.id)
+  if (index > -1) {
+    newRecordsState.splice(index, 1)
+  }
+
+  return {
+    ...state,
+    mdocVcRecords: newRecordsState,
+  }
+}
+
 const addOpenBadgeRecord = (
   record: OpenBadgeCredentialRecord,
   state: OpenIDCredentialRecordState
@@ -407,6 +430,19 @@ export const OpenIDCredentialRecordProvider: React.FC<PropsWithChildren<OpenIDCr
       }))
     })
 
+    agent.mdoc
+      ?.getAll()
+      .then((creds) => {
+        setState((prev) => ({
+          ...prev,
+          mdocVcRecords: creds ?? [],
+          isLoading: false,
+        }))
+      })
+      .catch((err) => {
+        logger.warn('[OpenIDCredentialRecordProvider] Failed to load mdoc credentials', err)
+      })
+
     const openbadgesApi = (agent.modules as Record<string, unknown> | undefined)?.openbadges as
       | { getAllCredentials?: () => Promise<OpenBadgeCredentialRecord[]> }
       | undefined
@@ -468,6 +504,14 @@ export const OpenIDCredentialRecordProvider: React.FC<PropsWithChildren<OpenIDCr
       setState(removeSdJwtRecord(record, state))
     })
 
+    const mdoc_credentialAdded$ = recordsAddedByType(agent, MdocRecord).subscribe((record) => {
+      setState((prev) => addMdocRecord(record, prev))
+    })
+
+    const mdoc_credentialRemoved$ = recordsRemovedByType(agent, MdocRecord).subscribe((record) => {
+      setState((prev) => removeMdocRecord(record, prev))
+    })
+
     const openbadge_credentialAdded$ = recordsAddedByType(agent, OpenBadgeCredentialRecord).subscribe((record) => {
       setState((prev) => addOpenBadgeRecord(record, prev))
     })
@@ -489,6 +533,8 @@ export const OpenIDCredentialRecordProvider: React.FC<PropsWithChildren<OpenIDCr
       w3c_credentialRemoved$.unsubscribe()
       sdjwt_credentialAdded$.unsubscribe()
       sdjwt_credentialRemoved$.unsubscribe()
+      mdoc_credentialAdded$.unsubscribe()
+      mdoc_credentialRemoved$.unsubscribe()
       openbadge_credentialAdded$.unsubscribe()
       openbadge_credentialRemoved$.unsubscribe()
       jsonLd_credentialAdded$.unsubscribe()

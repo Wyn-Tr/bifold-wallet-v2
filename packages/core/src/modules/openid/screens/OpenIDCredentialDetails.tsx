@@ -18,7 +18,7 @@ import { OpenIDCredentialType, W3cCredentialDisplay } from '../types'
 import { TOKENS, useServices } from '../../../container-api'
 import { BrandingOverlay } from '@bifold/oca'
 import Record from '../../../components/record/Record'
-import { SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
 import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
 import { buildFieldsFromW3cCredsCredential, buildOverlayFromW3cCredential } from '../../../utils/oca'
 import CredentialDetailSecondaryHeader from '../../../components/views/CredentialDetailSecondaryHeader'
@@ -41,14 +41,19 @@ const OpenIDCredentialDetails: React.FC<OpenIDCredentialDetailsProps> = ({ navig
   const { credentialId, type } = route.params
 
   const [credential, setCredential] = useState<
-    W3cCredentialRecord | SdJwtVcRecord | OpenBadgeCredentialRecord | undefined
+    W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | undefined
   >(undefined)
   const [credentialDisplay, setCredentialDisplay] = useState<W3cCredentialDisplay>()
   const { t, i18n } = useTranslation()
   const { ColorPalette, TextTheme } = useTheme()
   const { agent } = useAgent()
-  const { removeCredential, getW3CCredentialById, getSdJwtCredentialById, getOpenBadgeCredentialById } =
-    useOpenIDCredentials()
+  const {
+    removeCredential,
+    getW3CCredentialById,
+    getSdJwtCredentialById,
+    getMdocCredentialById,
+    getOpenBadgeCredentialById,
+  } = useOpenIDCredentials()
   const [bundleResolver] = useServices([TOKENS.UTIL_OCA_RESOLVER])
 
   const [isRemoveModalDisplayed, setIsRemoveModalDisplayed] = useState(false)
@@ -79,10 +84,12 @@ const OpenIDCredentialDetails: React.FC<OpenIDCredentialDetailsProps> = ({ navig
     const fetchCredential = async () => {
       if (credentialRemoved) return
       try {
-        let record: SdJwtVcRecord | W3cCredentialRecord | OpenBadgeCredentialRecord | undefined
+        let record: SdJwtVcRecord | W3cCredentialRecord | MdocRecord | OpenBadgeCredentialRecord | undefined
 
         if (type === OpenIDCredentialType.SdJwtVc) {
           record = await getSdJwtCredentialById(credentialId)
+        } else if (type === OpenIDCredentialType.Mdoc) {
+          record = await getMdocCredentialById(credentialId)
         } else if (type === OpenIDCredentialType.OpenBadge) {
           record = await getOpenBadgeCredentialById(credentialId)
         } else {
@@ -103,6 +110,7 @@ const OpenIDCredentialDetails: React.FC<OpenIDCredentialDetailsProps> = ({ navig
     credentialId,
     type,
     getSdJwtCredentialById,
+    getMdocCredentialById,
     getW3CCredentialById,
     getOpenBadgeCredentialById,
     agent,

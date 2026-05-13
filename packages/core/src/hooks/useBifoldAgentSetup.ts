@@ -11,6 +11,7 @@ import { useStore } from '../contexts/store'
 import { WalletSecret } from '../types/security'
 import { createLinkSecretIfRequired, getAgentModules } from '../utils/agent'
 import { migrateToAskar } from '../utils/migration'
+import { loadTrustedCertificates } from '../utils/trustedCertificates'
 
 export type AgentSetupReturnType = {
   agent: Agent | null
@@ -22,16 +23,18 @@ const useBifoldAgentSetup = (): AgentSetupReturnType => {
   const [agent, setAgent] = useState<Agent | null>(null)
   const agentInstanceRef = useRef<Agent | null>(null)
   const [store, dispatch] = useStore()
-  const [cacheSchemas, cacheCredDefs, logger, indyLedgers, bridge, , webrtcIceServers, ocaResolver] = useServices([
-    TOKENS.CACHE_SCHEMAS,
-    TOKENS.CACHE_CRED_DEFS,
-    TOKENS.UTIL_LOGGER,
-    TOKENS.UTIL_LEDGERS,
-    TOKENS.UTIL_AGENT_BRIDGE,
-    TOKENS.UTIL_REFRESH_ORCHESTRATOR,
-    TOKENS.UTIL_WEBRTC_ICE_SERVERS,
-    TOKENS.UTIL_OCA_RESOLVER,
-  ])
+  const [cacheSchemas, cacheCredDefs, logger, indyLedgers, bridge, , webrtcIceServers, ocaResolver, trustSources] =
+    useServices([
+      TOKENS.CACHE_SCHEMAS,
+      TOKENS.CACHE_CRED_DEFS,
+      TOKENS.UTIL_LOGGER,
+      TOKENS.UTIL_LEDGERS,
+      TOKENS.UTIL_AGENT_BRIDGE,
+      TOKENS.UTIL_REFRESH_ORCHESTRATOR,
+      TOKENS.UTIL_WEBRTC_ICE_SERVERS,
+      TOKENS.UTIL_OCA_RESOLVER,
+      TOKENS.UTIL_X509_TRUSTED_CERTIFICATE_SOURCES,
+    ])
 
   const restartExistingAgent = useCallback(
     async (agent: Agent, walletSecret: WalletSecret): Promise<Agent | undefined> => {
@@ -55,6 +58,9 @@ const useBifoldAgentSetup = (): AgentSetupReturnType => {
 
   const createNewAgent = useCallback(
     async (walletSecret: WalletSecret, mediatorUrl: string): Promise<Agent> => {
+      const trustedPems = await loadTrustedCertificates(trustSources ?? [], logger)
+      const trustedX509Certificates = trustedPems.length > 0 ? trustedPems : undefined
+
       const newAgent = new Agent({
         config: {
           label: store.preferences.walletName || 'Aries Bifold',
@@ -75,6 +81,7 @@ const useBifoldAgentSetup = (): AgentSetupReturnType => {
             path: CachesDirectoryPath + '/txn-cache',
           },
           webrtcIceServers,
+          trustedX509Certificates,
         }),
       })
       const wsTransport = new WsOutboundTransport()
@@ -85,7 +92,7 @@ const useBifoldAgentSetup = (): AgentSetupReturnType => {
 
       return newAgent
     },
-    [store.preferences.walletName, logger, indyLedgers, webrtcIceServers]
+    [store.preferences.walletName, logger, indyLedgers, webrtcIceServers, trustSources]
   )
 
   const migrateIfRequired = useCallback(

@@ -27,6 +27,7 @@ import useBifoldAgentSetup from './hooks/useBifoldAgentSetup'
 import { Locales } from './localization'
 import { IHistoryManager } from './modules/history'
 import HistoryManager from './modules/history/context/historyManager'
+import { DEFAULT_TRUSTED_CERTIFICATE_SOURCES } from './utils/trustedCertificates'
 import { RefreshOrchestrator } from './modules/openid/refresh/refreshOrchestrator'
 import { IRefreshOrchestrator } from './modules/openid/refresh/types'
 import {
@@ -445,6 +446,14 @@ export class MainContainer implements Container {
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
     ])
+
+    // Default trust sources for mdoc / X.509 credential verification.
+    // Apps can override this token to add their own VICAL providers or
+    // bundled IACAs without forking core.
+    this._container.registerInstance(
+      TOKENS.UTIL_X509_TRUSTED_CERTIFICATE_SOURCES,
+      DEFAULT_TRUSTED_CERTIFICATE_SOURCES
+    )
 
     return this
   }
