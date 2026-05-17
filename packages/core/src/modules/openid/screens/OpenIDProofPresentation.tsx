@@ -6,6 +6,8 @@ import { DeviceEventEmitter } from 'react-native'
 
 import { Attribute } from '@bifold/oca/build/legacy'
 import { MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Button, { ButtonType } from '../../../components/buttons/Button'
 import OpenIDUnsatisfiedProofRequest from '../components/OpenIDUnsatisfiedProofRequest'
@@ -56,12 +58,18 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
   const [buttonsVisible, setButtonsVisible] = useState(true)
   const [acceptModalVisible, setAcceptModalVisible] = useState(false)
   const [credentialsRequested, setCredentialsRequested] = useState<
-    Array<W3cCredentialRecord | SdJwtVcRecord | MdocRecord>
+    Array<W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord>
   >([])
   const [satistfiedCredentialsSubmission, setSatistfiedCredentialsSubmission] = useState<SatisfiedCredentialsFormat>()
   const [selectedCredentialsSubmission, setSelectedCredentialsSubmission] = useState<SelectedCredentialsFormat>()
 
-  const { getW3CCredentialById, getSdJwtCredentialById, getMdocCredentialById } = useOpenIDCredentials()
+  const {
+    getW3CCredentialById,
+    getSdJwtCredentialById,
+    getMdocCredentialById,
+    getOpenBadgeCredentialById,
+    getJsonLdCredentialById,
+  } = useOpenIDCredentials()
 
   const { ColorPalette, ListItems, TextTheme } = useTheme()
   const { t } = useTranslation()
@@ -122,6 +130,26 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
     [credential]
   )
 
+  useEffect(() => {
+    if (!submission) {
+      // eslint-disable-next-line no-console
+      console.log('[OID4VP-screen] submission is undefined')
+      return
+    }
+    // eslint-disable-next-line no-console
+    console.log(
+      `[OID4VP-screen] submission: areAllSatisfied=${submission.areAllSatisfied}, entries.length=${submission.entries.length}, ` +
+        `creds-per-entry=${submission.entries.map((e) => `${e.inputDescriptorId.slice(0, 8)}:${e.credentials.length}(sat=${e.isSatisfied})`).join(', ')}`
+    )
+  }, [submission])
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[OID4VP-screen] credentialsRequested.length=${credentialsRequested.length}, selectedCredentialsSubmission=${selectedCredentialsSubmission ? Object.keys(selectedCredentialsSubmission).length + ' keys' : 'undefined'}`
+    )
+  })
+
   //This should run only once when the screen is mounted
   useEffect(() => {
     if (!submission) return
@@ -138,14 +166,41 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
   //Fetch all credentials satisfying the proof
   useEffect(() => {
     async function fetchCreds() {
-      if (!satistfiedCredentialsSubmission || satistfiedCredentialsSubmission.entries) return
-      const creds: Array<W3cCredentialRecord | SdJwtVcRecord | MdocRecord> = []
+      if (!satistfiedCredentialsSubmission || satistfiedCredentialsSubmission.entries) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[OID4VP-screen] fetchCreds early-return: sat=${!!satistfiedCredentialsSubmission}, sat.entries=${satistfiedCredentialsSubmission?.entries}`
+        )
+        return
+      }
+      // eslint-disable-next-line no-console
+      console.log(
+        `[OID4VP-screen] fetchCreds starting: ${Object.keys(satistfiedCredentialsSubmission).length} descriptor(s)`
+      )
+      const creds: Array<W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord> = []
 
       for (const [inputDescriptorID, credIDs] of Object.entries(satistfiedCredentialsSubmission)) {
         for (const { id, claimFormat } of credIDs) {
-          let credential: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | undefined
+          let credential:
+            | W3cCredentialRecord
+            | SdJwtVcRecord
+            | MdocRecord
+            | OpenBadgeCredentialRecord
+            | JsonLdCredentialRecord
+            | undefined
           if (isW3CProofRequest(claimFormat)) {
-            credential = await getW3CCredentialById(id)
+            // Credo's W3cCredentialRepository AND our JSON-LD / OpenBadge
+            // repos all surface as `ldp_vc` to PEX. Try Credo first, then
+            // fall back to our records — the augmenter only injects records
+            // that aren't already in Credo's, so the IDs are disjoint.
+            const w3c = await getW3CCredentialById(id).catch(() => undefined)
+            const jsonLd = w3c ? undefined : await getJsonLdCredentialById(id).catch(() => undefined)
+            const openBadge = w3c || jsonLd ? undefined : await getOpenBadgeCredentialById(id).catch(() => undefined)
+            credential = w3c ?? jsonLd ?? openBadge
+            // eslint-disable-next-line no-console
+            console.log(
+              `[OID4VP-screen] lookup id=${id.slice(0, 12)} fmt=${claimFormat} → w3c=${!!w3c} jsonLd=${!!jsonLd} openBadge=${!!openBadge}`
+            )
           } else if (isSdJwtProofRequest(claimFormat)) {
             credential = await getSdJwtCredentialById(id)
           } else if (isMdocProofRequest(claimFormat)) {
@@ -156,10 +211,19 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
           }
         }
       }
+      // eslint-disable-next-line no-console
+      console.log(`[OID4VP-screen] fetchCreds done: pushed ${creds.length} record(s)`)
       setCredentialsRequested(creds)
     }
     fetchCreds()
-  }, [satistfiedCredentialsSubmission, getW3CCredentialById, getSdJwtCredentialById, getMdocCredentialById])
+  }, [
+    satistfiedCredentialsSubmission,
+    getW3CCredentialById,
+    getSdJwtCredentialById,
+    getMdocCredentialById,
+    getOpenBadgeCredentialById,
+    getJsonLdCredentialById,
+  ])
 
   //Once satisfied credentials are set and all credentials fetched, we select the first one of each submission to display on screen
   useEffect(() => {
@@ -288,7 +352,7 @@ const OpenIDProofPresentation: React.FC<OpenIDProofPresentationProps> = ({
     const fields = buildFieldsFromW3cCredsCredential(credentialDisplay, requestedAttributes)
     return (
       <CredentialCard
-        credential={credential as W3cCredentialRecord | SdJwtVcRecord | MdocRecord}
+        credential={credential as W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord}
         displayItems={fields as Attribute[]}
         hasAltCredentials={hasMultipleCreds}
         onPress={() => {}}

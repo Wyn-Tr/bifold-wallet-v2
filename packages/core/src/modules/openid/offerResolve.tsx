@@ -297,14 +297,14 @@ export const receiveCredentialFromOpenId4VciOffer = async ({
   const resolvedCredentialIdsToRequest =
     credentialConfigurationIdsToRequest ?? offeredCredentialsToRequest.map((c) => c.id)
 
-  // JSON-LD branch — Credo 0.5's W3cJsonLdCredentialService can't validate VC v2
-  // documents and has no signature suite for DataIntegrityProof. We do the
-  // credential request ourselves and verify via @ajna-inc/openbadges, persisting
-  // as an OpenBadgeCredentialRecord (raw JSON, validator-free).
+  // JSON-LD bridge — only `ldp_vc` (embedded LD-Proof on a JSON-LD object).
+  // `jwt_vc_json-ld` is still a compact JWT string on the wire (the `-ld`
+  // suffix only signals that the JWT's `vc` payload contains a JSON-LD
+  // `@context`). Credo's standard JWT-VC path handles that fine, so we
+  // intentionally leave `JwtVcJsonLd` OUT of this routing condition — the
+  // bridge's object-only response handler would reject the JWT string.
   const isJsonLdRequest = offeredCredentialsToRequest.every(
-    (c) =>
-      c.format === OpenId4VciCredentialFormatProfile.LdpVc ||
-      c.format === OpenId4VciCredentialFormatProfile.JwtVcJsonLd
+    (c) => c.format === OpenId4VciCredentialFormatProfile.LdpVc
   )
   if (isJsonLdRequest) {
     return receiveJsonLdViaCustomBridge({

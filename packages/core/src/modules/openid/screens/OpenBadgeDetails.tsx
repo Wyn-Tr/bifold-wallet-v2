@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { StackScreenProps } from '@react-navigation/stack'
 import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
 import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
-import { DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { DeviceEventEmitter, Image, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useAgent } from '@credo-ts/react-hooks'
 
@@ -172,6 +172,20 @@ const OpenBadgeDetails: React.FC<OpenBadgeDetailsProps> = ({ navigation, route }
     },
     issuerName: { ...TextTheme.title, color: ColorPalette.brand.text, flex: 1 },
     removeSection: { marginTop: 24, marginBottom: 40 },
+    exportButton: {
+      marginTop: 24,
+      marginHorizontal: 16,
+      paddingVertical: 14,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: ColorPalette.brand.primary,
+      alignItems: 'center',
+    },
+    exportButtonText: {
+      ...TextTheme.normal,
+      color: ColorPalette.brand.primary,
+      fontWeight: '600',
+    },
   })
 
   useEffect(() => {
@@ -231,6 +245,36 @@ const OpenBadgeDetails: React.FC<OpenBadgeDetailsProps> = ({ navigation, route }
     setIsRemoveModalDisplayed(false)
     await new Promise((resolve) => setTimeout(resolve, 500))
     handleRemove()
+  }
+
+  /**
+   * Share the raw credential JSON via the OS share sheet. Useful for:
+   *   - Pasting into a different verifier (walt.id, DigitalBazaar online tool)
+   *     to confirm whether our credential / our VP are spec-compliant
+   *   - Saving to Notes / Files for later inspection
+   *   - Sending to issuer support when something looks off
+   *
+   * We share via the system share intent rather than copying to clipboard so
+   * the user can pick exactly where it goes — no auto-clobber of clipboard
+   * contents, no extra permissions for clipboard access.
+   */
+  const handleExportCredential = async () => {
+    if (!display?.json) return
+    try {
+      const json = JSON.stringify(display.json, null, 2)
+      await Share.share({
+        message: json,
+        title: `Credential — ${(display.json as { id?: string }).id ?? 'json-ld'}`,
+      })
+    } catch (err) {
+      const error = new BifoldError(
+        'Export failed',
+        'Could not share credential JSON',
+        (err as Error)?.message ?? '',
+        1025
+      )
+      DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error)
+    }
   }
 
 
@@ -493,6 +537,15 @@ const OpenBadgeDetails: React.FC<OpenBadgeDetailsProps> = ({ navigation, route }
             </Text>
           </View>
         </View>
+
+        <TouchableOpacity
+          style={styles.exportButton}
+          onPress={handleExportCredential}
+          testID={testIdWithKey('ExportCredentialJson')}
+          accessibilityLabel="Export credential JSON"
+        >
+          <Text style={styles.exportButtonText}>Export Credential JSON</Text>
+        </TouchableOpacity>
 
         <View style={styles.removeSection}>
           <RecordRemove onRemove={toggleDeclineModalVisible} />

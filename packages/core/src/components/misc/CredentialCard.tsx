@@ -100,6 +100,21 @@ const CredentialCard: React.FC<CredentialCardCustomProps> = ({ credential, logoU
         // no-op
       }
     }
+    // W3cCredentialRecord (jwt_vc_json / jwt_vc_json-ld) and MdocRecord (mDL,
+    // EUDI PID, etc.) all expose proper display info via getCredentialForDisplay
+    // — including the issuer's `credential_configurations_supported[*].display`
+    // name when present, falling back to the last `type` entry.
+    if (credType === 'W3cCredentialRecord' || credType === 'MdocRecord') {
+      try {
+        const display = getCredentialForDisplay(
+          credential as W3cCredentialRecord | MdocRecord,
+        )
+        if (display.display?.name && display.display.name !== 'Credential') return display.display.name
+        if (display.metadata?.type && display.metadata.type !== 'Credential') return display.metadata.type
+      } catch {
+        // no-op
+      }
+    }
     return credDefTag || schemaName || 'Credential'
   }
   const displayName = getDisplayName()

@@ -6,6 +6,7 @@ export type OpenIdVpErrorCode =
   | 'holder_binding_unavailable'
   | 'submission_requirements_unsatisfied'
   | 'preflight_failed'
+  | 'mixed_format_not_supported'
 
 export class OpenIdVpError extends Error {
   public readonly code: OpenIdVpErrorCode

@@ -1,4 +1,5 @@
 import { Agent, DifPexCredentialsForRequest, Jwt, X509ModuleConfig } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
 import { ParseInvitationResult } from '../../utils/parsers'
 import q from 'query-string'
 import { OpenId4VPRequestRecord } from './types'
@@ -8,6 +9,47 @@ import { validateSubmissionRequirements } from './submissionRequirements'
 import { getHostNameFromUrl } from './utils/utils'
 import { OpenId4VcSiopVerifiedAuthorizationRequest } from '@credo-ts/openid4vc'
 import { Linking } from 'react-native'
+import { augmentCandidatesWithJsonLd } from './jsonLd/augmentPexCandidates'
+import { JsonLdCredentialRecord } from './jsonLd/JsonLdCredentialRecord'
+import {
+  shareJsonLdPresentation,
+  type LdpVpCapableRecord,
+} from './jsonLd/shareJsonLdPresentation'
+import { evaluateX509ClientId } from './x509ClientId'
+import { normalizeAuthorizationRequest } from './normalizeAuthRequest'
+
+/**
+ * Pull the `presentation_definition` out of Sphereon's resolved request.
+ *
+ * Three places it could live:
+ *   1. `presentationDefinitions[0].definition` — Sphereon already extracted
+ *      and located it. Most reliable.
+ *   2. `payload.presentation_definition` — JWT payload field.
+ *   3. `authorizationRequestPayload.presentation_definition` — URL query
+ *      params. Won't have it for request_uri / request flows where the PD
+ *      is inside the JWT.
+ *
+ * We try in that order so we work across all transports.
+ */
+function extractPresentationDefinition(
+  request: OpenId4VcSiopVerifiedAuthorizationRequest
+): Record<string, unknown> | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = request as any
+  const fromPdList = r?.presentationDefinitions?.[0]?.definition
+  if (fromPdList && typeof fromPdList === 'object') return fromPdList
+  const fromPayload = r?.payload?.presentation_definition
+  if (fromPayload && typeof fromPayload === 'object') return fromPayload
+  const fromUrlParams = r?.authorizationRequestPayload?.presentation_definition
+  if (fromUrlParams && typeof fromUrlParams === 'object') return fromUrlParams
+  return undefined
+}
+
+/** True when the record is one we present via our JSON-LD VP path. */
+function isLdpVpRecord(record: unknown): record is LdpVpCapableRecord {
+  if (!record || typeof record !== 'object') return false
+  return record instanceof JsonLdCredentialRecord || record instanceof OpenBadgeCredentialRecord
+}
 
 function handleTextResponse(text: string): ParseInvitationResult {
   // If the text starts with 'ey' we assume it's a JWT and thus an OpenID authorization request
@@ -184,9 +226,26 @@ export const getCredentialsForProofRequest = async ({
   let requestUri = uri
 
   try {
-    const { certificate = null, data: newData = null } = allowUntrustedCertificates
-      ? await extractCertificateFromAuthorizationRequest({ data, uri })
-      : {}
+    // x509_san_dns / x509_san_uri client_id_scheme: validate the SAN binding
+    // ourselves, then trust the leaf cert for the duration of the resolve
+    // call. Without this, EUDI-style verifiers (and any RP that authenticates
+    // via cert+SAN instead of a DID) fail at "untrusted certificate".
+    const x509Result = await evaluateX509ClientId({ agent, data, uri })
+    if (x509Result.scheme && !x509Result.matched && x509Result.reason) {
+      throw new Error(`x509 client_id_scheme rejected: ${x509Result.reason}`)
+    }
+
+    let certificate: string | null = null
+    let newData: string | null = null
+    if (x509Result.matched && x509Result.leafCertBase64) {
+      // SAN binding passed — trust the leaf so Credo's resolver accepts the
+      // request JWT signature. `withTrustedCertificate` removes it afterward.
+      certificate = x509Result.leafCertBase64
+    } else if (allowUntrustedCertificates) {
+      const extracted = await extractCertificateFromAuthorizationRequest({ data, uri })
+      certificate = extracted.certificate
+      newData = extracted.data
+    }
 
     if (newData) {
       // FIXME: Credo only support request string, but we already parsed it before. So we construct an request here
@@ -198,19 +257,67 @@ export const getCredentialsForProofRequest = async ({
       throw new Error('Either data or uri must be provided')
     }
 
-    agent.config.logger.info(`$$Receiving openid uri ${requestUri}`)
+    // Draft-24+ prefixed client_id translation. If the request JWT has a
+    // colon-prefixed client_id (e.g. `redirect_uri:https://...`), rewrite it
+    // into the bare URL + explicit client_id_scheme shape Sphereon-in-Credo
+    // 0.5 understands. Only operates on unsigned (alg:none) JWTs; signed ones
+    // pass through unchanged (see normalizeAuthRequest for the rationale).
+    agent.config.logger.info(`[OID4VP-norm] entering normalize, data=${!!data}, uri starts=${uri?.slice(0, 60)}`)
+    const normalized = await normalizeAuthorizationRequest({ data, uri, logger: agent.config.logger })
+    if (normalized.inlineRequest) {
+      requestUri = `openid://?request=${encodeURIComponent(normalized.inlineRequest)}`
+      agent.config.logger.info(`[OID4VP-norm] substituted requestUri with normalized inline (len=${requestUri.length})`)
+    } else {
+      agent.config.logger.info(`[OID4VP-norm] passing through original (no normalization)`)
+    }
+
+    agent.config.logger.info(`$$Receiving openid uri ${requestUri.slice(0, 200)}`)
 
     // Temp solution to add and remove the trusted certificate
-    const resolved = await withTrustedCertificate(agent, certificate, () => {
-      return agent.modules.openId4VcHolder.resolveSiopAuthorizationRequest(requestUri)
+    const resolved = await withTrustedCertificate(agent, certificate, async () => {
+      try {
+        return await agent.modules.openId4VcHolder.resolveSiopAuthorizationRequest(requestUri)
+      } catch (e) {
+        agent.config.logger.error(
+          `[OID4VP-resolve] Sphereon resolve threw: name=${(e as Error)?.name} msg=${(e as Error)?.message}`
+        )
+        throw e
+      }
     })
 
     if (!resolved.presentationExchange) {
       throw new Error('No presentation exchange found in authorization request.')
     }
 
+    // Augment Credo's PEX result with our JSON-LD / OpenBadge records — Credo
+    // 0.5's PEX engine only sees W3cCredential / SdJwtVc / Mdoc records, so
+    // any credential we received via the JSON-LD bridge is invisible without
+    // this pass.
+    //
+    // Credo wraps the PEX result as `{ definition, credentialsForRequest }`;
+    // the inner `credentialsForRequest` is the `DifPexCredentialsForRequest`
+    // (with `.requirements`) that our augmenter operates on.
+    const presentationDefinition = extractPresentationDefinition(resolved.authorizationRequest)
+    agent.config.logger.info(
+      `[OID4VP-pex] PD extracted? ${!!presentationDefinition}; descriptors=${
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Array.isArray((presentationDefinition as any)?.input_descriptors)
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (presentationDefinition as any).input_descriptors.length
+          : 'n/a'
+      }`
+    )
+    const augmentedCredentialsForRequest = presentationDefinition
+      ? await augmentCandidatesWithJsonLd({
+          agent,
+          credentialsForRequest: resolved.presentationExchange.credentialsForRequest,
+          presentationDefinition,
+        })
+      : resolved.presentationExchange.credentialsForRequest
+
     return {
-      ...resolved.presentationExchange,
+      definition: resolved.presentationExchange.definition,
+      credentialsForRequest: augmentedCredentialsForRequest,
       authorizationRequest: resolved.authorizationRequest,
       verifierHostName: resolved.authorizationRequest.responseURI
         ? getHostNameFromUrl(resolved.authorizationRequest.responseURI)
@@ -268,6 +375,32 @@ export const shareProof = async ({
     )
   )
 
+  // Detect JSON-LD records — they can't go through Credo's
+  // acceptSiopAuthorizationRequest (W3cJsonLdCredentialService has no
+  // DataIntegrityProof suite). We route them through our openbadges-backed
+  // VP builder and POST the response ourselves.
+  const ldpVpDescriptors: Record<string, LdpVpCapableRecord[]> = {}
+  for (const [descriptorId, records] of Object.entries(credentials)) {
+    for (const record of records) {
+      if (isLdpVpRecord(record)) {
+        if (!ldpVpDescriptors[descriptorId]) ldpVpDescriptors[descriptorId] = []
+        ldpVpDescriptors[descriptorId].push(record)
+      }
+    }
+  }
+  const hasLdpVp = Object.keys(ldpVpDescriptors).length > 0
+  const hasNonLdpVp = Object.values(credentials).some((records) =>
+    records.some((r) => !isLdpVpRecord(r))
+  )
+  if (hasLdpVp && hasNonLdpVp) {
+    // Splitting one PEX submission across two presentations (one Credo-built,
+    // one ours) is non-trivial and verifiers rarely mix formats. Fail clearly.
+    throw new OpenIdVpError(
+      'mixed_format_not_supported',
+      'Cannot present JSON-LD and non-JSON-LD credentials in the same submission yet.'
+    )
+  }
+
   const inputDescriptors = credentialsForRequest.requirements.flatMap((requirement) =>
     requirement.submissionEntry.map((entry) => ({ id: entry.inputDescriptorId }))
   )
@@ -313,6 +446,33 @@ export const shareProof = async ({
   }
 
   try {
+    // JSON-LD path — build + sign + POST a ldp_vp ourselves. Credo's
+    // acceptSiopAuthorizationRequest can't reach our records and can't build
+    // DataIntegrityProof VPs.
+    if (hasLdpVp) {
+      const result = await shareJsonLdPresentation({
+        agent,
+        authorizationRequest,
+        selectedByDescriptor: ldpVpDescriptors,
+      })
+      if (result.redirectUri) {
+        await Linking.openURL(result.redirectUri)
+      }
+      if (result.status < 200 || result.status > 299) {
+        throw new Error(
+          `Verifier rejected JSON-LD presentation (HTTP ${result.status}): ${
+            typeof result.body === 'string' ? result.body : JSON.stringify(result.body).slice(0, 300)
+          }`
+        )
+      }
+      return {
+        serverResponse: {
+          status: result.status,
+          body: result.body as never,
+        },
+      } as never
+    }
+
     // Temp solution to add and remove the trusted certicaite
     const certificate =
       authorizationRequest.jwt && allowUntrustedCertificate ? extractCertificateFromJwt(authorizationRequest.jwt) : null
