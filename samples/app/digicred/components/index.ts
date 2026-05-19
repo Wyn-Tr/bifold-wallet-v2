@@ -11,3 +11,4 @@ export { default as CredentialButtons } from '../components/credentialCard/Crede
 export { default as SnackBarMessage } from './SnackBarMessage'
 export { default as ZoomableView } from './ZoomableView'
 export { DigiCredChatBackgroundRenderer } from './DigiCredChatBackgroundRenderer'
+export { default as EmptyChannelHero } from './EmptyChannelHero'

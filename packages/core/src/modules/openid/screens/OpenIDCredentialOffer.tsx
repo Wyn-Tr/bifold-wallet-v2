@@ -4,21 +4,28 @@ import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { useAgent } from '@credo-ts/react-hooks'
 import { CommonActions } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+  DeviceEventEmitter,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Button, { ButtonType } from '../../../components/buttons/Button'
+
 import CommonRemoveModal from '../../../components/modals/CommonRemoveModal'
 import { flattenSubject } from '../utils/flattenSubject'
 import { EventTypes } from '../../../constants'
-import { useTheme } from '../../../contexts/theme'
 import CredentialOfferAccept from '../../../screens/CredentialOfferAccept'
 import { BifoldError } from '../../../types/error'
 import { DeliveryStackParams, Screens, Stacks, TabStacks } from '../../../types/navigators'
 import { ModalUsage } from '../../../types/remove'
 import { testIdWithKey } from '../../../utils/testable'
-import OpenIDCredentialCard from '../components/OpenIDCredentialCard'
 import { getCredentialForDisplay } from '../display'
 import { NotificationEventType } from '../notification'
 import { temporaryMetaVanillaObject, setRefreshCredentialMetadata } from '../metadata'
@@ -28,10 +35,20 @@ import { acquirePreAuthorizedAccessToken, receiveCredentialFromOpenId4VciOffer }
 import { getCredentialConfigurationIds } from '../utils/utils'
 import { RefreshStatus } from '../refresh/types'
 import { OpenId4VciPendingCredentialOffer } from '../types'
+import {
+  DC_PALETTE,
+  DCActionRow,
+  DCAttrList,
+  DCIcon,
+  OpenIDCardRenderer,
+  expandObject,
+  resolveDesign,
+  type DCAttrItem,
+} from '../../openid-card-design'
 
-type OpenIDCredentialDetailsProps = StackScreenProps<DeliveryStackParams, Screens.OpenIDCredentialOffer>
+type Props = StackScreenProps<DeliveryStackParams, Screens.OpenIDCredentialOffer>
 
-const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigation, route }) => {
+const OpenIDCredentialOffer: React.FC<Props> = ({ navigation, route }) => {
   // FIXME: change params to accept credential id to avoid 'non-serializable' warnings
   const { credential } = route.params
   const isPendingCredentialOffer =
@@ -43,16 +60,16 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
   const issuedCredential = isPendingCredentialOffer
     ? undefined
     : (credential as W3cCredentialRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord)
+
   const credentialDisplay = issuedCredential ? getCredentialForDisplay(issuedCredential) : undefined
   const display = credentialDisplay?.display
+
   const pendingResolvedOffer = pendingOffer?.resolvedCredentialOffer
   const pendingConfigId = pendingResolvedOffer ? getCredentialConfigurationIds(pendingResolvedOffer)[0] : undefined
   const pendingSupported = pendingConfigId
     ? pendingResolvedOffer?.metadata?.credentialIssuerMetadata?.credential_configurations_supported?.[pendingConfigId]
     : undefined
-  const pendingDisplayInfo = Array.isArray(pendingSupported?.display)
-    ? pendingSupported.display[0]
-    : undefined
+  const pendingDisplayInfo = Array.isArray(pendingSupported?.display) ? pendingSupported.display[0] : undefined
   const pendingCredentialType = Array.isArray(pendingSupported?.credential_definition?.type)
     ? pendingSupported?.credential_definition?.type?.[pendingSupported.credential_definition.type.length - 1]
     : Array.isArray(pendingSupported?.credential_definition?.types)
@@ -64,13 +81,12 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
   const pendingDisplayDescription = pendingDisplayInfo?.description
   const pendingPreviewAttributes = pendingOffer?.previewAttributes
 
-  // console.log('$$ ====> Credential Display', JSON.stringify(credentialDisplay))
   const { t } = useTranslation()
-  const { ColorPalette, TextTheme } = useTheme()
   const { agent } = useAgent()
 
   const [isRemoveModalDisplayed, setIsRemoveModalDisplayed] = useState(false)
   const [buttonsVisible, setButtonsVisible] = useState(true)
+  const [acceptInFlight, setAcceptInFlight] = useState(false)
   const [acceptModalVisible, setAcceptModalVisible] = useState(false)
   const [txCode, setTxCode] = useState('')
   const [txCodeError, setTxCodeError] = useState<string | undefined>(undefined)
@@ -78,197 +94,12 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
   const { acceptNewCredential } = useAcceptReplacement()
   const { declineByNewId } = useDeclineReplacement()
 
-  const styles = StyleSheet.create({
-    headerTextContainer: {
-      paddingHorizontal: 25,
-      paddingVertical: 16,
-    },
-    headerText: {
-      ...TextTheme.normal,
-      flexShrink: 1,
-    },
-    txCodeContainer: {
-      marginBottom: 16,
-    },
-    txCodeLabel: {
-      ...TextTheme.normal,
-      marginBottom: 6,
-    },
-    txCodeInput: {
-      borderWidth: 1,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      color: TextTheme.normal.color,
-      borderColor: ColorPalette.brand.secondaryBackground,
-      backgroundColor: ColorPalette.brand.secondaryBackground,
-    },
-    txCodeHelpText: {
-      ...TextTheme.label,
-      marginTop: 6,
-    },
-    txCodeErrorText: {
-      ...TextTheme.label,
-      marginTop: 6,
-      color: ColorPalette.semantic.error,
-    },
-    footerButton: {
-      paddingTop: 10,
-    },
-    attributesSection: {
-      paddingHorizontal: 24,
-      paddingVertical: 18,
-      backgroundColor: ColorPalette.brand.secondaryBackground,
-      marginTop: 12,
-    },
-    sectionTitle: {
-      ...TextTheme.labelSubtitle,
-      color: ColorPalette.grayscale.mediumGrey,
-      marginBottom: 12,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-    },
-    metaRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: ColorPalette.grayscale.lightGrey,
-    },
-    metaRowLast: { borderBottomWidth: 0 },
-    metaLabel: { ...TextTheme.label, color: ColorPalette.grayscale.mediumGrey, flex: 1 },
-    metaValue: {
-      ...TextTheme.normal,
-      color: ColorPalette.brand.text,
-      flex: 2,
-      textAlign: 'right',
-    },
-    groupHeaderRow: {
-      paddingTop: 14,
-      paddingBottom: 6,
-    },
-    groupHeaderLabel: {
-      color: ColorPalette.brand.text,
-      fontWeight: '600',
-      textTransform: 'capitalize',
-    },
-    imageRow: {
-      flexDirection: 'column',
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: ColorPalette.grayscale.lightGrey,
-    },
-    imageRowLabel: {
-      ...TextTheme.label,
-      color: ColorPalette.grayscale.mediumGrey,
-      marginBottom: 8,
-    },
-    imageRowImage: {
-      width: '100%',
-      maxWidth: 240,
-      height: 140,
-      borderRadius: 8,
-      backgroundColor: ColorPalette.grayscale.lightGrey,
-      alignSelf: 'flex-start',
-    },
-    heroImageSection: {
-      alignItems: 'center',
-      paddingHorizontal: 24,
-      paddingTop: 4,
-      paddingBottom: 16,
-    },
-    heroImageLabel: {
-      ...TextTheme.labelSubtitle,
-      color: ColorPalette.grayscale.mediumGrey,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      alignSelf: 'flex-start',
-      marginBottom: 8,
-    },
-    heroImage: {
-      width: '100%',
-      height: 220,
-      borderRadius: 12,
-      backgroundColor: ColorPalette.grayscale.lightGrey,
-    },
-    plainTitleBlock: {
-      paddingHorizontal: 24,
-      paddingTop: 4,
-      paddingBottom: 16,
-    },
-    plainTitleText: {
-      ...TextTheme.headingTwo,
-      color: ColorPalette.brand.text,
-      marginBottom: 4,
-    },
-    plainTitleDescription: {
-      ...TextTheme.normal,
-      color: ColorPalette.grayscale.mediumGrey,
-    },
-    fallbackInfoSection: {
-      paddingHorizontal: 24,
-      paddingVertical: 18,
-      backgroundColor: ColorPalette.brand.secondaryBackground,
-      marginTop: 12,
-    },
-    fallbackInfoText: {
-      ...TextTheme.normal,
-      color: ColorPalette.brand.text,
-    },
-    summarySection: {
-      paddingHorizontal: 24,
-      paddingVertical: 18,
-      backgroundColor: ColorPalette.brand.secondaryBackground,
-      marginTop: 12,
-    },
-    summaryRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingVertical: 6,
-    },
-    summaryLabel: {
-      ...TextTheme.label,
-      color: ColorPalette.grayscale.mediumGrey,
-      flex: 1,
-    },
-    summaryValue: {
-      ...TextTheme.normal,
-      color: ColorPalette.brand.text,
-      flex: 2,
-      textAlign: 'right',
-    },
-    previewStatusBox: {
-      marginTop: 12,
-      borderRadius: 12,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      backgroundColor: ColorPalette.grayscale.white,
-    },
-    previewStatusTitle: {
-      ...TextTheme.labelSubtitle,
-      color: ColorPalette.brand.text,
-      marginBottom: 4,
-    },
-    previewStatusText: {
-      ...TextTheme.normal,
-      color: ColorPalette.grayscale.mediumGrey,
-    },
-    pendingValueText: {
-      ...TextTheme.normal,
-      color: ColorPalette.grayscale.mediumGrey,
-      fontStyle: 'italic',
-      flex: 2,
-      textAlign: 'right',
-    },
-  })
-
-  // Pull credentialSubject straight from the credential JSON for raw-JSON
-  // record types (OpenBadge / JsonLd). Fall back to the OCA-derived attributes
-  // for SD-JWT / W3C records, which credentialDisplay.attributes already
-  // populates correctly.
+  // ---- Preview attribute resolution (legacy behaviour preserved) ------------
+  // For pending offers: derive a labelled preview from offer.previewAttributes
+  // or the issuer's credential_definition / claims metadata.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const credJson = ((issuedCredential as any)?.credential ?? {}) as Record<string, unknown>
-  const pendingCredentialSubjectPreview = (() => {
+  const pendingCredentialSubjectPreview = useMemo(() => {
     const mapLabel = (key: string, value: unknown) => {
       const labelSource =
         (pendingSupported?.credential_definition?.credentialSubject as Record<string, unknown> | undefined)?.[key] ??
@@ -279,7 +110,6 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
         : undefined
       return [displayName || key, value]
     }
-
     if (pendingPreviewAttributes && typeof pendingPreviewAttributes === 'object') {
       return Object.fromEntries(
         Object.entries(pendingPreviewAttributes)
@@ -287,7 +117,6 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
           .map(([key, value]) => mapLabel(key, value))
       )
     }
-
     const credentialSubject = pendingSupported?.credential_definition?.credentialSubject
     if (credentialSubject && typeof credentialSubject === 'object' && !Array.isArray(credentialSubject)) {
       return Object.fromEntries(
@@ -301,7 +130,6 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
         })
       )
     }
-
     const claims = pendingSupported?.claims
     if (claims && typeof claims === 'object' && !Array.isArray(claims)) {
       return Object.fromEntries(
@@ -315,90 +143,46 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
         })
       )
     }
-
     return {}
-  })()
+  }, [pendingPreviewAttributes, pendingSupported])
 
   const subject = (Array.isArray(credJson.credentialSubject)
     ? (credJson.credentialSubject as unknown[])[0] ?? {}
     : credJson.credentialSubject ?? credentialDisplay?.attributes ?? pendingCredentialSubjectPreview ?? {}) as Record<string, unknown>
-  const allRows = flattenSubject(subject)
-  // Promote the first image attribute to a hero section at the top of the
-  // attributes view — base64 / data-URL images are unreadable when dumped as
-  // a value cell. Remaining images (if any) still render inline.
+
+  const allRows = useMemo(() => flattenSubject(subject), [subject])
   const heroImageRow = allRows.find((r) => r.isImage && r.value)
-  const subjectRows = heroImageRow ? allRows.filter((r) => r !== heroImageRow) : allRows
 
-  const pendingClaimLabelRows = (() => {
-    if (!isPendingCredentialOffer) return [] as Array<{ key: string; label: string; value: string }>
+  // Build DCAttrList items from the subject, preferring nested children for
+  // objects so a deep credentialSubject reads cleanly on the dark UI.
+  const attrItems: DCAttrItem[] = useMemo(() => expandObject(subject), [subject])
 
-    const claimSource =
-      (pendingSupported?.claims && typeof pendingSupported.claims === 'object'
-        ? (pendingSupported.claims as Record<string, unknown>)
-        : undefined) ??
-      (pendingSupported?.credential_definition?.credentialSubject &&
-      typeof pendingSupported.credential_definition.credentialSubject === 'object'
-        ? (pendingSupported.credential_definition.credentialSubject as Record<string, unknown>)
-        : undefined)
-
-    if (!claimSource) return [] as Array<{ key: string; label: string; value: string }>
-
-    return Object.entries(claimSource)
-      .filter(([key]) => key !== 'id' && key !== 'sub' && key !== 'status')
-      .map(([key, value]) => {
-        const obj = value && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
-        const displayName = Array.isArray(obj?.display)
-          ? ((obj?.display as Array<Record<string, unknown>>)[0]?.name as string | undefined)
-          : undefined
-        const exampleValue = obj?.value ?? obj?.default ?? obj?.example ?? ''
-        return {
-          key,
-          label: displayName || key,
-          value: typeof exampleValue === 'string' || typeof exampleValue === 'number' ? String(exampleValue) : '',
-        }
-      })
-  })()
-
-  const pendingFallbackRows =
-    subjectRows.length > 0
-      ? []
-      : pendingClaimLabelRows.length > 0
-        ? pendingClaimLabelRows
-        : pendingDisplayName
-          ? [{ key: 'credential', label: 'Credential', value: pendingDisplayName }]
-          : []
-
-  const hasPendingPreviewValues = !!(
-    pendingPreviewAttributes &&
-    Object.values(pendingPreviewAttributes).some(
-      (value) => value !== undefined && value !== null && String(value).trim().length > 0
-    )
-  )
-  const hasMetadataOnlyPreview = !hasPendingPreviewValues && (subjectRows.length > 0 || pendingFallbackRows.length > 0)
-  const previewStatusLabel = isPendingCredentialOffer
-    ? hasPendingPreviewValues
-      ? 'Preview available'
-      : hasMetadataOnlyPreview
-        ? 'Field names available'
-        : 'Preview unavailable'
-    : undefined
-  const previewStatusDescription = isPendingCredentialOffer
-    ? hasPendingPreviewValues
-      ? 'This issuer provided values you can review before acceptance.'
-      : hasMetadataOnlyPreview
-        ? 'This issuer shared field names, but values will appear after issuance.'
-        : 'This issuer did not provide preview data before issuance.'
-    : undefined
-
-  const pendingIssuerHost = (() => {
+  const pendingIssuerHost = useMemo(() => {
     const issuer = pendingResolvedOffer?.metadata?.issuer
-    if (!issuer) return 'Unknown issuer'
+    if (!issuer) return undefined
     try {
       return new URL(issuer).host
     } catch {
       return issuer
     }
-  })()
+  }, [pendingResolvedOffer])
+
+  const credentialName = isPendingCredentialOffer
+    ? pendingDisplayName
+    : credentialDisplay?.display?.name ?? credentialDisplay?.metadata?.type ?? 'Credential'
+  const issuerName = isPendingCredentialOffer
+    ? pendingIssuerHost ?? 'An issuer'
+    : display?.issuer?.name ?? pendingIssuerHost ?? 'An issuer'
+  const issuerDomain = isPendingCredentialOffer ? pendingIssuerHost : undefined
+  const headline = `${issuerName} wants to issue you a ${credentialName}`
+  const description = isPendingCredentialOffer ? pendingDisplayDescription : credentialDisplay?.display?.description
+
+  const design = useMemo(
+    () => (issuedCredential ? resolveDesign(issuedCredential as never) : null),
+    [issuedCredential]
+  )
+
+  // ---- Handlers (unchanged from legacy) -------------------------------------
 
   const toggleDeclineModalVisible = () => setIsRemoveModalDisplayed(!isRemoveModalDisplayed)
 
@@ -411,11 +195,7 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
       })
       return
     }
-
-    if (!issuedCredential) {
-      return
-    }
-
+    if (!issuedCredential) return
     await handleSendNotification(NotificationEventType.CREDENTIAL_DELETED)
     await declineByNewId(issuedCredential.id)
     toggleDeclineModalVisible()
@@ -425,18 +205,11 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
     })
   }
 
-  // Hide the "Credential Added" modal first, then on the next tick reset the
-  // parent navigator. Doing both in the same tick (or letting the modal call
-  // dispatch itself) caused a visible flicker — the modal would unmount at
-  // the same moment MainStack tore down DeliveryStack, briefly exposing the
-  // offer screen in between.
   const navigateToTab = useCallback(
     (tabScreen: string, innerScreen: string) => {
       setAcceptModalVisible(false)
       const parent = navigation.getParent()
       if (!parent) return
-      // requestAnimationFrame lets React commit the visibility update before
-      // the navigation reset replaces the surrounding screen.
       requestAnimationFrame(() => {
         parent.dispatch(
           CommonActions.reset({
@@ -446,15 +219,7 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
                 name: Stacks.TabStack,
                 state: {
                   index: 0,
-                  routes: [
-                    {
-                      name: tabScreen,
-                      state: {
-                        index: 0,
-                        routes: [{ name: innerScreen }],
-                      },
-                    },
-                  ],
+                  routes: [{ name: tabScreen, state: { index: 0, routes: [{ name: innerScreen }] } }],
                 },
               },
             ],
@@ -465,13 +230,10 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
     [navigation]
   )
 
-  const handleAcceptDone = useCallback(() => {
-    navigateToTab(TabStacks.CredentialStack, Screens.Credentials)
-  }, [navigateToTab])
-
-  const handleAcceptBackToHome = useCallback(() => {
-    navigateToTab(TabStacks.HomeStack, Screens.Home)
-  }, [navigateToTab])
+  const handleAcceptDone = useCallback(() => navigateToTab(TabStacks.CredentialStack, Screens.Credentials), [
+    navigateToTab,
+  ])
+  const handleAcceptBackToHome = useCallback(() => navigateToTab(TabStacks.HomeStack, Screens.Home), [navigateToTab])
 
   const handleSendNotification = async (notificationEventType: NotificationEventType) => {
     try {
@@ -490,20 +252,18 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
         })
       }
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.warn('[Credential Offer] error sending notification', err)
     }
   }
 
   const handleAcceptTouched = async () => {
-    if (!agent) {
-      return
-    }
+    if (!agent) return
     try {
       if (isPendingCredentialOffer && pendingOffer) {
         const trimmedCode = txCode.trim()
         const normalizedCode = trimmedCode.replace(/\s+/g, '').toUpperCase()
         const txCodeLength = pendingOffer.txCode?.length
-
         if (requiresTxCode) {
           if (!normalizedCode) {
             setTxCodeError('Transaction code is required.')
@@ -518,9 +278,9 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
             return
           }
         }
-
         setTxCodeError(undefined)
         setButtonsVisible(false)
+        setAcceptInFlight(true)
 
         const resolvedCredentialOffer = pendingOffer.resolvedCredentialOffer
         const preAuthGrant =
@@ -577,282 +337,126 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
 
         await acceptNewCredential(credentialRecord)
         await handleSendNotification(NotificationEventType.CREDENTIAL_ACCEPTED)
+        setAcceptInFlight(false)
         setAcceptModalVisible(true)
         return
       }
 
-      if (!issuedCredential) {
-        return
-      }
-
+      if (!issuedCredential) return
+      setAcceptInFlight(true)
       await acceptNewCredential(issuedCredential)
       await handleSendNotification(NotificationEventType.CREDENTIAL_ACCEPTED)
+      setAcceptInFlight(false)
       setAcceptModalVisible(true)
     } catch (err: unknown) {
       setButtonsVisible(true)
+      setAcceptInFlight(false)
       const error = new BifoldError(t('Error.Title1024'), t('Error.Message1024'), (err as Error)?.message ?? err, 1024)
       DeviceEventEmitter.emit(EventTypes.ERROR_ADDED, error)
     }
   }
 
-  const footerButton = (
-    title: string,
-    buttonPress: () => void,
-    buttonType: ButtonType,
-    testID: string,
-    accessibilityLabel: string
-  ) => {
-    return (
-      <View style={styles.footerButton}>
-        <Button
-          title={title}
-          accessibilityLabel={accessibilityLabel}
-          testID={testID}
-          buttonType={buttonType}
-          onPress={buttonPress}
-          disabled={!buttonsVisible}
-        />
-      </View>
-    )
-  }
+  // ---- Render ---------------------------------------------------------------
 
-  // Only render the OpenIDCredentialCard chrome when the credential has
-  // actual brand styling — background colour, background image, or a logo.
-  // Without any of those, the card is a 220px-tall empty box with the title
-  // floating in a tiny header band, which leaves a huge blank gap before the
-  // attributes. For unbranded credentials we render a clean title block
-  // instead.
-  const hasBrandedCard = !!(
-    credentialDisplay?.display?.backgroundColor ||
-    credentialDisplay?.display?.backgroundImage?.url ||
-    credentialDisplay?.display?.logo?.url
-  )
-
-  const renderOpenIdCard = () => {
-    if (!credentialDisplay || !issuedCredential) return null
-    return (
-      <OpenIDCredentialCard
-        credentialDisplay={credentialDisplay}
-        credentialRecord={issuedCredential as W3cCredentialRecord}
+  return (
+    <View style={styles.root}>
+      <LinearGradient
+        colors={DC_PALETTE.bgGrad as unknown as string[]}
+        locations={[0, 0.55, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFill}
       />
-    )
-  }
-
-  const header = () => {
-    return (
-      <>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText} testID={testIdWithKey('HeaderText')}>
-            <Text>{display?.issuer.name || t('ContactDetails.AContact')}</Text>{' '}
-            {t('CredentialOffer.IsOfferingYouACredential')}
-          </Text>
+      <SafeAreaView edges={['top', 'bottom', 'left', 'right']} style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.scroll} testID={testIdWithKey('CredentialOfferScreen')}>
+        <View style={styles.pill}>
+          <Text style={styles.pillText}>INCOMING OFFER</Text>
         </View>
-        {issuedCredential && hasBrandedCard ? (
-          <View style={{ marginHorizontal: 15, marginBottom: 16 }}>{renderOpenIdCard()}</View>
-        ) : issuedCredential || isPendingCredentialOffer ? (
-          <View style={styles.plainTitleBlock}>
-            <Text style={styles.plainTitleText} testID={testIdWithKey('CredentialName')}>
-              {issuedCredential
-                ? credentialDisplay?.display?.name ?? credentialDisplay?.metadata?.type ?? 'Credential'
-                : pendingDisplayName}
+        <Text style={styles.headline} testID={testIdWithKey('HeaderText')}>
+          {headline}
+        </Text>
+
+        <View style={styles.heroSection}>
+          {design && issuedCredential ? (
+            <OpenIDCardRenderer credentialRecord={issuedCredential as never} design={design} mode="full" />
+          ) : (
+            <FallbackCard name={credentialName} description={description} heroImageUrl={heroImageRow?.value} />
+          )}
+        </View>
+
+        <View style={styles.issuerCard}>
+          <View style={styles.issuerAvatar}>
+            <Text style={styles.issuerAvatarText}>{initials(issuerName)}</Text>
+          </View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={styles.issuerName} testID={testIdWithKey('IssuerName')} numberOfLines={1}>
+              {issuerName}
             </Text>
-            {(issuedCredential ? credentialDisplay?.display?.description : pendingDisplayDescription) ? (
-              <Text style={styles.plainTitleDescription}>
-                {issuedCredential ? credentialDisplay?.display?.description : pendingDisplayDescription}
+            {issuerDomain ? (
+              <Text style={styles.issuerSub} numberOfLines={1}>
+                {issuerDomain}
               </Text>
             ) : null}
           </View>
-        ) : null}
-        {isPendingCredentialOffer && (
-          <View style={styles.summarySection}>
-            <Text style={styles.sectionTitle}>Credential Summary</Text>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Issuer</Text>
-              <Text style={styles.summaryValue}>{pendingIssuerHost}</Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Configuration</Text>
-              <Text style={styles.summaryValue}>{pendingConfigId || pendingCredentialType || 'Credential'}</Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Format</Text>
-              <Text style={styles.summaryValue}>{pendingSupported?.format || 'unknown'}</Text>
-            </View>
-            <View style={styles.previewStatusBox}>
-              <Text style={styles.previewStatusTitle}>{previewStatusLabel}</Text>
-              <Text style={styles.previewStatusText}>{previewStatusDescription}</Text>
-            </View>
-          </View>
-        )}
-      </>
-    )
-  }
-
-  const footer = () => {
-    const paddingHorizontal = 24
-    const paddingVertical = 16
-    const paddingBottom = 26
-    return (
-      <View style={{ marginBottom: 50 }}>
-        <View
-          style={{
-            paddingHorizontal: paddingHorizontal,
-            paddingVertical: paddingVertical,
-            paddingBottom: paddingBottom,
-            backgroundColor: ColorPalette.brand.secondaryBackground,
-          }}
-        >
-          {isPendingCredentialOffer && requiresTxCode && (
-            <View style={styles.txCodeContainer}>
-              <Text style={styles.txCodeLabel}>Transaction code</Text>
-              <TextInput
-                ref={txCodeInputRef}
-                style={styles.txCodeInput}
-                value={txCode}
-                onChangeText={(value) => {
-                  setTxCode(value)
-                  if (txCodeError) {
-                    setTxCodeError(undefined)
-                  }
-                }}
-                placeholder="Enter transaction code"
-                autoCapitalize="characters"
-                autoCorrect={false}
-                keyboardType="default"
-                maxLength={pendingOffer?.txCode?.length}
-                blurOnSubmit={false}
-                returnKeyType="done"
-                autoFocus={requiresTxCode}
-                onBlur={() => {
-                  const expectedLength = pendingOffer?.txCode?.length
-                  if (!expectedLength) {
-                    return
-                  }
-                  const currentLength = txCode.replace(/\s+/g, '').length
-                  if (currentLength < expectedLength) {
-                    setTimeout(() => txCodeInputRef.current?.focus(), 50)
-                  }
-                }}
-              />
-              {pendingOffer?.txCode?.description && (
-                <Text style={styles.txCodeHelpText}>{pendingOffer.txCode.description}</Text>
-              )}
-              {txCodeError && <Text style={styles.txCodeErrorText}>{txCodeError}</Text>}
-            </View>
-          )}
-          {footerButton(
-            t('Global.Accept'),
-            handleAcceptTouched,
-            ButtonType.Primary,
-            testIdWithKey('AcceptCredentialOffer'),
-            t('Global.Accept')
-          )}
-          {footerButton(
-            t('Global.Decline'),
-            toggleDeclineModalVisible,
-            ButtonType.Secondary,
-            testIdWithKey('DeclineCredentialOffer'),
-            t('Global.Decline')
-          )}
+          <DCIcon name="verified" size={18} color={DC_PALETTE.accent} />
         </View>
-      </View>
-    )
-  }
 
-  return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom', 'left', 'right']}>
-      <ScrollView>
-        {header()}
-        {heroImageRow?.value && (
-          <View style={styles.heroImageSection}>
-            <Text style={styles.heroImageLabel}>{heroImageRow.label}</Text>
-            <Image
-              source={{ uri: heroImageRow.value }}
-              style={styles.heroImage}
-              resizeMode="contain"
-              testID={testIdWithKey(`Attribute-${heroImageRow.key}`)}
+        {isPendingCredentialOffer && requiresTxCode ? (
+          <View style={styles.txCodeCard}>
+            <Text style={styles.txCodeLabel}>Transaction code</Text>
+            <TextInput
+              ref={txCodeInputRef}
+              style={styles.txCodeInput}
+              value={txCode}
+              onChangeText={(v) => {
+                setTxCode(v)
+                if (txCodeError) setTxCodeError(undefined)
+              }}
+              placeholder="Enter transaction code"
+              placeholderTextColor={DC_PALETTE.subMuted}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={pendingOffer?.txCode?.length}
+              returnKeyType="done"
+              autoFocus={requiresTxCode}
+              testID={testIdWithKey('TxCode')}
             />
+            {pendingOffer?.txCode?.description ? (
+              <Text style={styles.txCodeHelp}>{pendingOffer.txCode.description}</Text>
+            ) : null}
+            {txCodeError ? <Text style={styles.txCodeError}>{txCodeError}</Text> : null}
           </View>
-        )}
-        {subjectRows.length > 0 ? (
-          <View style={styles.attributesSection}>
-            <Text style={styles.sectionTitle}>{isPendingCredentialOffer ? 'Credential Preview' : 'Attributes'}</Text>
-            {subjectRows.map((row, idx) => {
-              const isLast = idx === subjectRows.length - 1
-              const indent = row.depth > 0 ? { paddingLeft: 16 * row.depth } : null
-              if (row.isHeader) {
-                return (
-                  <View
-                    key={row.key}
-                    style={[styles.groupHeaderRow, indent, isLast ? styles.metaRowLast : null]}
-                  >
-                    <Text style={[styles.metaLabel, styles.groupHeaderLabel]}>{row.label}</Text>
-                  </View>
-                )
-              }
-              if (row.isImage && row.value) {
-                return (
-                  <View
-                    key={row.key}
-                    style={[styles.imageRow, indent, isLast ? styles.metaRowLast : null]}
-                  >
-                    <Text style={styles.imageRowLabel}>{row.label}</Text>
-                    <Image
-                      source={{ uri: row.value }}
-                      style={styles.imageRowImage}
-                      resizeMode="contain"
-                      testID={testIdWithKey(`Attribute-${row.key}`)}
-                    />
-                  </View>
-                )
-              }
-              const showPendingPlaceholder =
-                isPendingCredentialOffer && !hasPendingPreviewValues && (!row.value || row.value.trim().length === 0)
-              return (
-                <View
-                  key={row.key}
-                  style={[styles.metaRow, indent, isLast ? styles.metaRowLast : null]}
-                >
-                  <Text style={styles.metaLabel}>{row.label}</Text>
-                  <Text
-                    style={showPendingPlaceholder ? styles.pendingValueText : styles.metaValue}
-                    testID={testIdWithKey(`Attribute-${row.key}`)}
-                  >
-                    {showPendingPlaceholder ? 'Available after acceptance' : row.value}
-                  </Text>
-                </View>
-              )
-            })}
-          </View>
-        ) : pendingFallbackRows.length > 0 ? (
-          <View style={styles.attributesSection}>
-            <Text style={styles.sectionTitle}>Credential Preview</Text>
-            {pendingFallbackRows.map((row, idx) => {
-              const isLast = idx === pendingFallbackRows.length - 1
-              const showPendingPlaceholder = !row.value || row.value.trim().length === 0
-              return (
-                <View key={row.key} style={[styles.metaRow, isLast ? styles.metaRowLast : null]}>
-                  <Text style={styles.metaLabel}>{row.label}</Text>
-                  <Text
-                    style={showPendingPlaceholder ? styles.pendingValueText : styles.metaValue}
-                    testID={testIdWithKey(`Fallback-${row.key}`)}
-                  >
-                    {showPendingPlaceholder ? 'Available after acceptance' : row.value}
-                  </Text>
-                </View>
-              )
-            })}
+        ) : null}
+
+        {attrItems.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>
+              {isPendingCredentialOffer ? "YOU'LL RECEIVE (PREVIEW)" : "YOU'LL RECEIVE"}
+            </Text>
+            <DCAttrList items={attrItems} />
           </View>
         ) : isPendingCredentialOffer ? (
-          <View style={styles.fallbackInfoSection}>
-            <Text style={styles.sectionTitle}>Attributes</Text>
-            <Text style={styles.fallbackInfoText}>
-              No preview attributes were provided in this credential offer or issuer metadata.
-            </Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>YOU'LL RECEIVE</Text>
+            <View style={styles.previewBox}>
+              <Text style={styles.previewText}>
+                This issuer didn't include a preview. Attributes will appear after acceptance.
+              </Text>
+            </View>
           </View>
         ) : null}
-        {footer()}
+
+        <DCActionRow
+          primaryLabel={t('Global.Accept')}
+          primaryIcon="check"
+          onPrimary={handleAcceptTouched}
+          primaryLoading={acceptInFlight}
+          primaryDisabled={!buttonsVisible}
+          secondaryLabel={t('Global.Decline')}
+          onSecondary={toggleDeclineModalVisible}
+        />
       </ScrollView>
+
       <CredentialOfferAccept
         visible={acceptModalVisible}
         credentialId={''}
@@ -867,8 +471,147 @@ const OpenIDCredentialOffer: React.FC<OpenIDCredentialDetailsProps> = ({ navigat
         onCancel={toggleDeclineModalVisible}
         extraDetails={display?.issuer?.name || t('ContactDetails.AContact')}
       />
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   )
 }
+
+const FallbackCard: React.FC<{
+  name: string
+  description?: string
+  heroImageUrl?: string
+}> = ({ name, description, heroImageUrl }) => (
+  <View style={fallbackStyles.card}>
+    {heroImageUrl ? (
+      <View style={fallbackStyles.heroImageWrap}>
+        <Text style={fallbackStyles.heroImagePlaceholder}>{name.charAt(0).toUpperCase()}</Text>
+      </View>
+    ) : null}
+    <Text style={fallbackStyles.cardTitle} numberOfLines={2}>
+      {name}
+    </Text>
+    {description ? (
+      <Text style={fallbackStyles.cardDescription} numberOfLines={3}>
+        {description}
+      </Text>
+    ) : null}
+  </View>
+)
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).slice(0, 2)
+  return parts.map((p) => p[0] ?? '').join('').toUpperCase() || '?'
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: DC_PALETTE.bg },
+  safe: { flex: 1 },
+  scroll: { padding: 18, paddingBottom: 36 },
+
+  pill: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(125,224,213,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(125,224,213,0.25)',
+    marginTop: 6,
+    marginBottom: 12,
+  },
+  pillText: { color: DC_PALETTE.accent, fontSize: 11, fontWeight: '700', letterSpacing: 1.2 },
+
+  headline: { color: '#FFFFFF', fontSize: 22, fontWeight: '700', lineHeight: 28 },
+
+  heroSection: { marginTop: 18, marginBottom: 4 },
+
+  issuerCard: {
+    marginTop: 14,
+    padding: 14,
+    backgroundColor: DC_PALETTE.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: DC_PALETTE.cardBorder,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  issuerAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  issuerAvatarText: { color: DC_PALETTE.bg, fontWeight: '700', fontSize: 14 },
+  issuerName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
+  issuerSub: { color: DC_PALETTE.muted, fontSize: 12, marginTop: 2 },
+
+  txCodeCard: {
+    marginTop: 18,
+    padding: 14,
+    backgroundColor: DC_PALETTE.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: DC_PALETTE.cardBorder,
+  },
+  txCodeLabel: { color: '#FFFFFF', fontSize: 12, fontWeight: '600', marginBottom: 8, letterSpacing: 0.4 },
+  txCodeInput: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#FFFFFF',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    fontSize: 15,
+    letterSpacing: 1.2,
+  },
+  txCodeHelp: { color: DC_PALETTE.muted, fontSize: 11, marginTop: 6 },
+  txCodeError: { color: DC_PALETTE.danger, fontSize: 12, marginTop: 6 },
+
+  section: { marginTop: 22 },
+  sectionLabel: {
+    color: DC_PALETTE.subMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+  previewBox: {
+    padding: 14,
+    backgroundColor: DC_PALETTE.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: DC_PALETTE.cardBorder,
+  },
+  previewText: { color: DC_PALETTE.muted, fontSize: 12.5, lineHeight: 18 },
+})
+
+const fallbackStyles = StyleSheet.create({
+  card: {
+    backgroundColor: DC_PALETTE.card,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: DC_PALETTE.cardBorder,
+    padding: 22,
+    alignItems: 'flex-start',
+    minHeight: 160,
+    justifyContent: 'center',
+  },
+  heroImageWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  heroImagePlaceholder: { color: '#FFFFFF', fontSize: 24, fontWeight: '700' },
+  cardTitle: { color: '#FFFFFF', fontSize: 22, fontWeight: '700', lineHeight: 28 },
+  cardDescription: { color: DC_PALETTE.muted, fontSize: 13, marginTop: 6, lineHeight: 18 },
+})
 
 export default OpenIDCredentialOffer

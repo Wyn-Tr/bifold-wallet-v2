@@ -44,6 +44,21 @@ export const buildFieldsFromOpenIDTemplate = (data: { [key: string]: unknown }):
 
 export function formatDate(input: string | Date): string {
   const date = input instanceof Date ? input : new Date(input)
+  if (Number.isNaN(date.getTime())) return typeof input === 'string' ? input : ''
+  // Credential issuance / validity dates are date-of-record, not appointments.
+  // Including hour/minute produces noisy "May 17, 2024 at 12:00 AM" strings
+  // for full-date claims (mDoc tag 1004, OID4VCI validFrom, etc.). Show the
+  // date only — separate `formatDateTime` exists for clock-time use cases.
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+export function formatDateTime(input: string | Date): string {
+  const date = input instanceof Date ? input : new Date(input)
+  if (Number.isNaN(date.getTime())) return typeof input === 'string' ? input : ''
   return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'long',

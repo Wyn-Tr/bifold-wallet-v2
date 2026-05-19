@@ -6,6 +6,10 @@ import HeaderRightHome from '../components/buttons/HeaderHome'
 import IconButton, { ButtonLocation } from '../components/buttons/IconButton'
 import { useTheme } from '../contexts/theme'
 import VcApiExchange from '../screens/VcApiExchange'
+import { OpenIDAcceptLoadingRoute } from '../modules/openid/screens/accept/OpenIDAcceptLoadingRoute'
+import { OpenIDCredentialAcceptedRoute } from '../modules/openid/screens/accept/OpenIDCredentialAcceptedRoute'
+import { OpenIDProofSendingRoute } from '../modules/openid/screens/proof/OpenIDProofSendingRoute'
+import { OpenIDProofSuccessRoute } from '../modules/openid/screens/proof/OpenIDProofSuccessRoute'
 import { DeliveryStackParams, Screens } from '../types/navigators'
 import { testIdWithKey } from '../utils/testable'
 
@@ -46,12 +50,16 @@ const DeliveryStack: React.FC = () => {
         ...ScreenOptionsDictionary[Screens.Connection],
       }}
     >
-      <Stack.Screen name={Screens.Connection} component={Connection} options={{ ...defaultStackOptions }} />
+      <Stack.Screen
+        name={Screens.Connection}
+        component={Connection}
+        options={{ ...defaultStackOptions, headerShown: false }}
+      />
       <Stack.Screen
         name={Screens.OpenIDCredentialOffer}
         component={OpenIDCredentialOffer}
         options={{
-          title: t('Screens.CredentialOffer'),
+          headerShown: false,
           ...ScreenOptionsDictionary[Screens.OpenIDCredentialOffer],
         }}
       />
@@ -59,7 +67,7 @@ const DeliveryStack: React.FC = () => {
         name={Screens.OpenIDProofPresentation}
         component={OpenIDProofPresentation}
         options={{
-          title: t('Screens.ProofRequest'),
+          headerShown: false,
           ...ScreenOptionsDictionary[Screens.OpenIDProofPresentation],
         }}
       />
@@ -84,6 +92,26 @@ const DeliveryStack: React.FC = () => {
         name={Screens.VcApiExchange}
         component={VcApiExchange}
         options={{ title: t('Screens.CredentialOffer') }}
+      />
+      <Stack.Screen
+        name={Screens.OpenIDAcceptLoading}
+        component={OpenIDAcceptLoadingRoute}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name={Screens.OpenIDCredentialAccepted}
+        component={OpenIDCredentialAcceptedRoute}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name={Screens.OpenIDProofSending}
+        component={OpenIDProofSendingRoute}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name={Screens.OpenIDProofSuccess}
+        component={OpenIDProofSuccessRoute}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
     </Stack.Navigator>
   )

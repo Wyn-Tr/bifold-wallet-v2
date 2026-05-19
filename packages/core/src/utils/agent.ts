@@ -64,7 +64,11 @@ import { UserProfileModule } from '@2060.io/credo-ts-didcomm-user-profile'
 // issuance/verification with mobile-safe ECDSA/Ed25519 cryptosuites. Used for
 // credentials that genuinely have OBv3 type, not for arbitrary JSON-LD W3C
 // VCs (those go to JsonLdCredentialModule below).
-import { OpenBadgesModule } from '@ajna-inc/openbadges'
+import {
+  OpenBadgesModule,
+  OpenBadgesCredentialFormatService,
+  OpenBadgesProofFormatService,
+} from '@ajna-inc/openbadges'
 
 // Generic W3C JSON-LD credential storage. Holds raw JSON without
 // class-validator so v1, v2, and DataIntegrityProof all round-trip cleanly.
@@ -154,6 +158,7 @@ export function getAgentModules({
             indyCredentialFormat,
             new AnonCredsCredentialFormatService(),
             new DataIntegrityCredentialFormatService(),
+            new OpenBadgesCredentialFormatService(),
           ],
         }),
       ],
@@ -167,6 +172,7 @@ export function getAgentModules({
             indyProofFormat,
             new AnonCredsProofFormatService(),
             new DifPresentationExchangeProofFormatService(),
+            new OpenBadgesProofFormatService(),
           ],
         }),
       ],

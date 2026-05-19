@@ -28,10 +28,15 @@ export enum Screens {
   CredentialOffer = 'Credential Offer',
   OpenIDCredentialDetails = 'Open ID Credential details',
   OpenIDCredentialOffer = 'Open ID Credential offer',
+  OpenIDAcceptLoading = 'Open ID Accept Loading',
+  OpenIDCredentialAccepted = 'Open ID Credential Accepted',
   OpenIDProofPresentation = 'Open ID Proof Presentation',
+  OpenIDProofSending = 'Open ID Proof Sending',
+  OpenIDProofSuccess = 'Open ID Proof Success',
   OpenIDProofCredentialSelect = 'Open ID Proof Credential Select',
   OpenBadgeDetails = 'Open Badge Details',
   VcApiExchange = 'VC API Exchange',
+  DesignerCardGallery = 'Designer Card Gallery',
   ProofRequest = 'Proof Request',
   ProofRequestDetails = 'Proof Request Details',
   ProofRequestUsageHistory = 'Proof Request Usage History',
@@ -230,6 +235,7 @@ export type SettingStackParams = {
   [Screens.Terms]: undefined
   [Screens.Onboarding]: undefined
   [Screens.Developer]: undefined
+  [Screens.DesignerCardGallery]: undefined
   [Screens.TogglePushNotifications]: undefined
   [Screens.HistorySettings]: undefined
   [Screens.AutoLock]: undefined
@@ -277,7 +283,23 @@ export type DeliveryStackParams = {
       | OpenBadgeCredentialRecord
       | JsonLdCredentialRecord
   }
+  [Screens.OpenIDAcceptLoading]: {
+    credentialId?: string
+    credentialName?: string
+    issuerName?: string
+  }
+  [Screens.OpenIDCredentialAccepted]: {
+    credentialId?: string
+    credentialName: string
+    issuerName?: string
+  }
   [Screens.OpenIDProofPresentation]: { credential: OpenId4VPRequestRecord }
+  [Screens.OpenIDProofSending]: { verifierName: string }
+  [Screens.OpenIDProofSuccess]: {
+    verifierName: string
+    verifierDomain?: string
+    sharedAt?: string
+  }
   [Screens.OpenIDProofCredentialSelect]: {
     inputDescriptorID: string
     selectedCredID: string

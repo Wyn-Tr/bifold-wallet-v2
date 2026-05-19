@@ -65,15 +65,17 @@ export const DefaultScreenOptionsDictionary: ScreenOptionsType = {
     headerTintColor: OnboardingTheme.headerTintColor,
     headerBackTestID: testIdWithKey('Back'),
   },
+  // Digicred dark redesign: these screens own their full surface — no native
+  // header. Every Stack.Screen spreads this dictionary on top of any inline
+  // options, so the dictionary has to be the source of truth.
   [Screens.OpenIDCredentialDetails]: {
-    headerShown: true,
+    headerShown: false,
   },
   [Screens.OpenIDCredentialOffer]: {
-    headerShown: true,
+    headerShown: false,
   },
   [Screens.OpenIDProofPresentation]: {
-    headerShown: true,
-    headerRight: () => false,
+    headerShown: false,
   },
 }
 

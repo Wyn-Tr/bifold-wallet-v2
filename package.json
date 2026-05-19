@@ -51,7 +51,7 @@
   "resolutions": {
     "@unimodules/react-native-adapter": "./noop",
     "@unimodules/core": "./noop",
-    "@ajna-inc/openbadges": "0.1.19",
+    "@ajna-inc/openbadges": "0.1.21",
     "tsyringe": "4.8.0",
     "expo": "~50.0.21",
     "expo-modules-autolinking": "1.11.1",

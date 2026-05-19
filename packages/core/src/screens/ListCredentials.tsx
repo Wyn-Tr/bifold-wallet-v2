@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { View, FlatList } from 'react-native'
 
 import CredentialCard from '../components/misc/CredentialCard'
+import { OpenIDCardRenderer, resolveDesign } from '../modules/openid-card-design'
 import { DispatchAction } from '../contexts/reducers/store'
 import { useStore } from '../contexts/store'
 import { useTheme } from '../contexts/theme'
@@ -104,6 +105,48 @@ const ListCredentials: React.FC = () => {
     const credType = (cred as { type?: string }).type
     const isOpenBadge = credType === 'OpenBadgeCredentialRecord'
     const isJsonLd = credType === 'JsonLdCredentialRecord'
+
+    const navigate = () => {
+      if (isOpenBadge) {
+        navigation.navigate(Screens.OpenIDCredentialDetails, {
+          credentialId: cred.id,
+          type: OpenIDCredentialType.OpenBadge,
+        })
+      } else if (isJsonLd) {
+        navigation.navigate(Screens.OpenIDCredentialDetails, {
+          credentialId: cred.id,
+          type: OpenIDCredentialType.JsonLd,
+        })
+      } else if (credType === 'W3cCredentialRecord' || cred instanceof W3cCredentialRecord) {
+        navigation.navigate(Screens.OpenIDCredentialDetails, {
+          credentialId: cred.id,
+          type: OpenIDCredentialType.W3cCredential,
+        })
+      } else if (credType === 'SdJwtVcRecord' || cred instanceof SdJwtVcRecord) {
+        navigation.navigate(Screens.OpenIDCredentialDetails, {
+          credentialId: cred.id,
+          type: OpenIDCredentialType.SdJwtVc,
+        })
+      } else {
+        navigation.navigate(Screens.CredentialDetails, { credentialId: cred.id })
+      }
+    }
+
+    // OID4VCI credentials whose attribute shape matches a known design get a
+    // branded card row. AnonCreds (CredentialExchangeRecord) always falls
+    // through to the generic CredentialCard — its custom SVG path lives in
+    // CredentialDetails, not here.
+    if (isOpenBadge || isJsonLd || credType === 'W3cCredentialRecord' || credType === 'SdJwtVcRecord' || credType === 'MdocRecord') {
+      const design = resolveDesign(cred as any)
+      if (design) {
+        return (
+          <View style={{ marginHorizontal: 14, marginVertical: 8 }}>
+            <OpenIDCardRenderer credentialRecord={cred as any} design={design} mode="compact" onPress={navigate} />
+          </View>
+        )
+      }
+    }
+
     return (
       <CredentialCard
         credential={cred as CredentialExchangeRecord}
@@ -111,31 +154,7 @@ const ListCredentials: React.FC = () => {
           (cred as CredentialExchangeRecord).revocationNotification?.revocationDate && [CredentialErrors.Revoked]
         }
         logoUrl={logoUrl}
-        onPress={() => {
-          if (isOpenBadge) {
-            navigation.navigate(Screens.OpenIDCredentialDetails, {
-              credentialId: cred.id,
-              type: OpenIDCredentialType.OpenBadge,
-            })
-          } else if (isJsonLd) {
-            navigation.navigate(Screens.OpenIDCredentialDetails, {
-              credentialId: cred.id,
-              type: OpenIDCredentialType.JsonLd,
-            })
-          } else if (credType === 'W3cCredentialRecord' || cred instanceof W3cCredentialRecord) {
-            navigation.navigate(Screens.OpenIDCredentialDetails, {
-              credentialId: cred.id,
-              type: OpenIDCredentialType.W3cCredential,
-            })
-          } else if (credType === 'SdJwtVcRecord' || cred instanceof SdJwtVcRecord) {
-            navigation.navigate(Screens.OpenIDCredentialDetails, {
-              credentialId: cred.id,
-              type: OpenIDCredentialType.SdJwtVc,
-            })
-          } else {
-            navigation.navigate(Screens.CredentialDetails, { credentialId: cred.id })
-          }
-        }}
+        onPress={navigate}
       />
     )
   }

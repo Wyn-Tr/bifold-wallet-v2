@@ -420,7 +420,28 @@ export function filterAndMapSdJwtKeys(sdJwtVcPayload: Record<string, unknown>) {
   }
 }
 
+// Decoding SD-JWT (JWS + disclosure hashing) and mDoc (CBOR) is non-trivial
+// on JS thread. Records are stable object identities across renders, so a
+// WeakMap keyed on the record gives free reuse across the list row + details
+// hero + offer screen for the same credential.
+const DISPLAY_CACHE = new WeakMap<object, W3cCredentialDisplay>()
+
 export function getCredentialForDisplay(
+  credentialRecord:
+    | W3cCredentialRecord
+    | SdJwtVcRecord
+    | MdocRecord
+    | OpenBadgeCredentialRecord
+    | JsonLdCredentialRecord
+): W3cCredentialDisplay {
+  const cached = DISPLAY_CACHE.get(credentialRecord as object)
+  if (cached) return cached
+  const result = computeCredentialForDisplay(credentialRecord)
+  DISPLAY_CACHE.set(credentialRecord as object, result)
+  return result
+}
+
+function computeCredentialForDisplay(
   credentialRecord:
     | W3cCredentialRecord
     | SdJwtVcRecord

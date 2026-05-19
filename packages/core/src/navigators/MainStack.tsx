@@ -135,7 +135,7 @@ const MainStack: React.FC = () => {
           component={OpenBadgeDetails}
           options={{
             title: t('Screens.CredentialDetails'),
-            headerShown: true,
+            headerShown: false,
           }}
         />
         <Stack.Screen

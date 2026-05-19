@@ -10,15 +10,18 @@ import {
   Image,
   Dimensions,
   Platform,
+  Alert,
 } from 'react-native'
 import { useNavigation, useIsFocused } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { CommonActions } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useConnections, useCredentials } from '@credo-ts/react-hooks'
+import Clipboard from '@react-native-clipboard/clipboard'
+import { useAgent, useConnections, useCredentials } from '@credo-ts/react-hooks'
 import { ConnectionType, CredentialState, DidExchangeState } from '@credo-ts/core'
 
 import {
+  connectFromScanOrDeepLink,
   testIdWithKey,
   useStore,
   getConnectionName,
@@ -29,7 +32,7 @@ import {
 import { useOpenIDCredentials } from '@bifold/core/src/modules/openid/context/OpenIDCredentialRecordProvider'
 import { useWorkflowSubtitles } from '../../../../packages/core/src/hooks/useWorkflowSubtitles'
 
-import { GradientBackground } from '../components'
+import { EmptyChannelHero, GradientBackground } from '../components'
 import { DigiCredColors } from '../theme'
 import { TOKENS, useServices } from '../../../../packages/core/src/container-api'
 import { Screens, Stacks } from '../../../../packages/core/src/types/navigators'
@@ -91,8 +94,9 @@ const Home: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<Record<string, object | undefined>>>()
   const isFocused = useIsFocused()
   const [store] = useStore()
-  const [config] = useServices([TOKENS.CONFIG])
+  const [logger, config] = useServices([TOKENS.UTIL_LOGGER, TOKENS.CONFIG])
   const contactHideList = config?.contactHideList
+  const { agent } = useAgent()
   const { records: credentials = [] } = useCredentials()
   const {
     openIdState: { w3cCredentialRecords, sdJwtVcRecords, openBadgeCredentialRecords, jsonLdCredentialRecords },
@@ -148,6 +152,23 @@ const Home: React.FC = () => {
   const handleScanPress = useCallback(() => {
     navigation.navigate(Stacks.ConnectStack as string, { screen: Screens.Scan } as Record<string, unknown>)
   }, [navigation])
+
+  const handlePastePress = useCallback(async () => {
+    try {
+      const text = (await Clipboard.getString())?.trim()
+      if (!text) {
+        Alert.alert('Clipboard is empty', 'Copy an invitation link first and try again.')
+        return
+      }
+      if (!/^https?:\/\//i.test(text) && !text.includes('oob=') && !text.includes('c_i=')) {
+        Alert.alert('No invitation found', 'The clipboard does not look like an invitation link.')
+        return
+      }
+      await connectFromScanOrDeepLink(text, agent, logger, navigation, false, false, false)
+    } catch (err) {
+      Alert.alert('Could not connect', (err as Error)?.message ?? 'Please try scanning a QR code instead.')
+    }
+  }, [agent, logger, navigation])
 
   const handleContactPress = useCallback(
     (connectionId: string) => {
@@ -221,14 +242,42 @@ const Home: React.FC = () => {
             data={sortedConnections}
             renderItem={renderContact}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[
+              styles.listContent,
+              sortedConnections.length === 0 ? styles.emptyListContent : null,
+            ]}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <EmptyChannelState onScan={handleScanPress} onPaste={handlePastePress} />
+            }
           />
         </View>
       </GradientBackground>
     </>
   )
 }
+
+const EmptyChannelState: React.FC<{ onScan: () => void; onPaste: () => void }> = ({ onScan, onPaste }) => (
+  <View style={styles.emptyWrap}>
+    <View style={styles.emptyHeroWrap}>
+      <EmptyChannelHero size={200} />
+    </View>
+    <Text style={styles.emptyTitle}>Connect your first channel</Text>
+    <Text style={styles.emptyBody}>
+      Channels let issuers send you credentials and request proofs — without one, your home stays quiet.
+    </Text>
+
+    <TouchableOpacity style={styles.primaryBtn} onPress={onScan} accessibilityRole="button">
+      <Icon name="qrcode-scan" size={18} color="#062826" />
+      <Text style={styles.primaryBtnText}>Scan invitation QR</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.secondaryBtn} onPress={onPaste} accessibilityRole="button">
+      <Icon name="link-variant" size={18} color="#FFFFFF" />
+      <Text style={styles.secondaryBtnText}>Paste invitation link</Text>
+    </TouchableOpacity>
+  </View>
+)
 
 const styles = StyleSheet.create({
   container: {
@@ -383,6 +432,66 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: ColorPalette.grayscale.white,
   },
+
+  // Empty state — animated rings + headline + buttons (no channels yet).
+  emptyListContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    paddingHorizontal: 24,
+    paddingTop: 8,
+  },
+  emptyWrap: {
+    width: '100%',
+    alignItems: 'center',
+    paddingTop: 8,
+  },
+  emptyHeroWrap: {
+    marginTop: 8,
+    marginBottom: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyTitle: {
+    color: DigiCredColors.text.primary,
+    fontSize: 22,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  emptyBody: {
+    color: DigiCredColors.text.secondary ?? 'rgba(255,255,255,0.65)',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 28,
+    paddingHorizontal: 4,
+  },
+  primaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#7DE0D5',
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    width: '100%',
+    marginBottom: 10,
+  },
+  primaryBtnText: { color: '#062826', fontSize: 15, fontWeight: '700' },
+  secondaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    width: '100%',
+  },
+  secondaryBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
 })
 
 export default Home
