@@ -26,7 +26,10 @@ export function usePulseRing(durationMs = 1800, enabled = true): PulseRingResult
       return
     }
     let cancelled = false
-    AccessibilityInfo.isReduceMotionEnabled().then((reduceMotion) => {
+    // Guard against an undefined return from the jest mock of AccessibilityInfo.
+    const reducedMotionProbe =
+      AccessibilityInfo.isReduceMotionEnabled?.() ?? Promise.resolve(false)
+    Promise.resolve(reducedMotionProbe).then((reduceMotion) => {
       if (cancelled || reduceMotion) return
       progress.value = withRepeat(
         withTiming(1, { duration: durationMs, easing: Easing.out(Easing.quad) }),
@@ -43,7 +46,7 @@ export function usePulseRing(durationMs = 1800, enabled = true): PulseRingResult
   const style = useAnimatedStyle(() => ({
     transform: [{ scale: 1 + progress.value * 0.8 }],
     opacity: 0.7 * (1 - progress.value),
-  }))
+  }), [progress])
 
   return { style }
 }

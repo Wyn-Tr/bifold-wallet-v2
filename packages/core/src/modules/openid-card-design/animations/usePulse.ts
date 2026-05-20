@@ -29,7 +29,10 @@ export function usePulse(amplitude = 0.04, durationMs = 1800, enabled = true): P
       return
     }
     let cancelled = false
-    AccessibilityInfo.isReduceMotionEnabled().then((reduceMotion) => {
+    // Guard against an undefined return from the jest mock of AccessibilityInfo.
+    const reducedMotionProbe =
+      AccessibilityInfo.isReduceMotionEnabled?.() ?? Promise.resolve(false)
+    Promise.resolve(reducedMotionProbe).then((reduceMotion) => {
       if (cancelled || reduceMotion) return
       const half = durationMs / 2
       scale.value = withRepeat(
@@ -47,9 +50,12 @@ export function usePulse(amplitude = 0.04, durationMs = 1800, enabled = true): P
     }
   }, [amplitude, durationMs, enabled, scale])
 
+  // Explicit deps array satisfies Reanimated's "useAnimatedStyle was used
+  // without a dependency array or Babel plugin" warning, which jest treats
+  // as an error in test runs that disable the Reanimated Babel plugin.
   const style = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-  }))
+  }), [scale])
 
   return { scale, style }
 }

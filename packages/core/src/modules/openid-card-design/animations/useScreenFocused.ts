@@ -7,11 +7,26 @@
 // and only consult it when present so non-screen usages (tests, the dev
 // gallery) don't crash.
 
-import { useContext, useEffect, useState } from 'react'
-import { NavigationContext } from '@react-navigation/native'
+import { createContext, useContext, useEffect, useState } from 'react'
+import * as ReactNavigation from '@react-navigation/native'
+
+// In the jest mock of @react-navigation/native, NavigationContext is not
+// exported. Calling useContext(undefined) crashes with "Cannot read
+// properties of undefined (reading '_context')". Fall back to an empty
+// local context so components that consult this hook still render (with
+// `focused = true`) in tests and the dev gallery.
+const FallbackNavigationContext = createContext<unknown>(undefined)
+const NavCtx =
+  (ReactNavigation as { NavigationContext?: typeof FallbackNavigationContext }).NavigationContext ??
+  FallbackNavigationContext
+
+type NavigationLike = {
+  isFocused: () => boolean
+  addListener: (event: 'focus' | 'blur', cb: () => void) => () => void
+}
 
 export function useScreenFocused(): boolean {
-  const navigation = useContext(NavigationContext)
+  const navigation = useContext(NavCtx) as NavigationLike | undefined
   const [focused, setFocused] = useState(() => (navigation ? navigation.isFocused() : true))
 
   useEffect(() => {

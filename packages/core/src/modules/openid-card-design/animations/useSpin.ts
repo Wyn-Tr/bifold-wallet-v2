@@ -27,7 +27,11 @@ export function useSpin(durationMs = 900, enabled = true): SpinResult {
       return
     }
     let cancelled = false
-    AccessibilityInfo.isReduceMotionEnabled().then((reduceMotion) => {
+    // The jest mock of AccessibilityInfo sometimes returns undefined instead
+    // of a Promise; guard so the animation still starts (reduceMotion=false).
+    const reducedMotionProbe =
+      AccessibilityInfo.isReduceMotionEnabled?.() ?? Promise.resolve(false)
+    Promise.resolve(reducedMotionProbe).then((reduceMotion) => {
       if (cancelled || reduceMotion) return
       rotation.value = withRepeat(
         withTiming(360, { duration: durationMs, easing: Easing.linear }),
@@ -43,7 +47,7 @@ export function useSpin(durationMs = 900, enabled = true): SpinResult {
 
   const style = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
-  }))
+  }), [rotation])
 
   return { rotation, style }
 }
