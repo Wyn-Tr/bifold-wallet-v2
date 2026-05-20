@@ -18,7 +18,9 @@ import {
   CredentialsModule,
   DidsModule,
   DifPresentationExchangeProofFormatService,
+  JwkDidRegistrar,
   JwkDidResolver,
+  KeyDidRegistrar,
   KeyDidResolver,
   MediationRecipientModule,
   MediatorPickupStrategy,
@@ -27,6 +29,7 @@ import {
   V2CredentialProtocol,
   V2ProofProtocol,
   WebDidResolver,
+  X509Module,
 } from '@credo-ts/core'
 import { IndyVdrAnonCredsRegistry, IndyVdrModule, IndyVdrPoolConfig } from '@credo-ts/indy-vdr'
 import { OpenId4VcHolderModule } from '@credo-ts/openid4vc'
@@ -57,6 +60,22 @@ import { WebRTCModule } from '@ajna-inc/webrtc'
 // with the ACA-Py `user_profile_protocol` plugin running in CRMS).
 import { UserProfileModule } from '@2060.io/credo-ts-didcomm-user-profile'
 
+// Ajna OpenBadges Module — OBv3 (OpenBadgeCredential / AchievementCredential)
+// issuance/verification with mobile-safe ECDSA/Ed25519 cryptosuites. Used for
+// credentials that genuinely have OBv3 type, not for arbitrary JSON-LD W3C
+// VCs (those go to JsonLdCredentialModule below).
+import {
+  OpenBadgesModule,
+  OpenBadgesCredentialFormatService,
+  OpenBadgesProofFormatService,
+} from '@ajna-inc/openbadges'
+
+// Generic W3C JSON-LD credential storage. Holds raw JSON without
+// class-validator so v1, v2, and DataIntegrityProof all round-trip cleanly.
+// This is the proper home for non-OBv3 credentials issued via OID4VCI when
+// Credo 0.5's W3cCredentialRecord rejects them at validation time.
+import { JsonLdCredentialModule } from '../modules/openid/jsonLd/JsonLdCredentialModule'
+
 export interface WebRTCIceServer {
   urls: string | string[]
   username?: string
@@ -68,6 +87,7 @@ interface GetAgentModulesOptions {
   mediatorInvitationUrl?: string
   txnCache?: { capacity: number; expiryOffsetMs: number; path?: string }
   webrtcIceServers?: WebRTCIceServer[]
+  trustedX509Certificates?: string[]
 }
 
 export type BifoldAgent = Agent<ReturnType<typeof getAgentModules>>
@@ -79,7 +99,13 @@ export type BifoldAgent = Agent<ReturnType<typeof getAgentModules>>
  * @param txnCache optional local cache config for indyvdr
  * @returns modules to be used in agent setup
  */
-export function getAgentModules({ indyNetworks, mediatorInvitationUrl, txnCache, webrtcIceServers }: GetAgentModulesOptions) {
+export function getAgentModules({
+  indyNetworks,
+  mediatorInvitationUrl,
+  txnCache,
+  webrtcIceServers,
+  trustedX509Certificates,
+}: GetAgentModulesOptions) {
   const indyCredentialFormat = new LegacyIndyCredentialFormatService()
   const indyProofFormat = new LegacyIndyProofFormatService()
 
@@ -132,6 +158,7 @@ export function getAgentModules({ indyNetworks, mediatorInvitationUrl, txnCache,
             indyCredentialFormat,
             new AnonCredsCredentialFormatService(),
             new DataIntegrityCredentialFormatService(),
+            new OpenBadgesCredentialFormatService(),
           ],
         }),
       ],
@@ -145,6 +172,7 @@ export function getAgentModules({ indyNetworks, mediatorInvitationUrl, txnCache,
             indyProofFormat,
             new AnonCredsProofFormatService(),
             new DifPresentationExchangeProofFormatService(),
+            new OpenBadgesProofFormatService(),
           ],
         }),
       ],
@@ -192,8 +220,25 @@ export function getAgentModules({ indyNetworks, mediatorInvitationUrl, txnCache,
         new PeerDidResolver(),
         new KanonDIDResolver(ledgerService),
       ],
-      registrars: [new KanonDIDRegistrar(ledgerService)],
+      // JwkDidRegistrar / KeyDidRegistrar are required so the OID4VCI
+      // credentialBindingResolver can mint a holder DID for the credential request.
+      registrars: [new JwkDidRegistrar(), new KeyDidRegistrar(), new KanonDIDRegistrar(ledgerService)],
     }),
+    // X.509 trust anchors for verifier flows that require certificate validation
+    // (e.g. mDoc reader trust). Optional — the module accepts undefined.
+    x509: new X509Module({
+      trustedCertificates:
+        trustedX509Certificates && trustedX509Certificates.length > 0
+          ? (trustedX509Certificates as [string, ...string[]])
+          : undefined,
+    }),
+    // OpenBadges 0.1.14 — only used for credentials with OBv3 type
+    // (OpenBadgeCredential / AchievementCredential). Provides the
+    // EddsaRdfc2022Cryptosuite for DataIntegrityProof verification (mobile-safe).
+    openbadges: new OpenBadgesModule({}),
+    // Generic W3C JSON-LD credential storage. Receives every OID4VCI JSON-LD
+    // credential that isn't an OBv3 badge.
+    jsonLdCredentials: new JsonLdCredentialModule(),
   }
 }
 

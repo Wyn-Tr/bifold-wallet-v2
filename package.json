@@ -51,6 +51,7 @@
   "resolutions": {
     "@unimodules/react-native-adapter": "./noop",
     "@unimodules/core": "./noop",
+    "@ajna-inc/openbadges": "0.1.21",
     "tsyringe": "4.8.0",
     "expo": "~50.0.21",
     "expo-modules-autolinking": "1.11.1",
@@ -69,7 +70,8 @@
     "@hyperledger/indy-vdr-shared@0.2.2": "patch:@hyperledger/indy-vdr-shared@npm%3A0.2.2#./.yarn/patches/@hyperledger-indy-vdr-shared-npm-0.2.2-b989282fc6.patch",
     "@animo-id/pex@npm:4.1.1-alpha.0": "patch:@animo-id/pex@npm%3A4.1.1-alpha.0#~/.yarn/patches/@animo-id-pex-npm-4.1.1-alpha.0-f29edfffa2.patch",
     "@sphereon/pex@npm:5.0.0-unstable.24": "patch:@sphereon/pex@npm%3A5.0.0-unstable.24#~/.yarn/patches/@sphereon-pex-npm-5.0.0-unstable.24-921df3a8ac.patch",
-    "expo-modules-core@npm:1.11.14": "patch:expo-modules-core@npm%3A1.11.14#~/.yarn/patches/expo-modules-core-npm-1.11.14-d72efb177e.patch"
+    "expo-modules-core@npm:1.11.14": "patch:expo-modules-core@npm%3A1.11.14#~/.yarn/patches/expo-modules-core-npm-1.11.14-d72efb177e.patch",
+    "@digitalcredentials/rdf-canonize@npm:1.0.0": "patch:@digitalcredentials/rdf-canonize@npm%3A1.0.0#~/.yarn/patches/@digitalcredentials-rdf-canonize-npm-1.0.0-rncompat.patch"
   },
   "dependencies": {
     "@babel/preset-react": "^7.28.5",

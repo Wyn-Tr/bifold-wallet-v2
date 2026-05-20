@@ -110,13 +110,24 @@ android {
         applicationId "com.digicred"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 45
-        versionName "1.8.3"
+        versionCode 46
+        versionName "1.8.4"
 
         missingDimensionStrategy 'react-native-camera', 'general'
         manifestPlaceholders = [
   GOOGLE_MAPS_API_KEY: (project.ext.env.get("GOOGLE_MAPS_API_KEY") ?: "")
     ]
+
+        // Opt-in ABI filter for shrunk APKs. Run with e.g.
+        //   ./gradlew assembleRelease -PtargetAbi=arm64-v8a
+        // to package only that ABI's native libs (drops universal APK from
+        // ~230 MB to ~70 MB). Without the property, all 4 ABIs are packaged
+        // (default Play Store-friendly behaviour).
+        if (project.hasProperty('targetAbi')) {
+            ndk {
+                abiFilters project.getProperty('targetAbi').split(',')
+            }
+        }
     }
     signingConfigs {
         debug {

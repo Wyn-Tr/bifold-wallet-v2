@@ -33,101 +33,290 @@ exports[`Connection Screen No connection, show to proof 1`] = `
             }
           }
         >
-          <RNCSafeAreaView
-            edges={
-              Object {
-                "bottom": "additive",
-                "left": "additive",
-                "right": "additive",
-                "top": "off",
-              }
-            }
+          <View
             style={
               Object {
+                "backgroundColor": "#062826",
                 "flex": 1,
               }
             }
-            testID="com.ariesbifold:id/ProofRequestLoading"
           >
-            <RCTScrollView>
-              <View>
-                <View
-                  style={
-                    Object {
-                      "backgroundColor": "#000000",
-                      "height": 8,
-                      "width": "100%",
-                    }
+            <BVLinearGradient
+              colors={
+                Array [
+                  4279123771,
+                  4278593574,
+                  4278460446,
+                ]
+              }
+              endPoint={
+                Object {
+                  "x": 0.5,
+                  "y": 1,
+                }
+              }
+              locations={
+                Array [
+                  0,
+                  0.55,
+                  1,
+                ]
+              }
+              startPoint={
+                Object {
+                  "x": 0.5,
+                  "y": 0,
+                }
+              }
+              style={
+                Object {
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            />
+            <RNCSafeAreaView
+              edges={
+                Object {
+                  "bottom": "additive",
+                  "left": "additive",
+                  "right": "additive",
+                  "top": "additive",
+                }
+              }
+              style={
+                Object {
+                  "flex": 1,
+                }
+              }
+              testID="com.ariesbifold:id/ProofRequestLoading"
+            >
+              <RCTScrollView
+                contentContainerStyle={
+                  Object {
+                    "alignItems": "center",
+                    "flexGrow": 1,
+                    "paddingHorizontal": 24,
+                    "paddingTop": 60,
                   }
-                >
+                }
+                showsVerticalScrollIndicator={false}
+              >
+                <View>
                   <View
-                    collapsable={false}
                     style={
                       Object {
-                        "backgroundColor": "#FCBA19",
-                        "bottom": 0,
-                        "height": "100%",
-                        "left": 0,
-                        "position": "absolute",
-                        "right": 0,
-                        "top": 0,
-                        "transform": Array [
-                          Object {
-                            "translateX": -375,
-                          },
-                          Object {
-                            "scaleX": 0,
-                          },
-                          Object {
-                            "translateX": 375,
-                          },
-                        ],
-                        "width": "100%",
+                        "alignItems": "center",
+                        "height": 100,
+                        "justifyContent": "center",
+                        "width": 100,
                       }
                     }
-                  />
-                </View>
-                <View
-                  style={
-                    Object {
-                      "flex": 1,
-                      "marginHorizontal": 20,
-                      "marginTop": 8,
-                    }
-                  }
-                >
+                  >
+                    <View
+                      collapsable={false}
+                      jestAnimatedStyle={
+                        Object {
+                          "value": Object {
+                            "transform": Array [
+                              Object {
+                                "rotate": "0deg",
+                              },
+                            ],
+                          },
+                        }
+                      }
+                      style={
+                        Object {
+                          "borderBottomColor": "#7DE0D5",
+                          "borderLeftColor": "transparent",
+                          "borderRadius": 50,
+                          "borderRightColor": "#7DE0D5",
+                          "borderTopColor": "#7DE0D5",
+                          "borderWidth": 3,
+                          "height": 100,
+                          "transform": Array [
+                            Object {
+                              "rotate": "0deg",
+                            },
+                          ],
+                          "width": 100,
+                        }
+                      }
+                    />
+                    <View
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "backgroundColor": "rgba(125,224,213,0.10)",
+                          "borderColor": "rgba(125,224,213,0.22)",
+                          "borderRadius": 32,
+                          "borderWidth": 1,
+                          "height": 64,
+                          "justifyContent": "center",
+                          "position": "absolute",
+                          "width": 64,
+                        }
+                      }
+                    >
+                      <RNSVGSvgView
+                        align="xMidYMid"
+                        bbHeight="28"
+                        bbWidth="28"
+                        fill="none"
+                        focusable={false}
+                        height={28}
+                        meetOrSlice={0}
+                        minX={0}
+                        minY={0}
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "transparent",
+                              "borderWidth": 0,
+                            },
+                            Object {
+                              "flex": 0,
+                              "height": 28,
+                              "width": 28,
+                            },
+                          ]
+                        }
+                        vbHeight={24}
+                        vbWidth={24}
+                        width={28}
+                      >
+                        <RNSVGGroup
+                          fill={null}
+                          propList={
+                            Array [
+                              "fill",
+                            ]
+                          }
+                        >
+                          <RNSVGCircle
+                            cx="6"
+                            cy="12"
+                            fill={
+                              Object {
+                                "payload": 4278190080,
+                                "type": 0,
+                              }
+                            }
+                            propList={
+                              Array [
+                                "stroke",
+                                "strokeWidth",
+                              ]
+                            }
+                            r="2.5"
+                            stroke={
+                              Object {
+                                "payload": 4286439637,
+                                "type": 0,
+                              }
+                            }
+                            strokeWidth="1.8"
+                          />
+                          <RNSVGCircle
+                            cx="17"
+                            cy="6"
+                            fill={
+                              Object {
+                                "payload": 4278190080,
+                                "type": 0,
+                              }
+                            }
+                            propList={
+                              Array [
+                                "stroke",
+                                "strokeWidth",
+                              ]
+                            }
+                            r="2.5"
+                            stroke={
+                              Object {
+                                "payload": 4286439637,
+                                "type": 0,
+                              }
+                            }
+                            strokeWidth="1.8"
+                          />
+                          <RNSVGCircle
+                            cx="17"
+                            cy="18"
+                            fill={
+                              Object {
+                                "payload": 4278190080,
+                                "type": 0,
+                              }
+                            }
+                            propList={
+                              Array [
+                                "stroke",
+                                "strokeWidth",
+                              ]
+                            }
+                            r="2.5"
+                            stroke={
+                              Object {
+                                "payload": 4286439637,
+                                "type": 0,
+                              }
+                            }
+                            strokeWidth="1.8"
+                          />
+                          <RNSVGPath
+                            d="M8.2 10.8L14.8 7.2M8.2 13.2L14.8 16.8"
+                            fill={
+                              Object {
+                                "payload": 4278190080,
+                                "type": 0,
+                              }
+                            }
+                            propList={
+                              Array [
+                                "stroke",
+                                "strokeWidth",
+                              ]
+                            }
+                            stroke={
+                              Object {
+                                "payload": 4286439637,
+                                "type": 0,
+                              }
+                            }
+                            strokeWidth="1.8"
+                          />
+                        </RNSVGGroup>
+                      </RNSVGSvgView>
+                    </View>
+                  </View>
                   <Text
-                    maxFontSizeMultiplier={2}
                     style={
-                      Array [
-                        Object {
-                          "color": "#FFFFFF",
-                          "fontSize": 14,
-                          "fontWeight": "bold",
-                        },
-                        Object {
-                          "fontWeight": "normal",
-                          "textAlign": "center",
-                        },
-                      ]
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontSize": 22,
+                        "fontWeight": "700",
+                        "marginTop": 28,
+                        "textAlign": "center",
+                      }
                     }
                   >
                     LoadingPlaceholder.ProofRequest
                   </Text>
                   <Text
-                    maxFontSizeMultiplier={2}
                     style={
-                      Array [
-                        Object {
-                          "color": "#FFFFFF",
-                          "fontSize": 18,
-                          "fontWeight": "normal",
-                        },
-                        Object {
-                          "marginBottom": 10,
-                          "marginTop": 25,
-                        },
-                      ]
+                      Object {
+                        "color": "#7FB6AF",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                        "marginTop": 8,
+                        "textAlign": "center",
+                      }
                     }
                   >
                     LoadingPlaceholder.YourRequest
@@ -135,354 +324,90 @@ exports[`Connection Screen No connection, show to proof 1`] = `
                   <View
                     style={
                       Object {
-                        "borderRadius": 15,
-                        "flex": 1,
-                        "flexGrow": 1,
+                        "backgroundColor": "rgba(255,255,255,0.08)",
+                        "borderRadius": 2,
+                        "height": 4,
+                        "marginTop": 30,
+                        "overflow": "hidden",
+                        "width": "100%",
                       }
                     }
                   >
                     <View
-                      collapsable={false}
                       style={
-                        Object {
-                          "backgroundColor": "#FFFFFF",
-                          "borderRadius": 15,
-                          "opacity": 1,
-                        }
-                      }
-                    >
-                      <View
-                        style={
+                        Array [
                           Object {
-                            "flexDirection": "column",
-                          }
-                        }
-                        testID="com.ariesbifold:id/RecordLoading"
-                      >
-                        <View
-                          style={
-                            Object {
-                              "flexDirection": "row",
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "backgroundColor": "#D3D3D3",
-                                "borderBottomLeftRadius": 10,
-                                "borderTopLeftRadius": 10,
-                                "width": 40,
-                              }
-                            }
-                          />
-                          <View
-                            style={
-                              Object {
-                                "backgroundColor": "#D3D3D3",
-                                "borderRadius": 10,
-                                "height": 90,
-                                "marginLeft": -52.5,
-                                "marginTop": 37.5,
-                                "width": 90,
-                              }
-                            }
-                          />
-                          <View
-                            style={
-                              Object {
-                                "flexGrow": 1,
-                                "marginBottom": 15,
-                                "marginLeft": 15,
-                                "marginTop": 15,
-                              }
-                            }
-                          >
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 20,
-                                    "width": "100%",
-                                  },
-                                ]
-                              }
-                            />
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 25,
-                                    "width": "75%",
-                                  },
-                                ]
-                              }
-                            />
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 20,
-                                    "marginTop": 20,
-                                    "width": "35%",
-                                  },
-                                ]
-                              }
-                            />
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 25,
-                                    "width": "90%",
-                                  },
-                                ]
-                              }
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      collapsable={false}
-                      style={
-                        Object {
-                          "backgroundColor": "#FFFFFF",
-                          "borderRadius": 15,
-                          "marginTop": 10,
-                          "opacity": 1,
-                        }
-                      }
-                    >
-                      <View
-                        style={
+                            "backgroundColor": "#7DE0D5",
+                            "borderRadius": 2,
+                            "height": "100%",
+                          },
                           Object {
-                            "flexDirection": "column",
-                          }
-                        }
-                        testID="com.ariesbifold:id/RecordLoading"
-                      >
-                        <View
-                          style={
-                            Object {
-                              "flexDirection": "row",
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "backgroundColor": "#D3D3D3",
-                                "borderBottomLeftRadius": 10,
-                                "borderTopLeftRadius": 10,
-                                "width": 40,
-                              }
-                            }
-                          />
-                          <View
-                            style={
-                              Object {
-                                "backgroundColor": "#D3D3D3",
-                                "borderRadius": 10,
-                                "height": 90,
-                                "marginLeft": -52.5,
-                                "marginTop": 37.5,
-                                "width": 90,
-                              }
-                            }
-                          />
-                          <View
-                            style={
-                              Object {
-                                "flexGrow": 1,
-                                "marginBottom": 15,
-                                "marginLeft": 15,
-                                "marginTop": 15,
-                              }
-                            }
-                          >
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 20,
-                                    "width": "100%",
-                                  },
-                                ]
-                              }
-                            />
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 25,
-                                    "width": "75%",
-                                  },
-                                ]
-                              }
-                            />
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 20,
-                                    "marginTop": 20,
-                                    "width": "35%",
-                                  },
-                                ]
-                              }
-                            />
-                            <View
-                              style={
-                                Array [
-                                  Object {
-                                    "backgroundColor": "#D3D3D3",
-                                    "borderRadius": 10,
-                                    "height": 30,
-                                    "marginVertical": 5,
-                                  },
-                                  Object {
-                                    "height": 25,
-                                    "width": "90%",
-                                  },
-                                ]
-                              }
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={
-                      Object {
-                        "marginVertical": 25,
+                            "width": "30%",
+                          },
+                        ]
                       }
-                    }
-                  >
-                    <View
-                      accessibilityLabel="Global.Cancel"
-                      accessibilityRole="button"
-                      accessibilityState={
-                        Object {
-                          "busy": undefined,
-                          "checked": undefined,
-                          "disabled": false,
-                          "expanded": undefined,
-                          "selected": undefined,
-                        }
-                      }
-                      accessibilityValue={
-                        Object {
-                          "max": undefined,
-                          "min": undefined,
-                          "now": undefined,
-                          "text": undefined,
-                        }
-                      }
-                      accessible={true}
-                      collapsable={false}
-                      focusable={true}
-                      onClick={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderMove={[Function]}
-                      onResponderRelease={[Function]}
-                      onResponderTerminate={[Function]}
-                      onResponderTerminationRequest={[Function]}
-                      onStartShouldSetResponder={[Function]}
-                      style={
-                        Object {
-                          "backgroundColor": "#42803E",
-                          "borderRadius": 4,
-                          "opacity": 1,
-                          "padding": 16,
-                        }
-                      }
-                      testID="com.ariesbifold:id/Cancel"
-                    >
-                      <View
-                        style={
-                          Object {
-                            "alignItems": "center",
-                            "flexDirection": "row",
-                            "justifyContent": "center",
-                          }
-                        }
-                      >
-                        <Text
-                          maxFontSizeMultiplier={2}
-                          style={
-                            Array [
-                              Object {
-                                "color": "#FFFFFF",
-                                "fontSize": 18,
-                                "fontWeight": "normal",
-                              },
-                              Array [
-                                Object {
-                                  "color": "#FFFFFF",
-                                  "fontSize": 18,
-                                  "fontWeight": "bold",
-                                  "textAlign": "center",
-                                },
-                                false,
-                                false,
-                                false,
-                              ],
-                            ]
-                          }
-                        >
-                          Global.Cancel
-                        </Text>
-                      </View>
-                    </View>
+                    />
                   </View>
                 </View>
+              </RCTScrollView>
+              <View
+                accessibilityLabel="Global.Cancel"
+                accessibilityRole="button"
+                accessibilityState={
+                  Object {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  Object {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderColor": "rgba(255,255,255,0.18)",
+                    "borderRadius": 14,
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "margin": 20,
+                    "opacity": 1,
+                    "paddingVertical": 14,
+                  }
+                }
+                testID="com.ariesbifold:id/Cancel"
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                    }
+                  }
+                >
+                  Global.Cancel
+                </Text>
               </View>
-            </RCTScrollView>
-          </RNCSafeAreaView>
+            </RNCSafeAreaView>
+          </View>
           <RCTScrollView
             data={Array []}
             getItem={[Function]}
@@ -553,6 +478,8 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
             style={
               Object {
                 "backgroundColor": "#313132",
+                "borderTopLeftRadius": 18,
+                "borderTopRightRadius": 18,
                 "paddingBottom": 26,
                 "paddingHorizontal": 25,
                 "paddingVertical": 16,
@@ -623,59 +550,97 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
                 CredentialOffer.IsOfferingYouACredential
               </ThemedText>
             </View>
-            <View
-              style={
-                Object {
-                  "marginBottom": 16,
-                  "marginHorizontal": 15,
-                }
-              }
-            >
-              <CredentialCard
-                credential={
+            <React.Fragment>
+              <View
+                style={
                   Object {
-                    "_tags": Object {},
-                    "autoAcceptCredential": undefined,
-                    "connectionId": "b4b1b9cd-a445-4bb3-9645-a2377471965a",
-                    "createdAt": "2024-09-04T18:50:29.771Z",
-                    "credentialAttributes": Array [
-                      Object {
-                        "mime-type": "text/plain",
-                        "name": "student_first_name",
-                        "value": "Alice",
-                      },
-                      Object {
-                        "mime-type": "text/plain",
-                        "name": "student_last_name",
-                        "value": "Smith",
-                      },
-                      Object {
-                        "mime-type": "text/plain",
-                        "name": "expiry_date",
-                        "value": "20280820",
-                      },
-                    ],
-                    "credentials": Array [],
-                    "errorMessage": undefined,
-                    "id": "99bbf805-fc82-44dc-82eb-e3eb1e7f8ab7",
-                    "linkedAttachments": undefined,
-                    "metadata": Object {
-                      "_anoncreds/credential": Object {
-                        "credentialDefinitionId": "QEquAHkM35w4XVT3Ku5yat:3:CL:834668:student_card",
-                        "schemaId": "QEquAHkM35w4XVT3Ku5yat:2:student_card:1.6",
-                      },
-                    },
-                    "parentThreadId": undefined,
-                    "protocolVersion": "v1",
-                    "revocationNotification": undefined,
-                    "role": "holder",
-                    "state": "offer-received",
-                    "threadId": "735df561-5346-4cb0-b11f-44a49984c0c3",
+                    "backgroundColor": "#313132",
+                    "borderRadius": 16,
+                    "marginBottom": 12,
+                    "marginHorizontal": 15,
+                    "paddingHorizontal": 18,
+                    "paddingVertical": 16,
                   }
                 }
-                onPress={[Function]}
-              />
-            </View>
+              >
+                <ThemedText
+                  style={
+                    Object {
+                      "color": "#606060",
+                      "fontSize": 12,
+                      "fontWeight": "700",
+                      "letterSpacing": 0.5,
+                      "marginBottom": 6,
+                      "textTransform": "uppercase",
+                    }
+                  }
+                >
+                  Credential Preview
+                </ThemedText>
+                <ThemedText
+                  style={
+                    Object {
+                      "color": "#FFFFFF",
+                    }
+                  }
+                >
+                  Review the credential details below before accepting issuance.
+                </ThemedText>
+              </View>
+              <View
+                style={
+                  Object {
+                    "marginBottom": 16,
+                    "marginHorizontal": 15,
+                  }
+                }
+              >
+                <CredentialCard
+                  credential={
+                    Object {
+                      "_tags": Object {},
+                      "autoAcceptCredential": undefined,
+                      "connectionId": "b4b1b9cd-a445-4bb3-9645-a2377471965a",
+                      "createdAt": "2024-09-04T18:50:29.771Z",
+                      "credentialAttributes": Array [
+                        Object {
+                          "mime-type": "text/plain",
+                          "name": "student_first_name",
+                          "value": "Alice",
+                        },
+                        Object {
+                          "mime-type": "text/plain",
+                          "name": "student_last_name",
+                          "value": "Smith",
+                        },
+                        Object {
+                          "mime-type": "text/plain",
+                          "name": "expiry_date",
+                          "value": "20280820",
+                        },
+                      ],
+                      "credentials": Array [],
+                      "errorMessage": undefined,
+                      "id": "99bbf805-fc82-44dc-82eb-e3eb1e7f8ab7",
+                      "linkedAttachments": undefined,
+                      "metadata": Object {
+                        "_anoncreds/credential": Object {
+                          "credentialDefinitionId": "QEquAHkM35w4XVT3Ku5yat:3:CL:834668:student_card",
+                          "schemaId": "QEquAHkM35w4XVT3Ku5yat:2:student_card:1.6",
+                        },
+                      },
+                      "parentThreadId": undefined,
+                      "protocolVersion": "v1",
+                      "revocationNotification": undefined,
+                      "role": "holder",
+                      "state": "offer-received",
+                      "threadId": "735df561-5346-4cb0-b11f-44a49984c0c3",
+                    }
+                  }
+                  onPress={[Function]}
+                />
+              </View>
+            </React.Fragment>
           </React.Fragment>
         </RecordHeader>
       }
@@ -798,6 +763,58 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
                 </Text>
                  
                 CredentialOffer.IsOfferingYouACredential
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#313132",
+                  "borderRadius": 16,
+                  "marginBottom": 12,
+                  "marginHorizontal": 15,
+                  "paddingHorizontal": 18,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontSize": 18,
+                      "fontWeight": "normal",
+                    },
+                    Object {
+                      "color": "#606060",
+                      "fontSize": 12,
+                      "fontWeight": "700",
+                      "letterSpacing": 0.5,
+                      "marginBottom": 6,
+                      "textTransform": "uppercase",
+                    },
+                  ]
+                }
+              >
+                Credential Preview
+              </Text>
+              <Text
+                maxFontSizeMultiplier={2}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontSize": 18,
+                      "fontWeight": "normal",
+                    },
+                    Object {
+                      "color": "#FFFFFF",
+                    },
+                  ]
+                }
+              >
+                Review the credential details below before accepting issuance.
               </Text>
             </View>
             <View
@@ -1379,6 +1396,8 @@ exports[`Connection Screen Valid goal code aries.vc.issue extracted, show to off
               style={
                 Object {
                   "backgroundColor": "#313132",
+                  "borderTopLeftRadius": 18,
+                  "borderTopRightRadius": 18,
                   "paddingBottom": 26,
                   "paddingHorizontal": 25,
                   "paddingVertical": 16,

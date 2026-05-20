@@ -1,12 +1,14 @@
 // modules/openid/hooks/useAcceptReplacement.ts
 import { SdJwtVcRecord, W3cCredentialRecord, MdocRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { useCallback } from 'react'
 import { TOKENS, useServices } from '../../../container-api'
 import { useOpenIDCredentials } from '../context/OpenIDCredentialRecordProvider'
 import { credentialRegistry, selectOldIdByReplacementId } from '../refresh/registry'
 import { OpenIDCredentialType } from '../types'
 
-type AnyCred = W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+type AnyCred = W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
 
 const sleep = (ms: number) => new Promise<void>((res) => setTimeout(res, ms))
 /**
@@ -14,7 +16,7 @@ const sleep = (ms: number) => new Promise<void>((res) => setTimeout(res, ms))
  */
 
 export function useAcceptReplacement() {
-  const { storeCredential, removeCredential, getW3CCredentialById, getSdJwtCredentialById } = useOpenIDCredentials()
+  const openIdCredentials = useOpenIDCredentials()
   const [logger] = useServices([TOKENS.UTIL_LOGGER])
 
   /**
@@ -25,6 +27,13 @@ export function useAcceptReplacement() {
    */
   const acceptNewCredential = useCallback(
     async (newCred: AnyCred) => {
+      const { storeCredential, removeCredential, getSdJwtCredentialById } = openIdCredentials || {}
+
+      if (!storeCredential || !removeCredential || !getSdJwtCredentialById) {
+        logger.warn('[useAcceptReplacement] OpenID credential context unavailable — skipping replacement handling')
+        return
+      }
+
       logger.info(`🟢 [useAcceptReplacement] accepting new credential → ${newCred.id}`)
 
       // 1) persist new
@@ -57,7 +66,7 @@ export function useAcceptReplacement() {
 
       logger.info(`✅ [useAcceptReplacement] replacement complete: old=${oldId} → new=${newCred.id}`)
     },
-    [storeCredential, removeCredential, getSdJwtCredentialById, logger]
+    [openIdCredentials, logger]
   )
 
   /**
@@ -66,6 +75,13 @@ export function useAcceptReplacement() {
    */
   const acceptById = useCallback(
     async (newId: string) => {
+      const { getW3CCredentialById, getSdJwtCredentialById } = openIdCredentials || {}
+
+      if (!getW3CCredentialById || !getSdJwtCredentialById) {
+        logger.warn('[useAcceptReplacement] OpenID credential context unavailable — cannot accept by id')
+        return
+      }
+
       // try W3C first, then Sd-JWT
       const newW3c = await getW3CCredentialById(newId)
       const newSd = newW3c ? undefined : await getSdJwtCredentialById(newId)
@@ -73,7 +89,7 @@ export function useAcceptReplacement() {
       if (!rec) throw new Error(`New credential not found for id=${newId}`)
       await acceptNewCredential(rec)
     },
-    [getW3CCredentialById, getSdJwtCredentialById, acceptNewCredential]
+    [openIdCredentials, logger, acceptNewCredential]
   )
 
   return { acceptNewCredential, acceptById }

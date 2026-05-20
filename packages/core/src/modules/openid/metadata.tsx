@@ -7,6 +7,9 @@ import {
   SdJwtVcRepository,
   MdocRepository,
 } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord, OpenBadgeCredentialRepository } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from './jsonLd/JsonLdCredentialRecord'
+import { JsonLdCredentialRepository } from './jsonLd/JsonLdCredentialRepository'
 import type {
   OpenId4VciCredentialSupported,
   OpenId4VciIssuerMetadataDisplay,
@@ -29,6 +32,9 @@ export interface OpenId4VcCredentialMetadata {
     display?: OpenId4VciIssuerMetadataDisplay[]
     id: string
   }
+  // The issuer's credential_configuration_id (e.g. "OpenBadgeCredential"), used
+  // as the OCA bundle key. More durable than the per-credential record id.
+  credentialConfigurationId?: string
 }
 
 export type OpenId4VcCredentialMetadataExtended = Partial<
@@ -41,7 +47,9 @@ export type OpenIDCredentialNotificationMetadata = {
 }
 
 export function extractOpenId4VcCredentialMetadata(
-  credentialMetadata: Partial<OpenId4VciCredentialSupported & { credential_subject: CredentialSubjectRecord }>,
+  credentialMetadata: Partial<
+    OpenId4VciCredentialSupported & { credential_subject: CredentialSubjectRecord; id?: string }
+  >,
   serverMetadata: { display?: MetadataDisplay[]; id: string }
 ): OpenId4VcCredentialMetadata {
   return {
@@ -54,6 +62,7 @@ export function extractOpenId4VcCredentialMetadata(
       display: serverMetadata.display,
       id: serverMetadata.id,
     },
+    credentialConfigurationId: credentialMetadata.id,
   }
 }
 
@@ -61,7 +70,7 @@ export function extractOpenId4VcCredentialMetadata(
  * Gets the OpenId4Vc credential metadata from the given W3C credential record.
  */
 export function getOpenId4VcCredentialMetadata(
-  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
 ): OpenId4VcCredentialMetadata | null {
   return credentialRecord.metadata.get(openId4VcCredentialMetadataKey)
 }
@@ -72,7 +81,7 @@ export function getOpenId4VcCredentialMetadata(
  * NOTE: this does not save the record.
  */
 export function setOpenId4VcCredentialMetadata(
-  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord,
+  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord,
   metadata: OpenId4VcCredentialMetadata
 ) {
   credentialRecord.metadata.set(openId4VcCredentialMetadataKey, metadata)
@@ -82,7 +91,7 @@ export function setOpenId4VcCredentialMetadata(
  * Gets the refresh credential metadata from the given credential record.
  */
 export function getRefreshCredentialMetadata(
-  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
 ): RefreshCredentialMetadata | null {
   return credentialRecord.metadata.get(refreshCredentialMetadataKey)
 }
@@ -93,19 +102,19 @@ export function getRefreshCredentialMetadata(
  * NOTE: this does not save the record.
  */
 export function setRefreshCredentialMetadata(
-  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord,
+  credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord,
   metadata: RefreshCredentialMetadata
 ) {
   credentialRecord.metadata.set(refreshCredentialMetadataKey, metadata)
 }
 
-export function deleteRefreshCredentialMetadata(credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord) {
+export function deleteRefreshCredentialMetadata(credentialRecord: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord) {
   credentialRecord.metadata.delete(refreshCredentialMetadataKey)
 }
 
 export async function persistCredentialRecord(
   agentContext: AgentContext,
-  record: W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+  record: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
 ) {
   if (record instanceof W3cCredentialRecord) {
     await agentContext.dependencyManager.resolve(W3cCredentialRepository).update(agentContext, record)
@@ -113,6 +122,14 @@ export async function persistCredentialRecord(
     await agentContext.dependencyManager.resolve(SdJwtVcRepository).update(agentContext, record)
   } else if (record instanceof MdocRecord) {
     await agentContext.dependencyManager.resolve(MdocRepository).update(agentContext, record)
+  } else if ((record as { type?: string })?.type === 'OpenBadgeCredentialRecord') {
+    await agentContext.dependencyManager
+      .resolve(OpenBadgeCredentialRepository)
+      .update(agentContext, record as OpenBadgeCredentialRecord)
+  } else if ((record as { type?: string })?.type === 'JsonLdCredentialRecord') {
+    await agentContext.dependencyManager
+      .resolve(JsonLdCredentialRepository)
+      .update(agentContext, record as unknown as JsonLdCredentialRecord)
   } else {
     throw new Error('Unsupported credential record type for persistence')
   }
@@ -123,7 +140,7 @@ export async function markOpenIDCredentialStatus({
   status,
   agentContext,
 }: {
-  credential: W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+  credential: W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
   status: RefreshStatus
   agentContext: AgentContext
 }) {

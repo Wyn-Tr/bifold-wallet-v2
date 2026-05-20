@@ -1,12 +1,18 @@
 import {
   OpenId4VciCredentialSupported,
   OpenId4VciIssuerMetadataDisplay,
+  OpenId4VciResolvedCredentialOffer,
   OpenId4VcSiopResolvedAuthorizationRequest,
 } from '@credo-ts/openid4vc'
 import { CredentialMetadata } from './display'
 import { ClaimFormat, DifPexCredentialsForRequest, DifPresentationExchangeDefinition } from '@credo-ts/core'
 
-export type CredentialForDisplayId = `w3c-credential-${string}` | `sd-jwt-vc-${string}` | `mdoc-${string}`
+export type CredentialForDisplayId =
+  | `w3c-credential-${string}`
+  | `sd-jwt-vc-${string}`
+  | `mdoc-${string}`
+  | `open-badge-${string}`
+  | `json-ld-${string}`
 export interface OpenId4VcCredentialMetadata {
   credential: {
     display?: OpenId4VciCredentialSupported['display']
@@ -97,6 +103,21 @@ export interface OpenId4VPRequestRecord extends OpenId4VcSiopResolvedAuthorizati
   type: string
 }
 
+export type OpenId4VciTxCode = {
+  input_mode?: 'numeric' | 'text'
+  length?: number
+  description?: string
+}
+
+export interface OpenId4VciPendingCredentialOffer {
+  type: 'OpenId4VciPendingCredentialOffer'
+  createdAt: string | Date
+  resolvedCredentialOffer: OpenId4VciResolvedCredentialOffer
+  txCode?: OpenId4VciTxCode
+  userPinRequired?: boolean
+  previewAttributes?: Record<string, unknown>
+}
+
 interface DisplayInfo {
   name: string
   locale?: string
@@ -108,6 +129,8 @@ export enum OpenIDCredentialType {
   W3cCredential,
   SdJwtVc,
   Mdoc,
+  OpenBadge,
+  JsonLd,
 }
 
 export interface RefreshResponse {

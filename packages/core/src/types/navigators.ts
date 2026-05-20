@@ -1,4 +1,6 @@
 import { MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../modules/openid/jsonLd/JsonLdCredentialRecord'
 import { NavigatorScreenParams } from '@react-navigation/native'
 import { StackNavigationOptions } from '@react-navigation/stack'
 import { OpenId4VPRequestRecord, OpenIDCredentialType } from '../modules/openid/types'
@@ -26,8 +28,15 @@ export enum Screens {
   CredentialOffer = 'Credential Offer',
   OpenIDCredentialDetails = 'Open ID Credential details',
   OpenIDCredentialOffer = 'Open ID Credential offer',
+  OpenIDAcceptLoading = 'Open ID Accept Loading',
+  OpenIDCredentialAccepted = 'Open ID Credential Accepted',
   OpenIDProofPresentation = 'Open ID Proof Presentation',
+  OpenIDProofSending = 'Open ID Proof Sending',
+  OpenIDProofSuccess = 'Open ID Proof Success',
   OpenIDProofCredentialSelect = 'Open ID Proof Credential Select',
+  OpenBadgeDetails = 'Open Badge Details',
+  VcApiExchange = 'VC API Exchange',
+  DesignerCardGallery = 'Designer Card Gallery',
   ProofRequest = 'Proof Request',
   ProofRequestDetails = 'Proof Request Details',
   ProofRequestUsageHistory = 'Proof Request Usage History',
@@ -68,6 +77,7 @@ export enum Screens {
   VideoCall = 'Video Call',
   WorkflowDetails = 'Workflow Details',
   WorkflowTemplatePicker = 'Workflow Template Picker',
+  WorkflowAppScreen = 'Workflow App Screen',
   ExportWalletIntro = 'Export Wallet Intro',
   ExportWallet = 'Export Wallet',
   ImportWallet = 'Import Wallet',
@@ -111,6 +121,8 @@ export type RootStackParams = {
   [Stacks.HistoryStack]: NavigatorScreenParams<HistoryStackParams>
   [Screens.CredentialDetails]: { credentialId: string }
   [Screens.OpenIDCredentialDetails]: { credentialId: string; type: OpenIDCredentialType }
+  [Screens.OpenBadgeDetails]: { credentialId: string }
+  [Screens.VcApiExchange]: { exchangeUrl: string; initialResponse?: Record<string, unknown> }
   [Stacks.CustomNavStack1]: undefined
   [Screens.IncomingCall]: {
     connectionId: string
@@ -126,6 +138,13 @@ export type RootStackParams = {
   }
   [Screens.WorkflowDetails]: { instanceId: string }
   [Screens.WorkflowTemplatePicker]: { connectionId: string }
+  [Screens.WorkflowAppScreen]: {
+    content: any[]
+    workflowID: string
+    connectionId: string
+    screenTitle?: string
+    onActionPress?: (actionId: string, workflowID: string, data?: any) => void
+  }
 }
 
 export type TabStackParams = {
@@ -164,6 +183,13 @@ export type ContactStackParams = {
   [Screens.JSONDetails]: { jsonBlob: any }
   [Screens.WorkflowDetails]: { instanceId: string }
   [Screens.WorkflowTemplatePicker]: { connectionId: string }
+  [Screens.WorkflowAppScreen]: {
+    content: any[]
+    workflowID: string
+    connectionId: string
+    screenTitle?: string
+    onActionPress?: (actionId: string, workflowID: string, data?: any) => void
+  }
 }
 
 export type ProofRequestsStackParams = {
@@ -209,6 +235,7 @@ export type SettingStackParams = {
   [Screens.Terms]: undefined
   [Screens.Onboarding]: undefined
   [Screens.Developer]: undefined
+  [Screens.DesignerCardGallery]: undefined
   [Screens.TogglePushNotifications]: undefined
   [Screens.HistorySettings]: undefined
   [Screens.AutoLock]: undefined
@@ -249,9 +276,30 @@ export type DeliveryStackParams = {
   [Screens.Declined]: { credentialId: string }
   [Screens.Chat]: { connectionId: string }
   [Screens.OpenIDCredentialOffer]: {
-    credential: SdJwtVcRecord | W3cCredentialRecord | MdocRecord
+    credential:
+      | SdJwtVcRecord
+      | W3cCredentialRecord
+      | MdocRecord
+      | OpenBadgeCredentialRecord
+      | JsonLdCredentialRecord
+  }
+  [Screens.OpenIDAcceptLoading]: {
+    credentialId?: string
+    credentialName?: string
+    issuerName?: string
+  }
+  [Screens.OpenIDCredentialAccepted]: {
+    credentialId?: string
+    credentialName: string
+    issuerName?: string
   }
   [Screens.OpenIDProofPresentation]: { credential: OpenId4VPRequestRecord }
+  [Screens.OpenIDProofSending]: { verifierName: string }
+  [Screens.OpenIDProofSuccess]: {
+    verifierName: string
+    verifierDomain?: string
+    sharedAt?: string
+  }
   [Screens.OpenIDProofCredentialSelect]: {
     inputDescriptorID: string
     selectedCredID: string
@@ -269,6 +317,7 @@ export type DeliveryStackParams = {
       claimFormat: string
     }) => void
   }
+  [Screens.VcApiExchange]: { exchangeUrl: string; initialResponse?: Record<string, unknown> }
 }
 
 export type HistoryStackParams = {

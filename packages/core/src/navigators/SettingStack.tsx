@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useTheme } from '../contexts/theme'
 import { createCarouselStyle } from '../screens/OnboardingPages'
+import DesignerCardGalleryScreen from '../screens/DesignerCardGalleryScreen'
 import { Screens, SettingStackParams } from '../types/navigators'
 import { testIdWithKey } from '../utils/testable'
 
@@ -194,6 +195,13 @@ const SettingStack: React.FC = () => {
           title: t('Screens.Developer'),
           headerBackTestID: testIdWithKey('Back'),
           ...ScreenOptionsDictionary[Screens.Developer],
+        }}
+      />
+      <Stack.Screen
+        name={Screens.DesignerCardGallery}
+        component={DesignerCardGalleryScreen}
+        options={{
+          headerShown: false,
         }}
       />
       <Stack.Screen name={Screens.Onboarding} options={{ title: t('Screens.Onboarding') }}>

@@ -654,7 +654,7 @@
     "ViewMessage": "View message",
     "ScanOfferAddCard": "Scan an offer to add a card to your wallet",
     "Scan": "Scan QR Code",
-    "NewChannel": "New Channel",
+    "NewChannel": "Scan QR Code",
     "NotificationPreview": "You have received a notification...",
     "ListCredentials": "List Credentials",
     "UnknownContact":"Unknown Contact"
@@ -945,7 +945,7 @@
   },
   "TabStack": {
     "Home": "Notifications",
-    "Scan": "New Channel",
+    "Scan": "Scan QR Code",
     "Credentials": "Credentials",
     "ListCredentials": "List Credentials"
   },
@@ -1246,7 +1246,7 @@
   "homeNoChannels": {
     "welcome": "Welcome to your",
     "description": "Add your first credential by first joining a channel.",
-    "joinButton": "JOIN NEW CHANNEL",
+    "joinButton": "SCAN QR CODE",
     "howItWorks": "How does it work?",
     "item1": {
       "title": "Digital Credentials",

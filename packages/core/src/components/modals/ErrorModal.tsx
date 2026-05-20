@@ -12,7 +12,7 @@ import { BifoldError } from '../../types/error'
 import InfoBox, { InfoBoxType } from '../misc/InfoBox'
 import SafeAreaModal from './SafeAreaModal'
 import FullScreenErrorModal from './FullScreenErrorModal'
-import { Screens, TabStacks } from '../../types/navigators'
+import { Screens, Stacks, TabStacks } from '../../types/navigators'
 
 interface ErrorModalProps {
   enableReport?: boolean
@@ -43,7 +43,10 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ enableReport }) => {
   }, [])
 
   const onPressSimplifiedErrorModalCTA = useCallback(() => {
-    navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+    navigation.getParent()?.navigate(Stacks.TabStack, {
+      screen: TabStacks.HomeStack,
+      params: { screen: Screens.Home },
+    })
     setModalVisible(false)
   }, [navigation])
 

@@ -16,14 +16,22 @@ const parseOrder = (order: string | number | undefined): number => {
   return parseInt(order, 10) || 0
 }
 
-const BasicTableContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
-  const header: HeaderColumn[] = item.header || []
-  const rows: TableRow[] = item.rows || []
-  const showBorder = item.border === true || item.border === 'true'
+const DEFAULT_HEADER: HeaderColumn[] = [
+  { column1: 'Name', order: 0 },
+  { column1: 'Value', order: 1 },
+]
+const DEFAULT_ROWS: TableRow[] = [
+  { col1: 'Item 1', col2: '100' },
+  { col1: 'Item 2', col2: '200' },
+  { col1: 'Item 3', col2: '300' },
+]
 
-  if (header.length === 0 || rows.length === 0) {
-    return null
-  }
+const BasicTableContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
+  const rawHeader: HeaderColumn[] = item.header || []
+  const rawRows: TableRow[] = item.rows || []
+  const header = rawHeader.length > 0 ? rawHeader : DEFAULT_HEADER
+  const rows = rawRows.length > 0 ? rawRows : DEFAULT_ROWS
+  const showBorder = item.border === true || item.border === 'true'
 
   const sortedHeader = [...header].sort((a, b) => {
     return parseOrder(a.order) - parseOrder(b.order)

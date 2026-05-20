@@ -12,6 +12,7 @@ import { IHistoryManager } from './modules/history'
 import Onboarding from './screens/Onboarding'
 import { SplashProps } from './screens/Splash'
 import UpdateAvailable from './screens/UpdateAvailable'
+import { TrustedCertificateSource } from './utils/trustedCertificates'
 import { AttestationMonitor } from './types/attestation'
 import { IVersionCheckService } from './types/version-check'
 import { GenericFn } from './types/fn'
@@ -118,6 +119,7 @@ export const SCREEN_TOKENS = {
   SCREEN_WHAT_ARE_CONTACTS: 'screen.what-are-contacts',
   SCREEN_WORKFLOW_DETAILS: 'screen.workflow-details',
   SCREEN_WORKFLOW_TEMPLATE_PICKER: 'screen.workflow-template-picker',
+  SCREEN_WORKFLOW_APP: 'screen.workflow-app',
 
   // Credential Screens
   SCREEN_LIST_CREDENTIALS: 'screen.list-credentials',
@@ -244,6 +246,7 @@ export const UTILITY_TOKENS = {
   UTIL_WORKFLOW_REGISTRY: 'utility.workflow-registry',
   UTIL_THEME_REGISTRY: 'utility.theme-registry',
   UTIL_WEBRTC_ICE_SERVERS: 'utility.webrtc-ice-servers',
+  UTIL_X509_TRUSTED_CERTIFICATE_SOURCES: 'utility.x509-trusted-certificate-sources',
 } as const
 
 export const CONFIG_TOKENS = {
@@ -369,6 +372,7 @@ export type TokenMapping = {
   [TOKENS.UTIL_WORKFLOW_REGISTRY]: IWorkflowRegistry
   [TOKENS.UTIL_THEME_REGISTRY]: IThemeRegistry
   [TOKENS.UTIL_WEBRTC_ICE_SERVERS]: Array<{ urls: string | string[]; username?: string; credential?: string }>
+  [TOKENS.UTIL_X509_TRUSTED_CERTIFICATE_SOURCES]: TrustedCertificateSource[]
 
   // New Screen Tokens
   [TOKENS.SCREEN_PIN_CREATE]: React.FC<any>
@@ -402,6 +406,7 @@ export type TokenMapping = {
   [TOKENS.SCREEN_WHAT_ARE_CONTACTS]: React.FC
   [TOKENS.SCREEN_WORKFLOW_DETAILS]: React.FC<any>
   [TOKENS.SCREEN_WORKFLOW_TEMPLATE_PICKER]: React.FC<any>
+  [TOKENS.SCREEN_WORKFLOW_APP]: React.FC<any>
   [TOKENS.SCREEN_LIST_CREDENTIALS]: React.FC
   [TOKENS.SCREEN_JSON_DETAILS]: React.FC<any>
   [TOKENS.SCREEN_OPENID_CREDENTIAL_DETAILS]: React.FC<any>

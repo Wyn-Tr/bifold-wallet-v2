@@ -9,7 +9,7 @@ import { Agent, BasicMessageRecord, ConnectionRecord } from '@credo-ts/core'
 import { BasicMessageRole } from '@credo-ts/core/build/modules/basic-messages/BasicMessageRole'
 import { StackNavigationProp } from '@react-navigation/stack'
 import React from 'react'
-import { Alert } from 'react-native'
+import { Alert, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { TFunction } from 'react-i18next'
 
 import { CallbackType, ExtendedChatMessage } from '../../../components/chat/ChatMessage'
@@ -178,9 +178,58 @@ export class ActionMenuWorkflowHandler extends BaseWorkflowHandler<ActionMenuRec
       }
     }
 
-    const renderEvent = () => (
-      <ActionMenuBubble content={parsed.displayData} workflowID={parsed.workflowID} onActionPress={handlePress} />
-    )
+    // Check if this should be rendered as full-screen
+    const isScreenMode = parsed.displayMode === 'screen'
+
+    const renderEvent = () => {
+      if (isScreenMode && currentNavigation) {
+        // Render a compact card that navigates to WorkflowAppScreen
+        const screenTitle = parsed.screenTitle || this.getLabel(record)
+        const cardStyles = StyleSheet.create({
+          card: {
+            backgroundColor: '#F0F9F9',
+            borderRadius: 12,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: '#00807F',
+            maxWidth: 280,
+          },
+          title: {
+            fontSize: 16,
+            fontWeight: '700',
+            color: '#005F5F',
+            marginBottom: 4,
+          },
+          hint: {
+            fontSize: 13,
+            color: '#6B7280',
+          },
+        })
+
+        return (
+          <TouchableOpacity
+            style={cardStyles.card}
+            activeOpacity={0.7}
+            onPress={() => {
+              currentNavigation.navigate(Screens.WorkflowAppScreen as any, {
+                content: parsed.displayData,
+                workflowID: parsed.workflowID,
+                connectionId: currentConnectionId,
+                screenTitle,
+                onActionPress: handlePress,
+              })
+            }}
+          >
+            <Text style={cardStyles.title}>{screenTitle}</Text>
+            <Text style={cardStyles.hint}>Tap to open</Text>
+          </TouchableOpacity>
+        )
+      }
+
+      return (
+        <ActionMenuBubble content={parsed.displayData} workflowID={parsed.workflowID} onActionPress={handlePress} />
+      )
+    }
 
     return {
       _id: record.id,
@@ -320,6 +369,8 @@ export class ActionMenuWorkflowHandler extends BaseWorkflowHandler<ActionMenuRec
         return {
           displayData: parsed.displayData as ActionMenuContentItem[],
           workflowID: parsed.workflowID ?? '',
+          displayMode: parsed.displayMode,
+          screenTitle: parsed.screenTitle,
         }
       }
     } catch {

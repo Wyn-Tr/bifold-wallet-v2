@@ -37,3 +37,22 @@ import './content/ShareEntryContent'
 import './content/SliderContent'
 import './content/SubmitButtonContent'
 import './content/MultipleChoiceContent'
+
+// Layout container types
+import './content/RowContent'
+import './content/SectionContent'
+import './content/SpacerContent'
+import './content/DividerContent'
+
+// Marketplace primitives
+import './content/ChipContent'
+import './content/ChipRowContent'
+import './content/BadgeContent'
+import './content/TileContent'
+import './content/CarouselContent'
+
+// Export layout module
+export { GridLayout } from './layout/GridLayout'
+export type { GridLayoutProps } from './layout/GridLayout'
+export { useGridDimensions, computeItemWidth } from './layout/useGridDimensions'
+export type { GridDimensions } from './layout/useGridDimensions'

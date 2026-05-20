@@ -19,6 +19,8 @@ import { useAutoRequestPeerProfile } from '../hooks/useAutoRequestPeerProfile'
 import { useDefaultStackOptions } from './defaultStackOptions'
 import VideoCall from '../screens/VideoCall'
 import IncomingCall from '../screens/IncomingCall'
+import OpenBadgeDetails from '../modules/openid/screens/OpenBadgeDetails'
+import VcApiExchange from '../screens/VcApiExchange'
 
 const MainStack: React.FC = () => {
   const { t } = useTranslation()
@@ -126,6 +128,22 @@ const MainStack: React.FC = () => {
             title: t('Screens.CredentialDetails'),
             headerShown: false,
             ...ScreenOptionsDictionary[Screens.OpenIDCredentialDetails],
+          }}
+        />
+        <Stack.Screen
+          name={Screens.OpenBadgeDetails}
+          component={OpenBadgeDetails}
+          options={{
+            title: t('Screens.CredentialDetails'),
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={Screens.VcApiExchange}
+          component={VcApiExchange}
+          options={{
+            title: t('Screens.CredentialOffer'),
+            headerShown: true,
           }}
         />
         <Stack.Screen

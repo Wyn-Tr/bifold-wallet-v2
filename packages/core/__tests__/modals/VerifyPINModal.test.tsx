@@ -6,6 +6,7 @@ import { BasicAppContext } from '../helpers/app'
 import authContext from '../contexts/auth'
 import { AuthContext } from '../../src/contexts/auth'
 
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('VerifyPINModal Component', () => {
   test('Renders correctly', async () => {
     const tree = render(

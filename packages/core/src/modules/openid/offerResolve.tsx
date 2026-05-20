@@ -15,6 +15,7 @@ import {
   JwkDidCreateOptions,
   KeyBackend,
   KeyDidCreateOptions,
+  KeyType,
   Mdoc,
   MdocRecord,
   SdJwtVcRecord,
@@ -22,11 +23,14 @@ import {
   W3cJsonLdVerifiableCredential,
   W3cJwtVerifiableCredential,
 } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from './jsonLd/JsonLdCredentialRecord'
 import {
   extractOpenId4VcCredentialMetadata,
   setOpenId4VcCredentialMetadata,
   temporaryMetaVanillaObject,
 } from './metadata'
+import { receiveJsonLdCredentialFromOpenId4VciOffer } from './jsonLd/receiveJsonLdCredential'
 
 export const resolveOpenId4VciOffer = async ({
   agent,
@@ -181,6 +185,87 @@ export const customCredentialBindingResolver = async ({
   )
 }
 
+// Format preference order — Credo 0.5.17 cleanly handles SD-JWT, mDoc, and classic JWT-VC.
+// JSON-LD (ldp_vc / jwt_vc_json-ld) is last because Credo's W3cJsonLdCredentialService
+// can't validate VC v2 documents and has no signature suite for DataIntegrityProof.
+const FORMAT_PREFERENCE: ReadonlyArray<string> = [
+  'vc+sd-jwt',
+  'mso_mdoc',
+  'jwt_vc_json',
+  'jwt_vc_json-ld',
+  'ldp_vc',
+]
+
+function pickPreferredOfferedCredentials<T extends { format: string }>(offered: ReadonlyArray<T>): T[] {
+  for (const fmt of FORMAT_PREFERENCE) {
+    const match = offered.find((o) => o.format === fmt)
+    if (match) return [match]
+  }
+  return offered.length > 0 ? [offered[0]] : []
+}
+
+/**
+ * Mints a holder DID/key via the existing customCredentialBindingResolver and
+ * dispatches the JSON-LD credential request through the openbadges-backed bridge.
+ *
+ * Default signature alg is EdDSA / Ed25519 — matches what VC Playground and most
+ * issuers expect for `eddsa-rdfc-2022`. We don't read `proof_types_supported`
+ * from the offered config since Credo 0.5's metadata model is incomplete for
+ * those fields and EdDSA is the broadest-compatible default.
+ */
+async function receiveJsonLdViaCustomBridge({
+  agent,
+  resolvedCredentialOffer,
+  tokenResponse,
+  offeredCredential,
+  pidSchemes,
+  clientId,
+}: {
+  agent: Agent
+  resolvedCredentialOffer: OpenId4VciResolvedCredentialOffer
+  tokenResponse: OpenId4VciRequestTokenResponse
+  offeredCredential: OpenId4VciCredentialSupportedWithId
+  pidSchemes?: { sdJwtVcVcts: Array<string>; msoMdocDoctypes: Array<string> }
+  clientId?: string
+}): Promise<OpenBadgeCredentialRecord | JsonLdCredentialRecord> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const offered = offeredCredential as any
+  const bindingMethods: string[] | undefined = offered?.cryptographic_binding_methods_supported
+  const supportsAllDidMethods = bindingMethods?.includes('did') ?? false
+  const supportedDidMethods = bindingMethods?.filter((m: string) => m.startsWith('did:'))
+  const supportsJwk = bindingMethods?.includes('jwk') ?? false
+
+  const binding = await customCredentialBindingResolver({
+    agent,
+    keyType: KeyType.Ed25519,
+    supportsAllDidMethods,
+    supportedDidMethods,
+    supportsJwk,
+    credentialFormat: offeredCredential.format as
+      | OpenId4VciCredentialFormatProfile.LdpVc
+      | OpenId4VciCredentialFormatProfile.JwtVcJsonLd,
+    supportedCredentialId: offeredCredential.id,
+    resolvedCredentialOffer,
+    pidSchemes,
+  })
+
+  const record = await receiveJsonLdCredentialFromOpenId4VciOffer({
+    agent,
+    resolvedCredentialOffer,
+    tokenResponse,
+    offeredCredential,
+    binding,
+    signatureAlgorithm: JwaSignatureAlgorithm.EdDSA,
+    clientId,
+  })
+
+  // Match the existing flow's behaviour for notification metadata so the
+  // downstream notification + offer-screen code paths are uniform.
+  temporaryMetaVanillaObject.notificationMetadata = undefined
+
+  return record
+}
+
 export const receiveCredentialFromOpenId4VciOffer = async ({
   agent,
   resolvedCredentialOffer,
@@ -200,7 +285,8 @@ export const receiveCredentialFromOpenId4VciOffer = async ({
     ? resolvedCredentialOffer.offeredCredentials.filter((offered) =>
         credentialConfigurationIdsToRequest.includes(offered.id)
       )
-    : [resolvedCredentialOffer.offeredCredentials[0]]
+    : pickPreferredOfferedCredentials(resolvedCredentialOffer.offeredCredentials)
+
 
   if (offeredCredentialsToRequest.length === 0) {
     throw new Error(
@@ -208,11 +294,34 @@ export const receiveCredentialFromOpenId4VciOffer = async ({
     )
   }
 
+  const resolvedCredentialIdsToRequest =
+    credentialConfigurationIdsToRequest ?? offeredCredentialsToRequest.map((c) => c.id)
+
+  // JSON-LD bridge — only `ldp_vc` (embedded LD-Proof on a JSON-LD object).
+  // `jwt_vc_json-ld` is still a compact JWT string on the wire (the `-ld`
+  // suffix only signals that the JWT's `vc` payload contains a JSON-LD
+  // `@context`). Credo's standard JWT-VC path handles that fine, so we
+  // intentionally leave `JwtVcJsonLd` OUT of this routing condition — the
+  // bridge's object-only response handler would reject the JWT string.
+  const isJsonLdRequest = offeredCredentialsToRequest.every(
+    (c) => c.format === OpenId4VciCredentialFormatProfile.LdpVc
+  )
+  if (isJsonLdRequest) {
+    return receiveJsonLdViaCustomBridge({
+      agent,
+      resolvedCredentialOffer,
+      tokenResponse,
+      offeredCredential: offeredCredentialsToRequest[0] as OpenId4VciCredentialSupportedWithId,
+      pidSchemes,
+      clientId,
+    })
+  }
+
   const credentials = await agent.modules.openId4VcHolder.requestCredentials({
     resolvedCredentialOffer,
     ...tokenResponse,
     clientId,
-    credentialsToRequest: credentialConfigurationIdsToRequest,
+    credentialsToRequest: resolvedCredentialIdsToRequest,
     verifyCredentialStatus: false,
     allowedProofOfPossessionSignatureAlgorithms: [
       // NOTE: MATTR launchpad for JFF MUST use EdDSA. So it is important that the default (first allowed one)
@@ -277,8 +386,11 @@ export const receiveCredentialFromOpenId4VciOffer = async ({
     temporaryMetaVanillaObject.notificationMetadata = notificationMetadata
   }
 
+  const metadataSource =
+    offeredCredentialsToRequest.find((c) => c.id === resolvedCredentialIdsToRequest[0]) ?? offeredCredentialsToRequest[0]
+
   const openId4VcMetadata = extractOpenId4VcCredentialMetadata(
-    resolvedCredentialOffer.offeredCredentials[0] as OpenId4VciCredentialSupportedWithId,
+    metadataSource as OpenId4VciCredentialSupportedWithId,
     {
       id: resolvedCredentialOffer.metadata.issuer,
       display: resolvedCredentialOffer.metadata.credentialIssuerMetadata.display,

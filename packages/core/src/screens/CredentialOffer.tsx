@@ -89,6 +89,25 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
     headerText: {
       flexShrink: 1,
     },
+    previewIntroSection: {
+      marginHorizontal: 15,
+      marginBottom: 12,
+      paddingHorizontal: 18,
+      paddingVertical: 16,
+      backgroundColor: ColorPalette.brand.secondaryBackground,
+      borderRadius: 16,
+    },
+    previewIntroTitle: {
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
+      color: ColorPalette.grayscale.mediumGrey,
+      marginBottom: 6,
+    },
+    previewIntroText: {
+      color: ColorPalette.brand.text,
+    },
     footerButton: {
       paddingTop: 10,
     },
@@ -259,7 +278,10 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
           params: { instanceId: workflowInstanceId },
         })
       } else {
-        navigation.getParent()?.navigate(TabStacks.HomeStack, { screen: Screens.Home })
+        navigation.getParent()?.navigate(Stacks.TabStack, {
+          screen: TabStacks.HomeStack,
+          params: { screen: Screens.Home },
+        })
       }
     } catch (err: unknown) {
       const error = new BifoldError(t('Error.Title1025'), t('Error.Message1025'), (err as Error)?.message ?? err, 1025)
@@ -287,9 +309,17 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
           </ThemedText>
         </View>
         {!loading && credential && (
-          <View style={{ marginHorizontal: 15, marginBottom: 16 }}>
-            <CredentialCard credential={credential} onPress={()=> {}} />
-          </View>
+          <>
+            <View style={styles.previewIntroSection}>
+              <ThemedText style={styles.previewIntroTitle}>Credential Preview</ThemedText>
+              <ThemedText style={styles.previewIntroText}>
+                Review the credential details below before accepting issuance.
+              </ThemedText>
+            </View>
+            <View style={{ marginHorizontal: 15, marginBottom: 16 }}>
+              <CredentialCard credential={credential} onPress={()=> {}} />
+            </View>
+          </>
         )}
       </>
     )
@@ -303,6 +333,8 @@ const CredentialOffer: React.FC<CredentialOfferProps> = ({ navigation, credentia
           paddingVertical: 16,
           paddingBottom: 26,
           backgroundColor: ColorPalette.brand.secondaryBackground,
+          borderTopLeftRadius: 18,
+          borderTopRightRadius: 18,
         }}
       >
         {loading ? <RecordLoading /> : null}

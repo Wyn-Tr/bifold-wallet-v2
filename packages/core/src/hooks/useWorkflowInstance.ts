@@ -12,12 +12,13 @@ export interface WorkflowAction {
 }
 
 export interface WorkflowUiHint {
-  type: 'text' | 'submit-button' | 'input' | 'divider'
+  type: string
   text?: string
   label?: string
   event?: string
   input_schema?: Record<string, unknown>
   enabledWhen?: string
+  [key: string]: unknown
 }
 
 export interface EnrichedWorkflowStatus {

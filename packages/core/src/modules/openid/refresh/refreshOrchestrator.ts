@@ -1,5 +1,7 @@
 // modules/openid/refresh/RefreshOrchestrator.ts
 import { Agent, ClaimFormat, MdocRecord, SdJwtVcRecord, W3cCredentialRecord } from '@credo-ts/core'
+import { OpenBadgeCredentialRecord } from '@ajna-inc/openbadges'
+import { JsonLdCredentialRecord } from '../jsonLd/JsonLdCredentialRecord'
 import { BifoldLogger } from '../../../services/logger'
 import { refreshAccessToken } from './refreshToken'
 import { reissueCredentialWithAccessToken } from './reIssuance'
@@ -14,7 +16,7 @@ import {
   setRefreshCredentialMetadata,
 } from '../metadata'
 
-type AnyCred = W3cCredentialRecord | SdJwtVcRecord | MdocRecord
+type AnyCred = W3cCredentialRecord | SdJwtVcRecord | MdocRecord | OpenBadgeCredentialRecord | JsonLdCredentialRecord
 
 const defaultToLite = (rec: AnyCred) => ({
   id: rec.id,

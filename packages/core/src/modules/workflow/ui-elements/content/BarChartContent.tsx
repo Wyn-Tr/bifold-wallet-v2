@@ -14,12 +14,16 @@ const parseCount = (count: number | string): number => {
   return parseFloat(count) || 0
 }
 
-const BarChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
-  const bars: BarItem[] = item.bars || []
+const DEFAULT_BARS: BarItem[] = [
+  { label: 'Category A', count: 75 },
+  { label: 'Category B', count: 50 },
+  { label: 'Category C', count: 90 },
+  { label: 'Category D', count: 35 },
+]
 
-  if (bars.length === 0) {
-    return null
-  }
+const BarChartContent: React.FC<ContentProps> = ({ item, styles, colors }) => {
+  const rawBars: BarItem[] = item.bars || []
+  const bars = rawBars.length > 0 ? rawBars : DEFAULT_BARS
 
   // Find max count for scaling
   const maxCount = Math.max(...bars.map((b) => parseCount(b.count)), 1)
