@@ -152,6 +152,7 @@ export class EcdsaRdfc2019Cryptosuite {
    * + issuer-defined) don't trip over each other's `@protected` term
    * definitions during expansion.
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async canonicalize(document: Record<string, unknown>, _useNetworkContexts: boolean): Promise<string> {
     // RN's `globalThis.crypto.subtle` is undefined; rdf-canonize's MessageDigest
     // throws "crypto.subtle not found." on construction without this.

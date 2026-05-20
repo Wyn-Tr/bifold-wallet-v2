@@ -377,9 +377,25 @@ export const OpenIDCardRenderer: React.FC<OpenIDCardRendererProps> = ({
     }
   }, [credentialRecord])
 
+  // Memoise `attributes` so its reference is stable across renders — without
+  // this, downstream useMemo dependency arrays see a fresh object each render.
+  const attributes = useMemo(
+    () => (display?.attributes ?? {}) as Record<string, any>,
+    [display]
+  )
+
+  // All hooks must run unconditionally to respect react-hooks/rules-of-hooks,
+  // so the early-return on `!design` happens AFTER these calls.
+  const footer = useMemo(() => {
+    if (!design?.footerAttribute) return undefined
+    const raw = lookup(attributes, design.footerAttribute)
+    const v = formatValue(raw)
+    return v ? `${humanLabel(design.footerAttribute)} · ${v}` : undefined
+  }, [design?.footerAttribute, attributes])
+  const imageSource = useMemo(() => findHolderImage(attributes), [attributes])
+
   if (!design) return null
 
-  const attributes = (display?.attributes ?? {}) as Record<string, any>
   const metaHolder = display?.metadata?.holder
   const holder =
     deriveHolder(attributes) ??
@@ -387,13 +403,6 @@ export const OpenIDCardRenderer: React.FC<OpenIDCardRendererProps> = ({
   const title = display?.display?.name ?? humanLabel(design.layout)
   const subtitle = display?.display?.issuer?.name ?? undefined
   const fields = buildFields(design, attributes)
-  const footer = useMemo(() => {
-    if (!design.footerAttribute) return undefined
-    const raw = lookup(attributes, design.footerAttribute)
-    const v = formatValue(raw)
-    return v ? `${humanLabel(design.footerAttribute)} · ${v}` : undefined
-  }, [design.footerAttribute, attributes])
-  const imageSource = useMemo(() => findHolderImage(attributes), [attributes])
   const photoConfig = resolvePhotoMode(design.layout, imageSource)
 
   const card = (

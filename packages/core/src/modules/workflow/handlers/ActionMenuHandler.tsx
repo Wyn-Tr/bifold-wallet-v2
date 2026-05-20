@@ -9,7 +9,7 @@ import { Agent, BasicMessageRecord, ConnectionRecord } from '@credo-ts/core'
 import { BasicMessageRole } from '@credo-ts/core/build/modules/basic-messages/BasicMessageRole'
 import { StackNavigationProp } from '@react-navigation/stack'
 import React from 'react'
-import { Alert, Text, TouchableOpacity, View, StyleSheet } from 'react-native'
+import { Alert, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { TFunction } from 'react-i18next'
 
 import { CallbackType, ExtendedChatMessage } from '../../../components/chat/ChatMessage'

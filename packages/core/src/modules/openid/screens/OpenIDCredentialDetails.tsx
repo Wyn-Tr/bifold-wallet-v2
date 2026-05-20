@@ -171,10 +171,13 @@ const OpenIDCredentialDetails: React.FC<OpenIDCredentialDetailsProps> = ({ navig
     }
   }, [credentialDisplay, bundleResolver, i18n])
 
-  const finalFields: Field[] =
-    (overlay.presentationFields && overlay.presentationFields.length > 0
-      ? overlay.presentationFields
-      : fallbackFields) || []
+  const finalFields: Field[] = useMemo(
+    () =>
+      (overlay.presentationFields && overlay.presentationFields.length > 0
+        ? overlay.presentationFields
+        : fallbackFields) || [],
+    [overlay.presentationFields, fallbackFields]
+  )
 
   const toggleDeclineModalVisible = () => {
     if (credentialRemoved) return

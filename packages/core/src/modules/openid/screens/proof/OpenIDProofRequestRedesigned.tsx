@@ -107,7 +107,7 @@ export const OpenIDProofRequestRedesigned: React.FC<OpenIDProofRequestRedesigned
           ) : null}
         </View>
 
-        <DCSectionLabel>You'll share</DCSectionLabel>
+        <DCSectionLabel>You&apos;ll share</DCSectionLabel>
         <DCAttrList items={requestedAttributes} variant="shared" />
 
         {selectiveDisclosureNote ? (

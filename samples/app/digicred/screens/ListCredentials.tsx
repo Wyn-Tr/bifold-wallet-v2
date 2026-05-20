@@ -89,24 +89,37 @@ const ListCredentials: React.FC = () => {
     }
   }, [screenIsFocused, refreshOpenBadgeCredentials, refreshJsonLdCredentials])
 
-  let credentials: GenericCredentialExchangeRecord[] = [
-    ...useCredentialByState(CredentialState.CredentialReceived),
-    ...useCredentialByState(CredentialState.Done),
-    ...w3cCredentialRecords,
-    ...sdJwtVcRecords,
-    ...mdocVcRecords,
-    ...openBadgeCredentialRecords,
-    ...jsonLdCredentialRecords,
-  ]
+  const baseCredentialsReceived = useCredentialByState(CredentialState.CredentialReceived)
+  const baseCredentialsDone = useCredentialByState(CredentialState.Done)
 
-  const CredentialListFooter = credentialListFooter as React.FC<CredentialListFooterProps>
-
-  if (!store.preferences.developerModeEnabled) {
-    credentials = credentials.filter((r) => {
+  const credentials: GenericCredentialExchangeRecord[] = useMemo(() => {
+    const all: GenericCredentialExchangeRecord[] = [
+      ...baseCredentialsReceived,
+      ...baseCredentialsDone,
+      ...w3cCredentialRecords,
+      ...sdJwtVcRecords,
+      ...mdocVcRecords,
+      ...openBadgeCredentialRecords,
+      ...jsonLdCredentialRecords,
+    ]
+    if (store.preferences.developerModeEnabled) return all
+    return all.filter((r) => {
       const credDefId = r.metadata.get(AnonCredsCredentialMetadataKey)?.credentialDefinitionId
       return !credentialHideList?.includes(credDefId)
     })
-  }
+  }, [
+    baseCredentialsReceived,
+    baseCredentialsDone,
+    w3cCredentialRecords,
+    sdJwtVcRecords,
+    mdocVcRecords,
+    openBadgeCredentialRecords,
+    jsonLdCredentialRecords,
+    store.preferences.developerModeEnabled,
+    credentialHideList,
+  ])
+
+  const CredentialListFooter = credentialListFooter as React.FC<CredentialListFooterProps>
 
   useEffect(() => {
     const shouldShowTour = enableToursConfig && store.tours.enableTours && !store.tours.seenCredentialsTour
@@ -123,7 +136,7 @@ const ListCredentials: React.FC = () => {
   }
 
   const sortedCredentials = useMemo(
-    () => credentials.sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()),
+    () => [...credentials].sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()),
     [credentials]
   )
 

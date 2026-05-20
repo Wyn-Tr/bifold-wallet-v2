@@ -108,7 +108,7 @@ export const OpenIDCredentialOfferRedesigned: React.FC<OpenIDCredentialOfferRede
           </View>
         </View>
 
-        <DCSectionLabel>You'll receive</DCSectionLabel>
+        <DCSectionLabel>You&apos;ll receive</DCSectionLabel>
         <DCAttrList items={previewItems} />
 
         <DCActionRow

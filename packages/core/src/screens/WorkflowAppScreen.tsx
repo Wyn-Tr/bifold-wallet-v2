@@ -22,6 +22,7 @@ const WorkflowAppScreen: React.FC<WorkflowAppScreenProps> = ({ route, navigation
   const {
     content,
     workflowID,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connectionId,
     screenTitle,
     onActionPress,

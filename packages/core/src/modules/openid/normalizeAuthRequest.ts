@@ -244,7 +244,7 @@ function sanitizeFormatBlock(format: unknown): void {
     const proofType = (value as Record<string, unknown>).proof_type
     const sanitized = sanitizeProofTypeList(proofType)
     if (sanitized) {
-      ;(value as Record<string, unknown>).proof_type = sanitized
+      (value as Record<string, unknown>).proof_type = sanitized
     }
   }
 }

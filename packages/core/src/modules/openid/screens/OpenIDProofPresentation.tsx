@@ -441,7 +441,7 @@ const PresentationSection: React.FC<{
 
       {sharedItems.length > 0 ? (
         <>
-          <Text style={styles.sectionLabel}>YOU'LL SHARE</Text>
+          <Text style={styles.sectionLabel}>YOU&apos;LL SHARE</Text>
           <DCAttrList items={sharedItems} variant="shared" />
         </>
       ) : null}

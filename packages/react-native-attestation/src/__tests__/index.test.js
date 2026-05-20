@@ -1,2 +1,3 @@
-"use strict";
-it.todo('write a test');
+'use strict'
+/* global it */
+it.todo('write a test')

@@ -467,7 +467,7 @@ export const OpenIDCredentialRecordProvider: React.FC<PropsWithChildren<OpenIDCr
     } catch (err) {
       logger.warn('[OpenIDCredentialRecordProvider] JsonLdCredentialRepository not registered', err as Record<string, unknown>)
     }
-  }, [agent])
+  }, [agent, logger])
 
   useEffect(() => {
     if (state.isLoading) {

@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
@@ -146,9 +145,15 @@ const OpenIDCredentialOffer: React.FC<Props> = ({ navigation, route }) => {
     return {}
   }, [pendingPreviewAttributes, pendingSupported])
 
-  const subject = (Array.isArray(credJson.credentialSubject)
-    ? (credJson.credentialSubject as unknown[])[0] ?? {}
-    : credJson.credentialSubject ?? credentialDisplay?.attributes ?? pendingCredentialSubjectPreview ?? {}) as Record<string, unknown>
+  // Memoise the conditional subject derivation so the reference is stable
+  // across renders and downstream useMemo dep arrays don't see it as new.
+  const subject = useMemo(
+    () =>
+      (Array.isArray(credJson.credentialSubject)
+        ? (credJson.credentialSubject as unknown[])[0] ?? {}
+        : credJson.credentialSubject ?? credentialDisplay?.attributes ?? pendingCredentialSubjectPreview ?? {}) as Record<string, unknown>,
+    [credJson.credentialSubject, credentialDisplay?.attributes, pendingCredentialSubjectPreview]
+  )
 
   const allRows = useMemo(() => flattenSubject(subject), [subject])
   const heroImageRow = allRows.find((r) => r.isImage && r.value)
@@ -437,10 +442,10 @@ const OpenIDCredentialOffer: React.FC<Props> = ({ navigation, route }) => {
           </View>
         ) : isPendingCredentialOffer ? (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>YOU'LL RECEIVE</Text>
+            <Text style={styles.sectionLabel}>YOU&apos;LL RECEIVE</Text>
             <View style={styles.previewBox}>
               <Text style={styles.previewText}>
-                This issuer didn't include a preview. Attributes will appear after acceptance.
+                This issuer didn&apos;t include a preview. Attributes will appear after acceptance.
               </Text>
             </View>
           </View>

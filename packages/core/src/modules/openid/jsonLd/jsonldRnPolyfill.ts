@@ -76,7 +76,7 @@ export function installSubtleDigestPolyfill(): void {
   //    reference inside that module is still empty. Mutate its `subtle` field
   //    directly. Use a try/catch in case the package isn't resolvable.
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     const isomorphicWebcrypto = require('isomorphic-webcrypto')
     if (isomorphicWebcrypto && (!isomorphicWebcrypto.subtle || typeof isomorphicWebcrypto.subtle.digest !== 'function')) {
       isomorphicWebcrypto.subtle = { ...(isomorphicWebcrypto.subtle ?? {}), digest }

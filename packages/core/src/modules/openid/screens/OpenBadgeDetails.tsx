@@ -182,7 +182,7 @@ const OpenBadgeDetails: React.FC<OpenBadgeDetailsProps> = ({ navigation, route }
   // …). Nested objects inside each section become indented children rows.
   type RowGroup = { title?: string; items: DCAttrItem[] }
   const rowGroups: RowGroup[] = []
-  let inline: RowGroup = { items: [] }
+  const inline: RowGroup = { items: [] }
   rowGroups.push(inline)
   for (const [k, v] of Object.entries(subject)) {
     if (k === subjectImageKey) continue

@@ -8,7 +8,7 @@
 import { ConnectionRecord } from '@credo-ts/core'
 import type { WorkflowInstanceRecord } from '@ajna-inc/workflow'
 import { StackNavigationProp } from '@react-navigation/stack'
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { TFunction } from 'react-i18next'
 

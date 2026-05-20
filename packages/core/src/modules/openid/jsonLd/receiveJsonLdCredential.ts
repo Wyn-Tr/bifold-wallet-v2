@@ -101,6 +101,7 @@ function buildSignCallback(agent: Agent) {
     }
 
     // Strip x5c — we don't support cert chain headers here.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { x5c: _x5c, ...protectedHeaderOptions } = jwt.header as Record<string, unknown> & {
       x5c?: unknown
     }

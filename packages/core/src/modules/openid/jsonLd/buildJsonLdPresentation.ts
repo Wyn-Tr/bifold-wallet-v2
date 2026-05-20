@@ -155,7 +155,7 @@ export async function buildJsonLdPresentation({
   // Veres can't verify our signature — Veres reconstructs hashData from
   // canonical N-Quads, and the bytes it sees aren't the ones we signed.
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     const jsonldNs = require('@digitalcredentials/jsonld') as Record<string, unknown>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const jld: any = (jsonldNs as any).default ?? jsonldNs
@@ -169,7 +169,7 @@ export async function buildJsonLdPresentation({
       return { contextUrl: null, document: await r.json(), documentUrl: url }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     const { createPreprocessingDocumentLoader } = require(
       '@ajna-inc/openbadges/build/cryptosuites/contextPreprocessor'
     ) as { createPreprocessingDocumentLoader: () => (url: string) => Promise<unknown> }
@@ -219,7 +219,7 @@ export async function buildJsonLdPresentation({
     // `key.publicKey` is the raw 32-byte Ed25519 public key on Credo's Key.
     const pubKey = (key as unknown as { publicKey: Uint8Array }).publicKey
     if (lastSignedHashData && lastSignature && pubKey) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
       const ed = require('@stablelib/ed25519') as typeof import('@stablelib/ed25519')
       const ok = ed.verify(pubKey, lastSignedHashData, lastSignature)
       agent.config.logger.info(
@@ -252,7 +252,7 @@ export async function buildJsonLdPresentation({
   // verifier expects to see when stripping the proof for verification.
   const proofs = (signed as { proof?: unknown }).proof
   if (Array.isArray(proofs) && proofs.length === 1) {
-    ;(signed as Record<string, unknown>).proof = proofs[0]
+    (signed as Record<string, unknown>).proof = proofs[0]
   }
 
   return {

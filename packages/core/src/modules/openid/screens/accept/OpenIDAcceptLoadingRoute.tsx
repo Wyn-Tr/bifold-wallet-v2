@@ -40,7 +40,7 @@ export const OpenIDAcceptLoadingRoute: React.FC<Props> = ({ navigation, route })
       return
     }
     // Fall back to async lookup for anything not yet hydrated in the cache.
-    ;(async () => {
+    (async () => {
       try {
         const tries: Array<Promise<SupportedCredentialRecord | undefined>> = [
           getOpenBadgeCredentialById(credentialId) as Promise<SupportedCredentialRecord | undefined>,

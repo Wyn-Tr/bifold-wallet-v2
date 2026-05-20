@@ -16,6 +16,7 @@ export class JsonLdCredentialModule implements Module {
     dependencyManager.registerInstance(JsonLdCredentialRepository, repository)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async initialize(_agentContext: AgentContext): Promise<void> {
     // Nothing to initialize; storage backend is provided by AskarModule.
   }
