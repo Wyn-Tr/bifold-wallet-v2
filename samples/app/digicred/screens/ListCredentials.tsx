@@ -342,12 +342,26 @@ function describeCredential(
       title = display?.display?.name ?? title
       issuer = display?.display?.issuer?.name ?? ''
     } else if (cred instanceof CredentialExchangeRecord) {
-      // AnonCreds: lean on the connection's label for the issuer, schema name
-      // (if present in metadata) for the title.
+      // AnonCreds: lean on the connection's label for the issuer, schema
+      // name (if present in metadata) for the title. When neither is
+      // available we extract just the cred-def TAG from the trailing
+      // segment of the credentialDefinitionId — never show the full
+      // `<DID>:3:CL:<schemaSeqNo>:<tag>` string in the UI.
+      //
+      // Format: <DID>:3:CL:<schemaId-or-seqNo>:<tag>
+      // The DID portion may itself contain colons (e.g. did:indy:net:abc),
+      // but the tag is always the LAST `:`-delimited segment, so a simple
+      // rsplit covers every variant we've seen.
       const meta = cred.metadata.get(AnonCredsCredentialMetadataKey) as
         | { schemaName?: string; credentialDefinitionId?: string }
         | undefined
-      title = meta?.schemaName ?? meta?.credentialDefinitionId ?? title
+      const credDefTag = (() => {
+        const id = meta?.credentialDefinitionId
+        if (!id) return undefined
+        const tag = id.slice(id.lastIndexOf(':') + 1).trim()
+        return tag.length > 0 ? tag : undefined
+      })()
+      title = meta?.schemaName ?? credDefTag ?? title
       const connection = cred.connectionId ? connectionsMap[cred.connectionId] : undefined
       issuer = connection?.theirLabel ?? connection?.alias ?? ''
     }
